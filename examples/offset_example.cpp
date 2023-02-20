@@ -2,7 +2,7 @@
 #include "../include/offset.hpp"
 
 #include <iostream>
-
+#include <filesystem>
 class ServoOffset : public ethercat_interface::Offset
 {
     public:
@@ -118,14 +118,16 @@ class Slave
 
 int main()
 {
-	ethercat_interface::Offset* s;
+	/* ethercat_interface::Offset* s;
 	s = new ServoOffset();
 
 	register_domains(s);
 
 	Slave slave(s);
 
-	register_domains(slave.offset);
+	register_domains(slave.offset); */
+
+	std::cout << std::filesystem::current_path() << std::endl; 
 
 	return 0;
 }
