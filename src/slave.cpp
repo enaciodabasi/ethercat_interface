@@ -5,7 +5,7 @@ namespace ethercat_interface
     
     namespace slave
     {
-        Slave::Slave(const std::string& slave_name, SlaveInfo slave_info)
+        Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
         {
             m_SlaveName = slave_name;   
 
@@ -15,13 +15,20 @@ namespace ethercat_interface
             m_Alias = slave_info.alias;
             m_InputPorts = slave_info.inputPorts;
             m_OutputPorts = slave_info.outputPorts;
+
+            if(offset != nullptr)
+            {
+                m_SlaveOffsets = offset;
+            }
     
         }
 
         Slave::~Slave()
         {
-
+            delete m_SlaveOffsets;
         }
+
+        
 
         /*
         -------------------------------------------------------
@@ -105,6 +112,7 @@ namespace ethercat_interface
             return slavePDOs;
         }                                                              
 
+        // -----------------------------------
         ec_pdo_info_t* createSlavePDOs(
             std::size_t num_entries,
             ec_pdo_entry_info_t* entriesArray,
@@ -132,6 +140,8 @@ namespace ethercat_interface
             return slavePDOs;
         }
 
+
+        // -----------------------------------
         ec_pdo_info_t* createSlavePDOs(
             std::vector<ec_pdo_entry_info_t>& entries_vector,
             uint16_t RxPDO_start,
@@ -145,6 +155,8 @@ namespace ethercat_interface
                 *(slavePDOs + i) = {(uint16_t)(RxPDO_start + i), 1, &entries_vector[i]};
             }
         }
+
+        // -----------------------------------
         ec_pdo_entry_reg_t* createDomainRegistries(
             uint16_t slave_alias,
             uint16_t slave_position,
@@ -168,9 +180,50 @@ namespace ethercat_interface
                     slave_product_code,
                     indexes.at(i),
                     subindexes.at(i),
-                    
+                    offset->getData(offset->m_OffsetNameIndexes[i]),
+                    NULL
                 };
             }
+        }
+
+        // -----------------------------------
+
+        ec_sync_info_t* createSlaveSyncs(
+            uint8_t num_sync_managers,
+            std::vector<ec_direction_t> sync_directions,
+            std::vector<uint> number_of_pdos,
+            std::vector<int> index_to_add_to_pdo,
+            ec_pdo_info_t* pdos,
+            std::vector<ec_watchdog_mode_t> watchdog_modes
+        )
+        {
+            ec_sync_info_t* slaveSyncs = new ec_sync_info_t[num_sync_managers + 1];
+
+            for(uint8_t i = 0; i < num_sync_managers; i++)
+            {   
+                if(index_to_add_to_pdo[i] == NULL)
+                {
+                    *(slaveSyncs + 1) = {
+                        i,
+                        sync_directions[i],
+                        number_of_pdos[i],
+                        NULL,
+                        watchdog_modes[i]
+                    };
+                }
+                else
+                    *(slaveSyncs + 1) = {
+                        i,
+                        sync_directions[i],
+                        number_of_pdos[i],
+                        pdos + index_to_add_to_pdo[i],
+                        watchdog_modes[i]
+                    };
+            }
+
+            *(slaveSyncs + num_sync_managers) = {0xff};
+
+            return slaveSyncs;
         }
 
     }

@@ -114,6 +114,15 @@ namespace ethercat_interface
             unsigned int* bit_position = nullptr
         );
 
+        ec_sync_info_t* createSlaveSyncs(
+            uint8_t num_sync_managers,
+            std::vector<ec_direction_t> sync_directions,
+            std::vector<uint> number_of_pdos,
+            std::vector<int> index_to_add_to_pdo,
+            ec_pdo_info_t* pdos,
+            std::vector<ec_watchdog_mode_t> watchdog_modes
+        );
+
         /**
          * @brief: Base class for implementing an EtherCAT Slave using the IGH EtherCAT Master Library. 
          * 
@@ -123,12 +132,19 @@ namespace ethercat_interface
             public:
 
 
-            Slave(const std::string& slave_name, SlaveInfo slave_info);
+            Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr);
             ~Slave();
+
+            virtual void configure_slave();
 
             inline ec_slave_config_t* getEthercatSlaveConfig()
             {
                 return m_EthercatSlavePtr;
+            }
+
+            inline void setOffsetPtr(Offset* offset)
+            {
+                m_SlaveOffsets = offset;
             }
 
             private:

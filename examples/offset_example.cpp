@@ -106,12 +106,26 @@ void register_domains(ethercat_interface::Offset* offsetservo)
 	}
 }
 
+class Slave
+{
+	public:
+	Slave(ethercat_interface::Offset* ofs)
+	{
+		offset = ofs;
+	}
+	ethercat_interface::Offset* offset;
+};
+
 int main()
 {
 	ethercat_interface::Offset* s;
 	s = new ServoOffset();
 
 	register_domains(s);
+
+	Slave slave(s);
+
+	register_domains(slave.offset);
 
 	return 0;
 }
