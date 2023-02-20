@@ -28,7 +28,10 @@ namespace ethercat_interface
             delete m_SlaveOffsets;
         }
 
-        
+        void Slave::configure_slave()
+        {
+            
+        }
 
         /*
         -------------------------------------------------------

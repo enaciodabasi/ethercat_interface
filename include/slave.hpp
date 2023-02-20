@@ -20,12 +20,12 @@
 #include "ecrt.h"
 
 #include "offset.hpp"
-#include "utils.hpp"
+#include "utilities.hpp"
 
 namespace ethercat_interface
 {   
 
-    using namespace utils;
+    using namespace utilities;
     namespace slave
     {   
         class Slave;

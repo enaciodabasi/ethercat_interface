@@ -9,15 +9,15 @@
  * 
  */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef UTILITIES_HPP
+#define UTILITIES_HPP
 
 #include <string>
 #include <vector>
 
 namespace ethercat_interface
 {
-    namespace utils
+    namespace utilities
     {
         struct SlaveInfo
         {
@@ -29,8 +29,8 @@ namespace ethercat_interface
             std::vector<int> inputPorts;
             std::vector<int> outputPorts;
         };
-    } // End of namespace utils
+    } // End of namespace utilities
 
 } // End of namespace ethercat_interface
 
-#endif // UTILS_HPP
+#endif // UTILITIES_HPP
