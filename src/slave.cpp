@@ -1,4 +1,5 @@
 #include "slave.hpp"
+#include <optional>
 
 namespace ethercat_interface
 {   
@@ -7,14 +8,14 @@ namespace ethercat_interface
     {
         Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
         {
-            m_SlaveName = slave_name;   
-
-            m_VendorID = slave_info.vendorID;
-            m_ProductCode = slave_info.productCode;
-            m_Position = slave_info.position;
-            m_Alias = slave_info.alias;
-            m_InputPorts = slave_info.inputPorts;
-            m_OutputPorts = slave_info.outputPorts;
+            //m_SlaveName = slave_name;   
+//
+            //m_VendorID = slave_info.vendorID;
+            //m_ProductCode = slave_info.productCode;
+            //m_Position = slave_info.position;
+            //m_Alias = slave_info.alias;
+            //m_InputPorts = slave_info.inputPorts;
+            //m_OutputPorts = slave_info.outputPorts;
 
             if(offset != nullptr)
             {
@@ -195,7 +196,7 @@ namespace ethercat_interface
             uint8_t num_sync_managers,
             std::vector<ec_direction_t> sync_directions,
             std::vector<uint> number_of_pdos,
-            std::vector<int> index_to_add_to_pdo,
+            std::vector<std::optional<int>> index_to_add_to_pdo,
             ec_pdo_info_t* pdos,
             std::vector<ec_watchdog_mode_t> watchdog_modes
         )
@@ -204,7 +205,7 @@ namespace ethercat_interface
 
             for(uint8_t i = 0; i < num_sync_managers; i++)
             {   
-                if(index_to_add_to_pdo[i] == NULL)
+                if(index_to_add_to_pdo[i] == std::nullopt)
                 {
                     *(slaveSyncs + 1) = {
                         i,
@@ -219,7 +220,7 @@ namespace ethercat_interface
                         i,
                         sync_directions[i],
                         number_of_pdos[i],
-                        pdos + index_to_add_to_pdo[i],
+                        pdos + index_to_add_to_pdo[i].value(),
                         watchdog_modes[i]
                     };
             }

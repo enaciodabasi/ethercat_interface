@@ -5,6 +5,27 @@ namespace ethercat_interface
 {
     namespace utilities
     {
+        std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
+        {
+            std::vector<std::optional<int>> newDiffs;
+            newDiffs.resize(diffs_with_nulls.size());
+
+            for(std::size_t i = 0; i < diffs_with_nulls.size(); i++)
+            {
+                if(diffs_with_nulls[i] == "NULL" || diffs_with_nulls[i] == "null")
+                {
+                    newDiffs[i] = std::nullopt;
+                }
+                else
+                {
+                    newDiffs[i] = std::stoi(diffs_with_nulls[i]);
+                }
+            }
+
+            return newDiffs;
+        }
+       
+
         SlaveInfo parse_config_file(
             const std::string& file_name,
             const std::string& slave_name
@@ -43,7 +64,7 @@ namespace ethercat_interface
                 
                 const std::vector<std::string> tempPdoDiffs = slave_config["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
                 info.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
-                    
+
                 info.slaveSyncInfo.watchdogModes = slave_config["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
 
             }catch(const YAML::BadFile& ex)

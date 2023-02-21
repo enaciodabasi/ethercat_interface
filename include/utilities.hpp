@@ -50,25 +50,7 @@ namespace ethercat_interface
             }
         };
 
-        std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
-        {
-            std::vector<std::optional<int>> newDiffs;
-            newDiffs.resize(diffs_with_nulls.size());
-
-            for(std::size_t i = 0; i < diffs_with_nulls.size(); i++)
-            {
-                if(diffs_with_nulls[i] == "NULL" || diffs_with_nulls[i] == "null")
-                {
-                    newDiffs[i] = std::nullopt;
-                }
-                else
-                {
-                    newDiffs[i] = std::stoi(diffs_with_nulls[i]);
-                }
-            }
-
-            return newDiffs;
-        }
+        std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls);
         
         struct SlaveSyncInfo
         {
