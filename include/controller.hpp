@@ -39,7 +39,9 @@ namespace ethercat_interface
             
             virtual void cyclic_task() = 0;
 
-            virtual void initSlaves() = 0;
+            virtual void loadSlaves(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames) = 0;
+
+            //virtual void initSlaves();
 
             inline void setConfigFileNames(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames)
             {

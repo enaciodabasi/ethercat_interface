@@ -7,6 +7,7 @@ namespace ethercat_interface
     namespace slave
     {
         Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
+            : m_SlaveName(slave_name)
         {
             
             if(offset != nullptr)

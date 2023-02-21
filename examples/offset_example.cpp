@@ -1,41 +1,9 @@
 
-#include "../include/offset.hpp"
+#include "offset_example.hpp"
 
 #include <iostream>
 #include <filesystem>
-class ServoOffset : public ethercat_interface::Offset
-{
-    public:
 
-	ServoOffset();
-
-    struct offset
-    {
-        uint ctrl_word;
-	    uint target_velocity;
-	    uint velocity_offset;
-	    uint operation_mode;
-	    uint digital_output;
-	    uint status_word;
-	    uint current_position;
-	    uint current_velocity;
-	    uint current_torque;
-	    uint mode_display;
-        uint digital_input; 
-    };
-
-    offset m_Data;
-
-	void setData();
-
-    void setData(void* data) override;
-
-	//unsigned int* getData(const std::string& offset_name) override;
-
-	void init_OffsetMap();
-
-
-};
 
 ServoOffset::ServoOffset()
 {
@@ -98,36 +66,26 @@ void ServoOffset::init_OffsetMap()
 }
 
 
-void register_domains(ethercat_interface::Offset* offsetservo)
+/* void register_domains(ethercat_interface::Offset* offsetservo)
 {
 	for(std::size_t i = 0; i < offsetservo->getNumberOfOffsets(); i++)
 	{
 		std::cout << offsetservo->getData(offsetservo->m_OffsetNameIndexes[i]) << std::endl;
 	}
-}
+} */
 
-class Slave
+/* int main()
 {
-	public:
-	Slave(ethercat_interface::Offset* ofs)
-	{
-		offset = ofs;
-	}
-	ethercat_interface::Offset* offset;
-};
-
-int main()
-{
-	/* ethercat_interface::Offset* s;
+	ethercat_interface::Offset* s;
 	s = new ServoOffset();
 
 	register_domains(s);
 
 	Slave slave(s);
 
-	register_domains(slave.offset); */
+	register_domains(slave.offset);
 
 	std::cout << std::filesystem::current_path() << std::endl; 
 
 	return 0;
-}
+} */

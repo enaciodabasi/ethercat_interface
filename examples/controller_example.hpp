@@ -1,0 +1,26 @@
+
+#ifndef CONTROLLER_EXAMPLE_HPP
+#define CONTROLLER_EXAMPLE_HPP
+
+#include "../include/controller.hpp"
+#include "offset_example.hpp"
+#include "slave_example.hpp"
+
+class Master : public ethercat_interface::controller::Controller
+{
+    public:
+
+    Master();
+    ~Master(){};
+
+    void cyclic_task() override;
+
+    void loadSlaves(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames) override;
+
+    private:
+
+    std::unique_ptr<ethercat_interface::slave::Slave> EPOS4_0;
+
+};
+
+#endif

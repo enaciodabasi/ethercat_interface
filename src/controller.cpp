@@ -18,7 +18,7 @@ namespace ethercat_interface
     {
         Controller::Controller()
         {
-            m_EthercatMaster = std::make_unique<ec_master_t>(ecrt_request_master(0));
+           /*  m_EthercatMaster = std::make_unique<ec_master_t>(ecrt_request_master(0));
 
             // If call to receive master fails e.g the ec_master_t pointer is null, throw a MasterRequestException
             if(!m_EthercatMaster.get()) 
@@ -31,7 +31,11 @@ namespace ethercat_interface
             if(!m_Domain.get())
             {
 
-            }
+            } */
+
+            //initSlaves();
+
+            configureSlaves();
         }
 
         Controller::~Controller()

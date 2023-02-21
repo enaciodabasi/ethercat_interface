@@ -137,6 +137,11 @@ namespace ethercat_interface
 
             virtual void configure_slave();
 
+            inline const std::string getSlaveName() const
+            {
+                return m_SlaveName;
+            }
+
             inline ec_slave_config_t* getEthercatSlaveConfig()
             {
                 return m_EthercatSlavePtr;
@@ -148,8 +153,10 @@ namespace ethercat_interface
             }
 
             void checkSlaveState();
+    
+            protected:
 
-            private:
+            std::string m_SlaveName;
 
             ec_slave_config_t* m_EthercatSlavePtr;
 
