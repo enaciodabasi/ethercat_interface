@@ -26,6 +26,17 @@ namespace ethercat_interface
             
         }
 
+        void Slave::checkSlaveState()
+        {
+            ec_slave_config_state_t state;
+            ecrt_slave_config_state(
+                this->m_EthercatSlavePtr,
+                &state
+            );
+            
+            this->m_SlaveConfigState = state;
+        }
+
         /*
         -------------------------------------------------------
         -------------------------------------------------------

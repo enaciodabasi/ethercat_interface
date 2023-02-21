@@ -147,9 +147,13 @@ namespace ethercat_interface
                 m_SlaveOffsets = offset;
             }
 
+            void checkSlaveState();
+
             private:
 
             ec_slave_config_t* m_EthercatSlavePtr;
+
+            ec_slave_config_state_t m_SlaveConfigState;
 
             SlaveInfo m_SlaveInfo;
 
