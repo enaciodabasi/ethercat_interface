@@ -15,6 +15,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <variant>
+#include <optional>
 
 #include <yaml-cpp/yaml.h>
 
@@ -47,6 +49,69 @@ namespace ethercat_interface
                 }
             }
         };
+
+        std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
+        {
+            std::vector<std::optional<int>> newDiffs;
+            newDiffs.resize(diffs_with_nulls.size());
+
+            for(std::size_t i = 0; i < diffs_with_nulls.size(); i++)
+            {
+                if(diffs_with_nulls[i] == "NULL" || diffs_with_nulls[i] == "null")
+                {
+                    newDiffs[i] = std::nullopt;
+                }
+                else
+                {
+                    newDiffs[i] = std::stoi(diffs_with_nulls[i]);
+                }
+            }
+
+            return newDiffs;
+        }
+        
+        struct SlaveSyncInfo
+        {
+            
+            std::size_t numSyncManagers;
+
+            std::vector<int> syncManagerDirections;
+
+            std::vector<int> numPDOs;
+
+            //std::vector<std::string> pdoIndexDiff;
+            std::vector<std::optional<int>> pdoIndexDiff;
+
+            std::vector<int> watchdogModes;
+
+            void toString()
+            {      
+                std::cout << "Number of sync managers: " << numSyncManagers << std::endl;
+
+                std::cout << "Direction of each sync manager: " << std::endl;
+                for(auto i : syncManagerDirections)
+                {
+                    std::cout << i << std::endl; 
+                }
+                std::cout << "Number of PDOs: " << std::endl;
+                for(auto i : numPDOs)
+                {   
+                    std::cout << i << std::endl; 
+                }
+                std::cout << "PDO Entry Bit Lengths: " << std::endl;
+                //for(auto i : pdoIndexDiff)
+                //{   
+                //    std::cout << i << std::endl; 
+                //}
+                std::cout << "Watchdog mode for each sync manager:" << std::endl;
+                for(auto i : watchdogModes)
+                {
+                    std::cout << i << std::endl;
+                }
+            }
+        };
+
+
         struct SlaveInfo
         {
             std::string slaveName;
@@ -57,6 +122,8 @@ namespace ethercat_interface
             
             PdoEntryInfo pdoEntryInfo;
 
+            SlaveSyncInfo slaveSyncInfo;
+
             void toString()
             {
                 std::cout << "Slave Name: " << slaveName << std::endl;
@@ -66,7 +133,7 @@ namespace ethercat_interface
                 std::cout << "Slave Alias: " << alias << std::endl;
                 
                 pdoEntryInfo.toString();
-                
+                slaveSyncInfo.toString();
             }
         };
 
