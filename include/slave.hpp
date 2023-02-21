@@ -151,19 +151,7 @@ namespace ethercat_interface
 
             ec_slave_config_t* m_EthercatSlavePtr;
 
-            std::string m_SlaveName;
-
-            int m_VendorID;
-
-            int m_ProductCode;
-
-            int m_Position;
-
-            int m_Alias;
-
-            std::vector<int> m_InputPorts;
-
-            std::vector<int> m_OutputPorts;
+            SlaveInfo m_SlaveInfo;
 
             Offset* m_SlaveOffsets;
 

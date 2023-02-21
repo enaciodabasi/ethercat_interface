@@ -8,15 +8,7 @@ namespace ethercat_interface
     {
         Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
         {
-            //m_SlaveName = slave_name;   
-//
-            //m_VendorID = slave_info.vendorID;
-            //m_ProductCode = slave_info.productCode;
-            //m_Position = slave_info.position;
-            //m_Alias = slave_info.alias;
-            //m_InputPorts = slave_info.inputPorts;
-            //m_OutputPorts = slave_info.outputPorts;
-
+            
             if(offset != nullptr)
             {
                 m_SlaveOffsets = offset;
