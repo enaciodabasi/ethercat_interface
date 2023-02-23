@@ -39,7 +39,7 @@ namespace ethercat_interface
             
             virtual void cyclic_task() = 0;
 
-            virtual void loadSlaves(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames) = 0;
+            virtual void loadSlaves() = 0;
 
             //virtual void initSlaves();
 
@@ -50,11 +50,11 @@ namespace ethercat_interface
 
             protected:
 
-            std::unique_ptr<ec_master_t> m_EthercatMaster;
-
-            std::unique_ptr<ec_domain_t> m_Domain;
-
-            std::vector<std::unique_ptr<slave::Slave>> m_Slaves;
+            //std::unique_ptr<ec_master_t> m_EthercatMaster;
+            ec_master_t* m_EthercatMaster;
+            //std::unique_ptr<ec_domain_t> m_Domain;
+            ec_domain_t* m_Domain;
+            std::vector<slave::Slave*> m_Slaves;
 
             void configureSlaves();
 

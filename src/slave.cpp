@@ -7,7 +7,7 @@ namespace ethercat_interface
     namespace slave
     {
         Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
-            : m_SlaveName(slave_name)
+            : m_SlaveName(slave_name), m_SlaveInfo(slave_info)
         {
             
             if(offset != nullptr)
@@ -65,7 +65,7 @@ namespace ethercat_interface
         ec_pdo_entry_info_t* createSlavePdoEntries(
             std::vector<uint16_t> indexes,
             std::vector<uint8_t> subindexes,
-            std::vector<uint8_t> bit_lengths
+            std::vector<uint16_t> bit_lengths
         )
         {
             std::size_t numEntries = indexes.size();
@@ -195,7 +195,17 @@ namespace ethercat_interface
         }
 
         // -----------------------------------
-
+        /**
+         * @brief Create a Slave Syncs object
+         * 
+         * @param num_sync_managers 
+         * @param sync_directions 
+         * @param number_of_pdos 
+         * @param index_to_add_to_pdo 
+         * @param pdos 
+         * @param watchdog_modes 
+         * @return ec_sync_info_t* 
+         */
         ec_sync_info_t* createSlaveSyncs(
             uint8_t num_sync_managers,
             std::vector<ec_direction_t> sync_directions,

@@ -15,6 +15,8 @@ class EPOS4 : public ethercat_interface::slave::Slave
     void configure_slave() override;
 
     private:
+
+    ec_sync_info_t* configure_syncs() override;
     
 };
 

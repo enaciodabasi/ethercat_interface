@@ -36,16 +36,16 @@ namespace ethercat_interface
             uint8_t bit_length
         );
 
-        ec_pdo_entry_info_t* createSlavePdoEntriesArray(
+        ec_pdo_entry_info_t* createSlavePdoEntries(
             std::vector<uint16_t> indexes,
             std::vector<uint8_t> subindexes,
-            std::vector<uint8_t> bit_lengths
+            std::vector<uint16_t> bit_lengths
         );
 
         std::vector<ec_pdo_entry_info_t> createSlavePdoEntriesVector(
             std::vector<uint16_t> indexes,
             std::vector<uint8_t> subindexes,
-            std::vector<uint8_t> bit_lengths
+            std::vector<uint16_t> bit_lengths
         );  
         
         ec_pdo_info_t* createSlavePDOs(
@@ -118,7 +118,7 @@ namespace ethercat_interface
             uint8_t num_sync_managers,
             std::vector<ec_direction_t> sync_directions,
             std::vector<uint> number_of_pdos,
-            std::vector<int> index_to_add_to_pdo,
+            std::vector<std::optional<int>> index_to_add_to_pdo,
             ec_pdo_info_t* pdos,
             std::vector<ec_watchdog_mode_t> watchdog_modes
         );
@@ -161,6 +161,14 @@ namespace ethercat_interface
             ec_slave_config_t* m_EthercatSlavePtr;
 
             ec_slave_config_state_t m_SlaveConfigState;
+
+            ec_pdo_entry_reg_t* m_SlavePdoEntryRegistries;
+
+            ec_pdo_entry_info_t* m_SlavePdoEntries;
+
+            ec_pdo_info_t* m_SlavePDOs;
+
+            ec_sync_info_t* m_SlaveSyncs;
 
             SlaveInfo m_SlaveInfo;
 

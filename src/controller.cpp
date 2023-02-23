@@ -35,7 +35,19 @@ namespace ethercat_interface
 
             //initSlaves();
 
-            configureSlaves();
+            m_EthercatMaster = ecrt_request_master(0);
+
+            if(!m_EthercatMaster)
+            {
+                std::cout << "Can't get EtherCAT Master." << std::endl;
+            }
+
+            m_Domain = ecrt_master_create_domain(m_EthercatMaster);
+
+            if(!m_Domain)
+            {
+                std::cout << "Can't create domain." << std::endl; 
+            }
         }
 
         Controller::~Controller()

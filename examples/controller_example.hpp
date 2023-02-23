@@ -15,7 +15,7 @@ class Master : public ethercat_interface::controller::Controller
 
     void cyclic_task() override;
 
-    void loadSlaves(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames) override;
+    void loadSlaves() override;
 
     private:
 

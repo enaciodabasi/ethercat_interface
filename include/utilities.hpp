@@ -20,13 +20,16 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "ecrt.h"
+
+
 namespace ethercat_interface
 {
     namespace utilities
     {   
         struct PdoEntryInfo
         {
-            std::vector<uint32_t> indexes;
+            std::vector<uint16_t> indexes;
             std::vector<uint8_t> subindexes;
             std::vector<uint16_t> bitLengths;
 
@@ -50,8 +53,28 @@ namespace ethercat_interface
             }
         };
 
+        struct IoMappingInfo
+        {
+            int RxPDO_Address;
+            int TxPDO_Address;
+            int RxPDO_Size;
+            int TxPDO_Size;
+
+            void toString()
+            {
+                std::cout << "RxPDO start address: " << RxPDO_Address << std::endl;
+                std::cout << "TxPDO start address: " << TxPDO_Address << std::endl;
+                std::cout << "RxPDO size: " << RxPDO_Size << std::endl;
+                std::cout << "TxPDO size: " << TxPDO_Size << std::endl;
+            }
+        };
+
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls);
         
+        std::vector<ec_direction_t> intToEcDirectionEnum(const std::vector<int>& directions);
+
+        std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int>& watchdog_modes);
+
         struct SlaveSyncInfo
         {
             
@@ -59,7 +82,7 @@ namespace ethercat_interface
 
             std::vector<int> syncManagerDirections;
 
-            std::vector<int> numPDOs;
+            std::vector<uint> numPDOs;
 
             //std::vector<std::string> pdoIndexDiff;
             std::vector<std::optional<int>> pdoIndexDiff;
@@ -103,7 +126,7 @@ namespace ethercat_interface
             int alias;
             
             PdoEntryInfo pdoEntryInfo;
-
+            IoMappingInfo ioMappingInfo;
             SlaveSyncInfo slaveSyncInfo;
 
             void toString()
@@ -115,6 +138,7 @@ namespace ethercat_interface
                 std::cout << "Slave Alias: " << alias << std::endl;
                 
                 pdoEntryInfo.toString();
+                ioMappingInfo.toString();
                 slaveSyncInfo.toString();
             }
         };
