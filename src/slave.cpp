@@ -29,7 +29,36 @@ namespace ethercat_interface
 
         void Slave::configure_slave()
         {
-            
+            m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
+            m_SlaveInfo.alias,
+            m_SlaveInfo.position,
+            m_SlaveInfo.vendorID,
+            m_SlaveInfo.productCode,
+            m_SlaveInfo.pdoEntryInfo.indexes,
+            m_SlaveInfo.pdoEntryInfo.subindexes,
+            m_SlaveOffsets);
+
+        m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
+            m_SlaveInfo.pdoEntryInfo.indexes,
+            m_SlaveInfo.pdoEntryInfo.subindexes,
+            m_SlaveInfo.pdoEntryInfo.bitLengths);
+
+        m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
+            m_SlavePdoEntries,
+            m_SlaveInfo.ioMappingInfo.RxPDO_Address,
+            m_SlaveInfo.ioMappingInfo.RxPDO_Size,
+            m_SlaveInfo.ioMappingInfo.TxPDO_Address,
+            m_SlaveInfo.ioMappingInfo.TxPDO_Size);
+
+        m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
+            m_SlaveInfo.slaveSyncInfo.numSyncManagers,
+            ethercat_interface::utilities::intToEcDirectionEnum(m_SlaveInfo.slaveSyncInfo.syncManagerDirections),
+            m_SlaveInfo.slaveSyncInfo.numPDOs,
+            m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
+            m_SlavePDOs,
+            ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes));
+
+            std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
 
         void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr)

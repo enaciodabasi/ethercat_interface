@@ -24,8 +24,3 @@ void Master::loadSlaves()
     EPOS4_0->setupSlave(m_EthercatMaster, m_Domain);
 
 }
-
-/* void Master::loadSlaves(const std::vector<std::pair<std::string, std::string>>& slaveConfigFileNames)
-{
-
-} */
