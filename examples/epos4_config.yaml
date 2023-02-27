@@ -1,8 +1,8 @@
 ---
 EPOS4_0:
- vendor_id: 0x00000002
- product_id: 0x1c353052
- slave_position: 1
+ vendor_id: 0x000000fb
+ product_id: 0x65520000
+ slave_position: 0
  slave_alias: 0
 
  pdo_entry_info:

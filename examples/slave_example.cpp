@@ -18,7 +18,8 @@ void EPOS4::configure_slave()
         m_SlaveInfo.pdoEntryInfo.subindexes,
         m_SlaveOffsets
     );
-
+    
+    
     m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
         m_SlaveInfo.pdoEntryInfo.indexes,
         m_SlaveInfo.pdoEntryInfo.subindexes,
@@ -41,7 +42,7 @@ void EPOS4::configure_slave()
         m_SlavePDOs,
         ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
     );
-
+    
     std::cout << "Configured slave " << m_SlaveName << std::endl;
 
 
