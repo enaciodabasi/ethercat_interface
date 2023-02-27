@@ -13,8 +13,6 @@ class EPOS4 : public ethercat_interface::slave::Slave
     ~EPOS4(){};
 
     private:
-
-    ec_sync_info_t* configure_syncs() override;
     
 };
 

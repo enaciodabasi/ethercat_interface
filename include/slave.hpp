@@ -182,15 +182,7 @@ namespace ethercat_interface
 
             SlaveInfo m_SlaveInfo;
 
-            Offset* m_SlaveOffsets;
-
-            /**
-             * @brief Virtual function for configuring the sync manager of the slave.
-             * @brief Should be overriden by each slave because the sync manager configuration can't be generalized.
-             * 
-             * @return ec_sync_info_t* 
-             */
-            virtual ec_sync_info_t* configure_syncs() = 0; 
+            Offset* m_SlaveOffsets; 
 
         };
 

@@ -6,8 +6,3 @@ EPOS4::EPOS4(const std::string& slave_name, ethercat_interface::utilities::Slave
 {
     std::cout << "Creating " << m_SlaveName << " Slave." << std::endl;
 }
-
-ec_sync_info_t* EPOS4::configure_syncs()
-{
-
-}
