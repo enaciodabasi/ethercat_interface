@@ -21,6 +21,8 @@ class Master : public ethercat_interface::controller::Controller
 
     std::unique_ptr<ethercat_interface::slave::Slave> EPOS4_0;
 
+    ethercat_interface::Offset* offset; 
+
 };
 
 #endif

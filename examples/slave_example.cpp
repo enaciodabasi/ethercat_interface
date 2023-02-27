@@ -19,7 +19,6 @@ void EPOS4::configure_slave()
         m_SlaveOffsets
     );
     
-    
     m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
         m_SlaveInfo.pdoEntryInfo.indexes,
         m_SlaveInfo.pdoEntryInfo.subindexes,
