@@ -41,6 +41,10 @@ namespace ethercat_interface
             {
                 std::cout << "Can't get EtherCAT Master." << std::endl;
             }
+            else
+            {
+                std::cout << "Succesfully request EtherCAT Master." << std::endl;
+            }
 
             m_Domain = ecrt_master_create_domain(m_EthercatMaster);
 
@@ -48,11 +52,17 @@ namespace ethercat_interface
             {
                 std::cout << "Can't create domain." << std::endl; 
             }
+            else
+            {
+                std::cout << "Succesfully created domain." << std::endl;
+            }
+            
         }
 
         Controller::~Controller()
         {
-            
+            ecrt_release_master(m_EthercatMaster);
+            std::cout << "Destroying master" << std::endl;
         }
 
         void Controller::configureSlaves()
