@@ -23,7 +23,12 @@ namespace ethercat_interface
         }
 
         Slave::~Slave()
-        {
+        {   
+            delete m_SlaveConfig;
+            delete m_SlavePdoEntryRegistries;
+            delete m_SlavePdoEntries;
+            delete m_SlavePDOs;
+            delete m_SlaveSyncs;
             delete m_SlaveOffsets;
         }
 
