@@ -13,8 +13,13 @@ namespace ethercat_interface
             if(offset != nullptr)
             {
                 m_SlaveOffsets = offset;
+                std::cout << "Created Offset." << std::endl;
             }
-    
+
+            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+            m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
+            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+            m_SlavePDOs = new ec_pdo_info_t[2];
         }
 
         Slave::~Slave()
@@ -27,11 +32,46 @@ namespace ethercat_interface
             
         }
 
+        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr)
+        {
+
+            m_SlaveConfig = ecrt_master_slave_config(
+                masterPtr,
+                m_SlaveInfo.alias,
+                m_SlaveInfo.position,
+                m_SlaveInfo.vendorID,
+                m_SlaveInfo.productCode
+            );
+
+        
+            if(!m_SlaveConfig)
+            {
+                std::cout << "Can't create slave config" << std::endl;
+            }
+
+            if(ecrt_slave_config_pdos(m_SlaveConfig, EC_END, m_SlaveSyncs) != 0)
+            {
+                std::cout << "Failed to create Slave Config PDOs." << std::endl;
+            }
+            else
+            {
+                std::cout << "Creation of slave config pdos is successful" << std::endl;
+            }
+            
+            std::cout << "Checking PDO Entry Registries" << std::endl;
+            if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
+            {
+                std::cout << "Failed during PDO entry registries check." << std::endl;
+            }
+
+            std::cout << "Slave config setup complete." << std::endl;
+        }
+
         void Slave::checkSlaveState()
         {
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
-                this->m_EthercatSlavePtr,
+                this->m_SlaveConfig,
                 &state
             );
             
@@ -111,13 +151,17 @@ namespace ethercat_interface
             int TxPDO_size
         )
         {           
-
+            std::cout << RxPDO_start << " " << RxPDO_size << " " << TxPDO_start << " " << TxPDO_size << std::endl;
             ec_pdo_info_t slavePDOs[] = {
                 {RxPDO_start, RxPDO_size, entriesArray + 0},
                 {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size}
             };
+
+            ec_pdo_info_t* pdos = new ec_pdo_info_t[2];
+            pdos[0] = {(uint16_t)RxPDO_start, (uint)RxPDO_size, entriesArray + 0};
+            pdos[1] = {(uint16_t)TxPDO_start, (uint)TxPDO_size, entriesArray + RxPDO_size};
             
-            return slavePDOs;
+            return pdos;
         }                                                              
 
         // -----------------------------------
@@ -177,10 +221,15 @@ namespace ethercat_interface
         )
         {   
             std::size_t numRegistries = indexes.size();
-            ec_pdo_entry_reg_t* domain_registries = new ec_pdo_entry_reg_t[numRegistries];
+            ec_pdo_entry_reg_t* domain_registries = new ec_pdo_entry_reg_t[numRegistries + 1];
 
             for(std::size_t i = 0; i < numRegistries; i++)
             {
+                if(i == numRegistries)
+                {
+                    *(domain_registries + i) = {};
+                    break; 
+                }
                 *(domain_registries + i) = {
                     slave_alias,
                     slave_position,
@@ -216,30 +265,39 @@ namespace ethercat_interface
         )
         {
             ec_sync_info_t* slaveSyncs = new ec_sync_info_t[num_sync_managers + 1];
+            for(int i = 0; i < num_sync_managers + 1; i++)
+            {
 
-            for(uint8_t i = 0; i < num_sync_managers; i++)
+            }
+            for(int i = 0; i < (int)num_sync_managers; i++)
             {   
                 if(index_to_add_to_pdo[i] == std::nullopt)
-                {
-                    *(slaveSyncs + 1) = {
-                        i,
-                        sync_directions[i],
-                        number_of_pdos[i],
-                        NULL,
-                        watchdog_modes[i]
-                    };
+                {   
+                    ec_sync_info_t syncInfo;
+                    syncInfo.index = (uint8_t)i;
+                    syncInfo.dir = sync_directions[i];
+                    syncInfo.n_pdos = number_of_pdos[i];
+                    syncInfo.pdos = NULL;
+                    syncInfo.watchdog_mode = watchdog_modes[i];
+                    slaveSyncs[i] = syncInfo;
                 }
                 else
-                    *(slaveSyncs + 1) = {
-                        i,
-                        sync_directions[i],
-                        number_of_pdos[i],
-                        pdos + index_to_add_to_pdo[i].value(),
-                        watchdog_modes[i]
-                    };
+                {
+                    ec_sync_info_t syncInfo;
+                    syncInfo.index = (uint8_t)i;
+                    syncInfo.dir = sync_directions[i];
+                    syncInfo.n_pdos = number_of_pdos[i];
+                    syncInfo.watchdog_mode = watchdog_modes[i];
+                    syncInfo.pdos = pdos + index_to_add_to_pdo[i].value();
+                    slaveSyncs[i] = syncInfo;
+
+                }
+                    
+
+                    
             }
 
-            *(slaveSyncs + num_sync_managers) = {0xff};
+            *(slaveSyncs + (int)num_sync_managers) = {0xff};
 
             return slaveSyncs;
         }

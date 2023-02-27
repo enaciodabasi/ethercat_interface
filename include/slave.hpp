@@ -137,6 +137,16 @@ namespace ethercat_interface
 
             virtual void configure_slave();
 
+            /**
+             * @brief 
+             * 
+             * @param masterPtr 
+             */
+            virtual void setupSlave(
+                ec_master_t* masterPtr,
+                ec_domain_t* domainPtr
+            );
+
             inline const std::string getSlaveName() const
             {
                 return m_SlaveName;
@@ -144,7 +154,7 @@ namespace ethercat_interface
 
             inline ec_slave_config_t* getEthercatSlaveConfig()
             {
-                return m_EthercatSlavePtr;
+                return m_SlaveConfig;
             }
 
             inline void setOffsetPtr(Offset* offset)
@@ -158,7 +168,7 @@ namespace ethercat_interface
 
             std::string m_SlaveName;
 
-            ec_slave_config_t* m_EthercatSlavePtr;
+            ec_slave_config_t* m_SlaveConfig;
 
             ec_slave_config_state_t m_SlaveConfigState;
 
