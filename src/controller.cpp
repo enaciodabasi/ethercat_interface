@@ -77,7 +77,7 @@ namespace ethercat_interface
 
         void Controller::start()
         {   
-            usleep(1000000);
+
             std::cout << "Activating Master..." << std::endl;
             if(ecrt_master_activate(m_EthercatMaster))
             {
