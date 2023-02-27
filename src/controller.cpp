@@ -72,6 +72,18 @@ namespace ethercat_interface
                 m_Slaves[i]->configure_slave();
             }
         }
+
+        void Controller::start()
+        {   
+            std::cout << "Activating Master..." << std::endl;
+            if(ecrt_master_activate(m_EthercatMaster) < 0)
+            {
+                std::cout << "Can't activate EtherCAT Master." << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            std::cout << "EtherCAT Master activated." << std::endl;
+        }
         
     }
 }

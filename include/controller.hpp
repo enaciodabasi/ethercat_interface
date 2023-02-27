@@ -37,6 +37,8 @@ namespace ethercat_interface
             Controller();
             virtual ~Controller();
             
+            void start();
+
             virtual void cyclic_task() = 0;
 
             virtual void loadSlaves() = 0;
