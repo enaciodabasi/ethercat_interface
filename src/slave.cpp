@@ -142,34 +142,15 @@ namespace ethercat_interface
             ec_pdo_entry_info_t* entries = new ec_pdo_entry_info_t[numEntries];
 
             for(std::size_t i = 0; i < numEntries; i++)
-            {
-                *(entries + i) = createSlavePdoEntryStruct(
+            {   
+                
+                entries[i] = {
                     indexes[i],
                     subindexes[i],
-                    bit_lengths[i]
-                );
+                    (uint8_t)bit_lengths[i]};
             }
 
             return entries;
-        }
-
-        std::vector<ec_pdo_entry_info_t> createSlavePdoEntriesVector(
-            std::vector<uint16_t> indexes,
-            std::vector<uint8_t> subindexes,
-            std::vector<uint8_t> bit_lengths
-        )
-        {
-            std::size_t numEntries = indexes.size();
-            std::vector<ec_pdo_entry_info_t> entriesVec;
-
-            for(std::size_t i = 0; i < numEntries; i++)
-            {
-                entriesVec.emplace_back(createSlavePdoEntryStruct(
-                    indexes[i],
-                    subindexes[i],
-                    bit_lengths[i]
-                ));
-            }
         }
 
         ec_pdo_info_t* createSlavePDOs(
@@ -180,7 +161,7 @@ namespace ethercat_interface
             int TxPDO_size
         )
         {           
-            std::cout << RxPDO_start << " " << RxPDO_size << " " << TxPDO_start << " " << TxPDO_size << std::endl;
+            //std::cout << RxPDO_start << " " << RxPDO_size << " " << TxPDO_start << " " << TxPDO_size << std::endl;
             ec_pdo_info_t slavePDOs[] = {
                 {RxPDO_start, RxPDO_size, entriesArray + 0},
                 {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size}
@@ -221,7 +202,6 @@ namespace ethercat_interface
             return slavePDOs;
         }
 
-
         // -----------------------------------
         ec_pdo_info_t* createSlavePDOs(
             std::vector<ec_pdo_entry_info_t>& entries_vector,
@@ -260,6 +240,7 @@ namespace ethercat_interface
                     break; 
                 }
                 //std::cout << offset->m_OffsetNameIndexes[i] << std::endl;
+                std::cout << subindexes[i] << std::endl;
                 unsigned int* op = new unsigned int();
                 op = offset->getData(offset->m_OffsetNameIndexes.at(i));
                 domain_registries[i] = {
@@ -272,6 +253,23 @@ namespace ethercat_interface
                     offset->getData(offset->m_OffsetNameIndexes.at(i))
                 };
             }
+            /* auto v = slave_vendor_id;
+            auto p = slave_product_code;
+            ec_pdo_entry_reg_t* domain_regs = new ec_pdo_entry_reg_t[numRegistries + 1];
+            domain_regs[0] = {0, 0, v, p, 0x6040, 0, &offsett.ctrl_word};
+            domain_regs[1] = {0, 0, v, p, 0x60FF, 0, &offsett.target_velocity};
+            domain_regs[2] = {0, 0, v, p, 0x60B1, 0, &offsett.velocity_offset};
+            domain_regs[3] = {0, 0, v, p, 0x6060, 0, &offsett.operation_mode};
+            domain_regs[4] = {0, 0, v, p, 0x60FE, 1, &offsett.digital_output};
+	        domain_regs[5] = {0, 0, v, p, 0x6041, 0, &offsett.status_word};
+            domain_regs[6] = {0, 0, v, p, 0x6064, 0, &offsett.current_position}; 
+	        domain_regs[7] = {0, 0, v, p, 0x606C, 0, &offsett.current_velocity};
+	        domain_regs[8] = {0, 0, v, p, 0x6077, 0, &offsett.current_torque};
+            domain_regs[9] = {0, 0, v, p, 0x6061, 0, &offsett.mode_display};
+            domain_regs[10] = {0, 0, v, p, 0x60FD, 0, &offsett.digital_input};
+            domain_regs[11] = {}; */
+
+            return domain_registries;
         }
 
         // -----------------------------------

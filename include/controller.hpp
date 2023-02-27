@@ -76,6 +76,13 @@ namespace ethercat_interface
              * 
              */
             ec_domain_t* m_Domain;
+
+            /**
+             * @brief Current state of the EtherCAT Domain.
+             * 
+             */
+            ec_domain_state_t m_DomainState;
+
             /**
              * @brief Pointer for the domain PD, used for reading/writing values from/to the slave.
              * 

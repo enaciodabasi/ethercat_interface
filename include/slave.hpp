@@ -22,6 +22,7 @@
 #include "offset.hpp"
 #include "utilities.hpp"
 
+
 namespace ethercat_interface
 {   
 
@@ -41,12 +42,6 @@ namespace ethercat_interface
             std::vector<uint8_t> subindexes,
             std::vector<uint16_t> bit_lengths
         );
-
-        std::vector<ec_pdo_entry_info_t> createSlavePdoEntriesVector(
-            std::vector<uint16_t> indexes,
-            std::vector<uint8_t> subindexes,
-            std::vector<uint16_t> bit_lengths
-        );  
         
         ec_pdo_info_t* createSlavePDOs(
             ec_pdo_entry_info_t* entriesArray,
@@ -183,6 +178,8 @@ namespace ethercat_interface
             SlaveInfo m_SlaveInfo;
 
             Offset* m_SlaveOffsets; 
+
+            
 
         };
 

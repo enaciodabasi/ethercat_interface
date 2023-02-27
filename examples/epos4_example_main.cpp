@@ -10,5 +10,6 @@ int main()
     //inf.toString();
 
     m.start();
-
+    
+    return 0;
 }
