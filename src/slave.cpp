@@ -24,11 +24,6 @@ namespace ethercat_interface
 
         Slave::~Slave()
         {   
-            delete m_SlaveConfig;
-            delete m_SlavePdoEntryRegistries;
-            delete m_SlavePdoEntries;
-            delete m_SlavePDOs;
-            delete m_SlaveSyncs;
             delete m_SlaveOffsets;
         }
 
@@ -274,7 +269,7 @@ namespace ethercat_interface
                     slave_product_code,
                     indexes.at(i),
                     subindexes.at(i),
-                    op
+                    offset->getData(offset->m_OffsetNameIndexes.at(i))
                 };
             }
         }

@@ -10,6 +10,8 @@ ServoOffset::ServoOffset()
 	init_OffsetMap();
 
 	m_NumOffsets = m_OffsetNameIndexes.size();
+
+	//std::cout << sizeof(m_Data) << std::endl;
 }
 
 void ServoOffset::setData(void* data)

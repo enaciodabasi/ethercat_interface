@@ -43,7 +43,7 @@ namespace ethercat_interface
             }
             else
             {
-                std::cout << "Succesfully request EtherCAT Master." << std::endl;
+                std::cout << "Succesfully requested EtherCAT Master." << std::endl;
             }
 
             m_Domain = ecrt_master_create_domain(m_EthercatMaster);
@@ -56,13 +56,15 @@ namespace ethercat_interface
             {
                 std::cout << "Succesfully created domain." << std::endl;
             }
-            
+            //m_DomainProcessData = new uint8_t();
         }
 
         Controller::~Controller()
         {
             ecrt_release_master(m_EthercatMaster);
             std::cout << "Destroying master" << std::endl;
+
+            delete m_DomainProcessData;
         }
 
         void Controller::configureSlaves()
@@ -76,13 +78,25 @@ namespace ethercat_interface
         void Controller::start()
         {   
             std::cout << "Activating Master..." << std::endl;
-            if(ecrt_master_activate(m_EthercatMaster) < 0)
+            if(ecrt_master_activate(m_EthercatMaster))
             {
                 std::cout << "Can't activate EtherCAT Master." << std::endl;
                 exit(EXIT_FAILURE);
             }
 
             std::cout << "EtherCAT Master activated." << std::endl;
+
+            //usleep(500000);
+            
+            m_DomainProcessData = ecrt_domain_data(m_Domain);
+            
+            if(!m_DomainProcessData)
+            {
+                std::cout << "Can't retrieve process data for the domain." << std::endl;
+                exit(EXIT_FAILURE);
+            }
+
+            std::cout << "Successfully retrieved process data for the domain" << std::endl;
         }
         
     }

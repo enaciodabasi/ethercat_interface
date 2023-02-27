@@ -16,6 +16,19 @@
 #include <vector>
 #include <memory>
 
+#include <sys/resource.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <time.h> /* clock_gettime() */
+#include <sys/mman.h> /* mlockall() */
+#include <sched.h> /* sched_setscheduler() */
+
+
 #include "ecrt.h"
 
 #include "slave.hpp"
@@ -52,15 +65,30 @@ namespace ethercat_interface
 
             protected:
 
-            //std::unique_ptr<ec_master_t> m_EthercatMaster;
+            /**
+             * @brief Pointer to the EtherCAT Master.
+             * 
+             */
             ec_master_t* m_EthercatMaster;
-            //std::unique_ptr<ec_domain_t> m_Domain;
+            
+            /**
+             * @brief Pointer to the domain.
+             * 
+             */
             ec_domain_t* m_Domain;
+            /**
+             * @brief Pointer for the domain PD, used for reading/writing values from/to the slave.
+             * 
+             */
+            uint8_t* m_DomainProcessData = nullptr;
+
             std::vector<slave::Slave*> m_Slaves;
 
             void configureSlaves();
 
             std::vector<std::pair<std::string, std::string>> m_SlaveConfigFileNames;
+
+            
 
             private:
 
