@@ -181,7 +181,7 @@ namespace ethercat_interface
 
             private:
 
-            bool DEBUG_ENABLED = false;
+            bool LOGGING_ENABLED = false;
 
         };
 
