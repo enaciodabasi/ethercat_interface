@@ -6,8 +6,8 @@ namespace ethercat_interface
     
     namespace slave
     {
-        Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset)
-            : m_SlaveName(slave_name), m_SlaveInfo(slave_info)
+        Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset, bool enable_logging)
+            : m_SlaveName(slave_name), m_SlaveInfo(slave_info), LOGGING_ENABLED(enable_logging)
         {
             
             if(offset != nullptr)
@@ -24,7 +24,7 @@ namespace ethercat_interface
 
         Slave::~Slave()
         {   
-            delete m_SlaveOffsets;
+            //delete m_SlaveOffsets;
         }
 
         void Slave::configure_slave()
@@ -96,7 +96,7 @@ namespace ethercat_interface
             std::cout << "Slave config setup complete." << std::endl;
         }
 
-        void Slave::checkSlaveState()
+        void Slave::updateSlaveState()
         {
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
@@ -104,7 +104,24 @@ namespace ethercat_interface
                 &state
             );
             
-            this->m_SlaveConfigState = state;
+            if(this->LOGGING_ENABLED)
+            {
+                if(state.al_state != m_CurrentSlaveState.al_state)
+                {
+                    std::cout << "Slave: State " << state.al_state << std::endl;
+                }
+                if(state.online != m_CurrentSlaveState.online)
+                {
+                    std::cout << "Slave: " << (state.online ? "online" : "offline") << std::endl;
+                }
+                if(state.operational != m_CurrentSlaveState.operational)
+                {
+                    std::cout << "Slave is " << (state.operational ? "" : "not") << "operational" << std::endl;
+                }
+            }
+
+            this->m_CurrentSlaveState = state;
+            
         }
 
         /*

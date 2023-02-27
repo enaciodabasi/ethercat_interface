@@ -127,7 +127,7 @@ namespace ethercat_interface
             public:
 
 
-            Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr);
+            Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
             ~Slave();
 
             virtual void configure_slave();
@@ -157,7 +157,7 @@ namespace ethercat_interface
                 m_SlaveOffsets = offset;
             }
 
-            void checkSlaveState();
+            void updateSlaveState();
     
             protected:
 
@@ -165,7 +165,7 @@ namespace ethercat_interface
 
             ec_slave_config_t* m_SlaveConfig;
 
-            ec_slave_config_state_t m_SlaveConfigState;
+            ec_slave_config_state_t m_CurrentSlaveState;
 
             ec_pdo_entry_reg_t* m_SlavePdoEntryRegistries;
 
@@ -179,7 +179,9 @@ namespace ethercat_interface
 
             Offset* m_SlaveOffsets; 
 
-            
+            private:
+
+            bool DEBUG_ENABLED = false;
 
         };
 
