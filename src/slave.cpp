@@ -222,23 +222,25 @@ namespace ethercat_interface
         {   
             std::size_t numRegistries = indexes.size();
             ec_pdo_entry_reg_t* domain_registries = new ec_pdo_entry_reg_t[numRegistries + 1];
-
-            for(std::size_t i = 0; i < numRegistries; i++)
+            
+            for(std::size_t i = 0; i <= numRegistries; i++)
             {
                 if(i == numRegistries)
                 {
-                    *(domain_registries + i) = {};
+                    domain_registries[i] = {};
                     break; 
                 }
-                *(domain_registries + i) = {
+                //std::cout << offset->m_OffsetNameIndexes[i] << std::endl;
+                unsigned int* op = new unsigned int();
+                op = offset->getData(offset->m_OffsetNameIndexes.at(i));
+                domain_registries[i] = {
                     slave_alias,
                     slave_position,
                     slave_vendor_id,
                     slave_product_code,
                     indexes.at(i),
                     subindexes.at(i),
-                    offset->getData(offset->m_OffsetNameIndexes[i]),
-                    NULL
+                    op
                 };
             }
         }
