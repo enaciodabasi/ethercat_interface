@@ -157,10 +157,10 @@ namespace ethercat_interface
             std::size_t numEntries = indexes.size();
 
             ec_pdo_entry_info_t* entries = new ec_pdo_entry_info_t[numEntries];
-
+            std::cout << "PDO ENTRIES" << std::endl;
             for(std::size_t i = 0; i < numEntries; i++)
             {   
-                
+                std::cout << indexes[i] << " " << subindexes[i] << " " << bit_lengths[i] << std::endl;
                 entries[i] = {
                     indexes[i],
                     subindexes[i],
@@ -183,10 +183,11 @@ namespace ethercat_interface
                 {RxPDO_start, RxPDO_size, entriesArray + 0},
                 {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size}
             };
-
+            std::cout << "PDO_INFO\n";
             ec_pdo_info_t* pdos = new ec_pdo_info_t[2];
             pdos[0] = {(uint16_t)RxPDO_start, (uint)RxPDO_size, entriesArray + 0};
             pdos[1] = {(uint16_t)TxPDO_start, (uint)TxPDO_size, entriesArray + RxPDO_size};
+            std::cout << (uint16_t)RxPDO_start << " " << TxPDO_start << " " << (uint)RxPDO_size << " " << (uint)TxPDO_size << std::endl;
             
             return pdos;
         }                                                              

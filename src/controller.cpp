@@ -77,13 +77,15 @@ namespace ethercat_interface
 
             //usleep(500000);
             
-            m_DomainProcessData = ecrt_domain_data(m_Domain);
+            //m_DomainProcessData = ecrt_domain_data(m_Domain);
             
-            if(!m_DomainProcessData)
+            if(!(m_DomainProcessData = ecrt_domain_data(m_Domain)))
             {
                 std::cout << "Can't retrieve process data for the domain." << std::endl;
                 exit(EXIT_FAILURE);
             }
+
+            
 
             std::cout << "Successfully retrieved process data for the domain" << std::endl;
         }

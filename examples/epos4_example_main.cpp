@@ -1,4 +1,8 @@
 #include "controller_example.hpp"
+#include "signal.h"
+static int run1 = 1;
+
+void signal_handler(int sig){run1 = 0;}
 
 int main()
 {
@@ -10,6 +14,27 @@ int main()
     //inf.toString();
 
     m.start();
+    m.exchangeDomainPD();
+
+    signal(SIGTERM, signal_handler);
+    signal(SIGINT, signal_handler);
+
+    run1 = 1;
+    while(run1)
+    {   
+        usleep(100000/100);
+        m.cyclic_task();
+    }
+    usleep(500000);
     
-    return 0;
+    //system("ethercat download -t int32 -p 0 0x60ff 00 00");
+
+	printf("\n\n*********************************\n\n");
+
+	printf("The motor has stopped!\n\n");
+
+	printf("*********************************\n\n");
+
+	return EXIT_SUCCESS;
+	return 0;
 }

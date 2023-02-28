@@ -154,6 +154,11 @@ namespace ethercat_interface
                 return m_SlaveConfig;
             }
 
+            inline ec_slave_config_state_t getCurrentSlaveState() const
+            {
+                return m_CurrentSlaveState;
+            }
+
             inline void setOffsetPtr(Offset* offset)
             {
                 m_SlaveOffsets = offset;
@@ -233,7 +238,10 @@ namespace ethercat_interface
             if(domain_process_data_ptr != nullptr)
             {
                 m_DomainProcessDataPtr = domain_process_data_ptr;
-            }    
+            }
+
+            auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
+
             /*
                 Control statement for determining which type of value is used with the template function.
                 Uses the appropriate macro function from the ecrt.h to read according to the template argument.
@@ -242,76 +250,76 @@ namespace ethercat_interface
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                return EC_READ_U8(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                ); 
             }
             else if constexpr (std::is_same_v<uint16_t, T>)
             {
                 return EC_READ_U16(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<uint32_t, T>)
             {
                 return EC_READ_U32(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<uint64_t, T>)
             {
                 return EC_READ_U64(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<int8_t, T>)
             {
                 return EC_READ_S8(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<int16_t, T>)
             {
                 return EC_READ_S16(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<int32_t, T>)
             {
                 return EC_READ_S32(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<int64_t, T>)
             {
                 return EC_READ_S64(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<float, T>)
             {
                 return EC_READ_REAL(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<double, T>)
             {
                 return EC_READ_LREAL(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
+                    data
                 );
             }
             else if constexpr (std::is_same_v<bool, T>)
             {
                 return EC_READ_BIT(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name),
+                    data,
                     bit_position
                 );
             }
             else
             {
-                return; // TODO: Throw an exception of according type.
+                std::cout << "Incorrect type\n";
             }
 
-            return;
+            
         }
 
         template<typename T>
@@ -322,11 +330,13 @@ namespace ethercat_interface
             int bit_position
         )
         {
-            
+
             if(domain_process_data_ptr != nullptr)
             {
                 m_DomainProcessDataPtr = domain_process_data_ptr;
             }
+
+            auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name);
 
             /*
                 Control statement for determining which type of value is used with the template function.
@@ -335,77 +345,77 @@ namespace ethercat_interface
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                EC_WRITE_U8(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                ); 
             }
             else if constexpr (std::is_same_v<uint16_t, T>)
             {
                 EC_WRITE_U16(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<uint32_t, T>)
             {
                 EC_WRITE_U32(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<uint64_t, T>)
             {
                 EC_WRITE_U64(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int8_t, T>)
             {
                 EC_WRITE_S8(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int16_t, T>)
             {
                 EC_WRITE_S16(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int32_t, T>)
             {
                 EC_WRITE_S32(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int64_t, T>)
             {
                 EC_WRITE_S64(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<float, T>)
             {
                 EC_WRITE_REAL(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<double, T>)
             {
                 EC_WRITE_LREAL(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<bool, T>)
             {
                 EC_WRITE_BIT(
-                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
+                    data,
                     bit_position,
                     new_val
                 );

@@ -18,7 +18,7 @@ add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
 )
-target_link_libraries(${PROJECT_NAME} ${ethercat_interface_lib})
+target_link_libraries(${PROJECT_NAME} ${ethercat_interface_lib} /usr/local/lib/libethercat.so)
 target_include_directories(${PROJECT_NAME} PUBLIC ${ethercat_interface_lib_INCLUDE_DIRS})
 
 
