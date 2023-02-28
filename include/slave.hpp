@@ -13,6 +13,7 @@
 #define SLAVE_HPP
 
 #include <iostream>
+#include <string>
 #include <vector>
 #include <memory>
 #include <map>
@@ -135,7 +136,8 @@ namespace ethercat_interface
             /**
              * @brief 
              * 
-             * @param masterPtr 
+             * @param masterPtr: Pointer to the EtherCAT master associated with the slave.
+             * @param domainPtr: Pointer to the domain which the slave is registered in. 
              */
             virtual void setupSlave(
                 ec_master_t* masterPtr,
@@ -158,7 +160,35 @@ namespace ethercat_interface
             }
 
             void updateSlaveState();
-    
+
+            /**
+             * @brief 
+             * 
+             * @tparam T: Type to read. 
+             * @param value_to_read_name: Name of the value to write. Must be the same as the one defined in the Offset. 
+             * @return auto: From the EtherCAT Master retrived value of type T. 
+             */
+            template<typename T>
+            auto readFromSlave(
+                const std::string& value_to_read_name, 
+                uint8_t* domain_process_data_ptr,
+                int bit_position = NULL
+            );
+            
+            /**
+             * @brief 
+             * 
+             * @tparam T: Type to write.
+             * @param value_to_write_name: Name of the value to write. Must be the same as the one defined in the Offset. 
+             */
+            template<typename T>
+            void writeToSlave(
+                const std::string& value_to_write_name,
+                const T& new_val, 
+                uint8_t* domain_process_data_ptr,
+                int bit_position = NULL
+            );
+
             protected:
 
             std::string m_SlaveName;
@@ -184,6 +214,178 @@ namespace ethercat_interface
             bool LOGGING_ENABLED = false;
 
         };
+
+        template<typename T>
+        auto Slave::readFromSlave(const std::string& value_to_read_name, uint8_t* domain_process_data_ptr, int bit_position)
+        {
+            if constexpr (std::is_same_v<uint8_t, T>)
+            {
+               return EC_READ_U8(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+               ); 
+            }
+            else if constexpr (std::is_same_v<uint16_t, T>)
+            {
+                return EC_READ_U16(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<uint32_t, T>)
+            {
+                return EC_READ_U32(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<uint64_t, T>)
+            {
+                return EC_READ_U64(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<int8_t, T>)
+            {
+                return EC_READ_S8(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<int16_t, T>)
+            {
+                return EC_READ_S16(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<int32_t, T>)
+            {
+                return EC_READ_S32(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<int64_t, T>)
+            {
+                return EC_READ_S64(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<float, T>)
+            {
+                return EC_READ_REAL(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<double, T>)
+            {
+                return EC_READ_LREAL(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                );
+            }
+            else if constexpr (std::is_same_v<bool, T>)
+            {
+                return EC_READ_BIT(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name),
+                    bit_position
+                );
+            }
+            else
+            {
+                return; // TODO: Throw an exception of according type.
+            }
+
+            return;
+        }
+
+        template<typename T>
+        void Slave::writeToSlave(
+            const std::string& value_to_write_name,
+            const T& new_val,
+            uint8_t* domain_process_data_ptr,
+            int bit_position
+        )
+        {
+            if constexpr (std::is_same_v<uint8_t, T>)
+            {
+               EC_WRITE_U8(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+               ); 
+            }
+            else if constexpr (std::is_same_v<uint16_t, T>)
+            {
+                EC_WRITE_U16(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<uint32_t, T>)
+            {
+                EC_WRITE_U32(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<uint64_t, T>)
+            {
+                EC_WRITE_U64(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<int8_t, T>)
+            {
+                EC_WRITE_S8(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<int16_t, T>)
+            {
+                EC_WRITE_S16(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<int32_t, T>)
+            {
+                EC_WRITE_S32(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<int64_t, T>)
+            {
+                EC_WRITE_S64(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<float, T>)
+            {
+                EC_WRITE_REAL(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<double, T>)
+            {
+                EC_WRITE_LREAL(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    new_val
+                );
+            }
+            else if constexpr (std::is_same_v<bool, T>)
+            {
+                EC_WRITE_BIT(
+                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    bit_position,
+                    new_val
+                );
+            }
+            else
+            {
+                // TODO: Throw an exception.
+            }
+        }
+
+        
 
     }
     
