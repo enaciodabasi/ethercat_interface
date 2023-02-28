@@ -63,8 +63,16 @@ namespace ethercat_interface
                 m_SlaveConfigFileNames = slaveConfigFileNames;
             }
 
+            /**
+             * @brief Updates the current master state. If ENABLE_LOGGING is set to true, logs the changes in the master.
+             * 
+             */
             void updateMasterState();
 
+            /**
+             * @brief Updates the current domain state. If ENABLE_LOGGING is set to true, logs the changes in the domain.
+             * 
+             */
             void updateDomainState();
 
             protected:
@@ -104,8 +112,6 @@ namespace ethercat_interface
             void configureSlaves();
 
             std::vector<std::pair<std::string, std::string>> m_SlaveConfigFileNames;
-
-            
 
             private:
 

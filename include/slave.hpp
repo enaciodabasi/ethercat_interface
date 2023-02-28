@@ -165,8 +165,10 @@ namespace ethercat_interface
              * @brief 
              * 
              * @tparam T: Type to read. 
-             * @param value_to_read_name: Name of the value to write. Must be the same as the one defined in the Offset. 
-             * @return auto: From the EtherCAT Master retrived value of type T. 
+             * @param value_to_read_name: Name of the value to write. Must be the same as the one defined in the Offset.
+             * @param domain_process_data_ptr: Pointer to the address of the domain's Process Data.
+             * @param bit_position: Used when using the EC_READ_BIT function. Defaults to NULL.
+             * @return From the EtherCAT Master retrived value of type T. 
              */
             template<typename T>
             auto readFromSlave(
@@ -180,6 +182,9 @@ namespace ethercat_interface
              * 
              * @tparam T: Type to write.
              * @param value_to_write_name: Name of the value to write. Must be the same as the one defined in the Offset. 
+             * @param new_val: New value of type T to write to the slave.
+             * @param domain_process_data_ptr: Pointer to the address of the domain's Process Data.
+             * @param bit_position: Used when using the EC_WRITE_BIT function. Defaults to NULL.
              */
             template<typename T>
             void writeToSlave(
@@ -218,6 +223,12 @@ namespace ethercat_interface
         template<typename T>
         auto Slave::readFromSlave(const std::string& value_to_read_name, uint8_t* domain_process_data_ptr, int bit_position)
         {
+            
+            /*
+                Control statement for determining which type of value is used with the template function.
+                Uses the appropriate macro function from the ecrt.h to read according to the template argument.
+             */
+
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                return EC_READ_U8(
@@ -301,6 +312,10 @@ namespace ethercat_interface
             int bit_position
         )
         {
+            /*
+                Control statement for determining which type of value is used with the template function.
+                Uses the appropriate macro function from the ecrt.h to write according to the template argument.
+             */
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                EC_WRITE_U8(
