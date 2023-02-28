@@ -47,7 +47,7 @@ namespace ethercat_interface
         {
             public:
 
-            Controller();
+            Controller(bool enable_logging = false);
             virtual ~Controller();
             
             void start();
@@ -63,6 +63,10 @@ namespace ethercat_interface
                 m_SlaveConfigFileNames = slaveConfigFileNames;
             }
 
+            void updateMasterState();
+
+            void updateDomainState();
+
             protected:
 
             /**
@@ -70,6 +74,12 @@ namespace ethercat_interface
              * 
              */
             ec_master_t* m_EthercatMaster;
+
+            /**
+             * @brief Current state of the EtherCAT Master, can be updated by the updateMasterState function. 
+             * 
+             */
+            ec_master_state_t m_CurrentMasterState;
             
             /**
              * @brief Pointer to the domain.
@@ -81,7 +91,7 @@ namespace ethercat_interface
              * @brief Current state of the EtherCAT Domain.
              * 
              */
-            ec_domain_state_t m_DomainState;
+            ec_domain_state_t m_CurrentDomainState;
 
             /**
              * @brief Pointer for the domain PD, used for reading/writing values from/to the slave.
@@ -99,7 +109,7 @@ namespace ethercat_interface
 
             private:
 
-            
+            bool ENABLE_LOGGING = false;
 
         };
     }

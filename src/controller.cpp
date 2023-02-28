@@ -16,25 +16,10 @@ namespace ethercat_interface
 {
     namespace controller
     {
-        Controller::Controller()
+        Controller::Controller(bool enable_logging)
+            : ENABLE_LOGGING(enable_logging)
         {
-           /*  m_EthercatMaster = std::make_unique<ec_master_t>(ecrt_request_master(0));
-
-            // If call to receive master fails e.g the ec_master_t pointer is null, throw a MasterRequestException
-            if(!m_EthercatMaster.get()) 
-            {
-                //throw exception::MasterRequestException();
-            }
-
-            m_Domain = std::make_unique<ec_domain_t>(ecrt_master_create_domain(m_EthercatMaster.get()));
-
-            if(!m_Domain.get())
-            {
-
-            } */
-
-            //initSlaves();
-
+           
             m_EthercatMaster = ecrt_request_master(0);
 
             if(!m_EthercatMaster)
@@ -56,7 +41,10 @@ namespace ethercat_interface
             {
                 std::cout << "Succesfully created domain." << std::endl;
             }
-            //m_DomainProcessData = new uint8_t();
+            
+            m_CurrentMasterState = {};
+            m_CurrentDomainState = {};
+
         }
 
         Controller::~Controller()
@@ -98,6 +86,53 @@ namespace ethercat_interface
             }
 
             std::cout << "Successfully retrieved process data for the domain" << std::endl;
+        }
+
+        void Controller::updateMasterState()
+        {
+            ec_master_state_t state;
+            ecrt_master_state(m_EthercatMaster, &state);
+
+            if(ENABLE_LOGGING)
+            {
+                if(state.slaves_responding != m_CurrentMasterState.slaves_responding)
+                {
+                    std::cout << state.slaves_responding << " slaves are responding." << std::endl;
+                }
+
+                if(state.link_up != m_CurrentMasterState.link_up)
+                {
+                    std::cout << "Link is " << (state.link_up ? "up" : "down") << std::endl;
+                }
+
+                if(state.al_states != m_CurrentMasterState.al_states)
+                {
+                    std::cout << "AL States: " << state.al_states << std::endl;
+                } 
+            }
+
+            m_CurrentMasterState = state;
+        }
+
+        void Controller::updateDomainState()
+        {
+            ec_domain_state_t state;
+            ecrt_domain_state(m_Domain, &state);
+
+            if(ENABLE_LOGGING)
+            {
+                if(state.working_counter != m_CurrentDomainState.working_counter)
+                {
+                    std::cout << "Domain WC:" << state.working_counter << std::endl; 
+                }
+
+                if(state.wc_state != m_CurrentDomainState.wc_state)
+                {
+                    std::cout << "Domain State: " << state.wc_state << std::endl;
+                }
+            }
+
+            m_CurrentDomainState = state;
         }
         
     }
