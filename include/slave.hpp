@@ -173,7 +173,7 @@ namespace ethercat_interface
             template<typename T>
             auto readFromSlave(
                 const std::string& value_to_read_name, 
-                uint8_t* domain_process_data_ptr,
+                uint8_t* domain_process_data_ptr = nullptr,
                 int bit_position = NULL
             );
             
@@ -190,9 +190,14 @@ namespace ethercat_interface
             void writeToSlave(
                 const std::string& value_to_write_name,
                 const T& new_val, 
-                uint8_t* domain_process_data_ptr,
+                uint8_t* domain_process_data_ptr = nullptr,
                 int bit_position = NULL
             );
+
+            inline void setDomainProcessDataPtr(uint8_t* domain_data_ptr)
+            {
+                this->m_DomainProcessDataPtr = domain_data_ptr;
+            }
 
             protected:
 
@@ -214,6 +219,8 @@ namespace ethercat_interface
 
             Offset* m_SlaveOffsets; 
 
+            uint8_t* m_DomainProcessDataPtr = nullptr;
+
             private:
 
             bool LOGGING_ENABLED = false;
@@ -223,7 +230,10 @@ namespace ethercat_interface
         template<typename T>
         auto Slave::readFromSlave(const std::string& value_to_read_name, uint8_t* domain_process_data_ptr, int bit_position)
         {
-            
+            if(domain_process_data_ptr != nullptr)
+            {
+                m_DomainProcessDataPtr = domain_process_data_ptr;
+            }    
             /*
                 Control statement for determining which type of value is used with the template function.
                 Uses the appropriate macro function from the ecrt.h to read according to the template argument.
@@ -232,67 +242,67 @@ namespace ethercat_interface
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                return EC_READ_U8(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                ); 
             }
             else if constexpr (std::is_same_v<uint16_t, T>)
             {
                 return EC_READ_U16(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<uint32_t, T>)
             {
                 return EC_READ_U32(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<uint64_t, T>)
             {
                 return EC_READ_U64(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<int8_t, T>)
             {
                 return EC_READ_S8(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<int16_t, T>)
             {
                 return EC_READ_S16(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<int32_t, T>)
             {
                 return EC_READ_S32(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<int64_t, T>)
             {
                 return EC_READ_S64(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<float, T>)
             {
                 return EC_READ_REAL(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<double, T>)
             {
                 return EC_READ_LREAL(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name)
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name)
                 );
             }
             else if constexpr (std::is_same_v<bool, T>)
             {
                 return EC_READ_BIT(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_read_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name),
                     bit_position
                 );
             }
@@ -312,6 +322,12 @@ namespace ethercat_interface
             int bit_position
         )
         {
+            
+            if(domain_process_data_ptr != nullptr)
+            {
+                m_DomainProcessDataPtr = domain_process_data_ptr;
+            }
+
             /*
                 Control statement for determining which type of value is used with the template function.
                 Uses the appropriate macro function from the ecrt.h to write according to the template argument.
@@ -319,77 +335,77 @@ namespace ethercat_interface
             if constexpr (std::is_same_v<uint8_t, T>)
             {
                EC_WRITE_U8(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                ); 
             }
             else if constexpr (std::is_same_v<uint16_t, T>)
             {
                 EC_WRITE_U16(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<uint32_t, T>)
             {
                 EC_WRITE_U32(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<uint64_t, T>)
             {
                 EC_WRITE_U64(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int8_t, T>)
             {
                 EC_WRITE_S8(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int16_t, T>)
             {
                 EC_WRITE_S16(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int32_t, T>)
             {
                 EC_WRITE_S32(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<int64_t, T>)
             {
                 EC_WRITE_S64(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<float, T>)
             {
                 EC_WRITE_REAL(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<double, T>)
             {
                 EC_WRITE_LREAL(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     new_val
                 );
             }
             else if constexpr (std::is_same_v<bool, T>)
             {
                 EC_WRITE_BIT(
-                    domain_process_data_ptr + *m_SlaveOffsets->getData(value_to_write_name),
+                    m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name),
                     bit_position,
                     new_val
                 );
