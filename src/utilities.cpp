@@ -1,5 +1,4 @@
 #include "../include/utilities.hpp"
-#include "utilities.hpp"
 
 namespace ethercat_interface
 {
@@ -105,10 +104,10 @@ namespace ethercat_interface
                 info.pdoEntryInfo.subindexes = slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint8_t>>();
                 info.pdoEntryInfo.bitLengths = slave_config["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
-                info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<int>();
-                info.ioMappingInfo.TxPDO_Address = slave_config["pdo_entry_info"]["txpdo_address"].as<int>();
-                info.ioMappingInfo.RxPDO_Size = slave_config["pdo_entry_info"]["rxpdo_size"].as<int>();
-                info.ioMappingInfo.TxPDO_Size = slave_config["pdo_entry_info"]["txpdo_size"].as<int>();
+                info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
+                info.ioMappingInfo.TxPDO_Address = slave_config["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
+                info.ioMappingInfo.RxPDO_Size = slave_config["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
+                info.ioMappingInfo.TxPDO_Size = slave_config["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
 
                 info.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(slave_config["slave_sync_info"]["num_sync_managers"].as<int>());
                 info.slaveSyncInfo.syncManagerDirections = slave_config["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();

@@ -172,21 +172,20 @@ namespace ethercat_interface
 
         ec_pdo_info_t* createSlavePDOs(
             ec_pdo_entry_info_t* entriesArray,
-            int RxPDO_start,
-            int RxPDO_size,
-            int TxPDO_start,
-            int TxPDO_size
+            uint16_t RxPDO_start,
+            unsigned int RxPDO_size,
+            uint16_t TxPDO_start,
+            unsigned int TxPDO_size
         )
         {           
-            //std::cout << RxPDO_start << " " << RxPDO_size << " " << TxPDO_start << " " << TxPDO_size << std::endl;
-            ec_pdo_info_t slavePDOs[] = {
+            /* ec_pdo_info_t slavePDOs[] = {
                 {RxPDO_start, RxPDO_size, entriesArray + 0},
                 {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size}
-            };
+            }; */
             std::cout << "PDO_INFO\n";
             ec_pdo_info_t* pdos = new ec_pdo_info_t[2];
-            pdos[0] = {(uint16_t)RxPDO_start, (uint)RxPDO_size, entriesArray + 0};
-            pdos[1] = {(uint16_t)TxPDO_start, (uint)TxPDO_size, entriesArray + RxPDO_size};
+            pdos[0] = {RxPDO_start, RxPDO_size, entriesArray + 0};
+            pdos[1] = {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size};
             std::cout << (uint16_t)RxPDO_start << " " << TxPDO_start << " " << (uint)RxPDO_size << " " << (uint)TxPDO_size << std::endl;
             
             return pdos;

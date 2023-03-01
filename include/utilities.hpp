@@ -55,10 +55,10 @@ namespace ethercat_interface
 
         struct IoMappingInfo
         {
-            int RxPDO_Address;
-            int TxPDO_Address;
-            int RxPDO_Size;
-            int TxPDO_Size;
+            uint16_t RxPDO_Address;
+            uint16_t TxPDO_Address;
+            unsigned int RxPDO_Size;
+            unsigned int TxPDO_Size;
 
             void toString()
             {

@@ -46,10 +46,10 @@ namespace ethercat_interface
         
         ec_pdo_info_t* createSlavePDOs(
             ec_pdo_entry_info_t* entriesArray,
-            int RxPDO_start,
-            int RxPDO_size,
-            int TxPDO_start,
-            int TxPDO_size
+            uint16_t RxPDO_start,
+            unsigned int RxPDO_size,
+            uint16_t TxPDO_start,
+            unsigned int TxPDO_size
         );
 
         /**
