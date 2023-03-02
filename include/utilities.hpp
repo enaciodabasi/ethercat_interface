@@ -75,6 +75,8 @@ namespace ethercat_interface
 
         std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int>& watchdog_modes);
 
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix);
+
         struct SlaveSyncInfo
         {
             

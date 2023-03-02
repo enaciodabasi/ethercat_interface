@@ -1,6 +1,14 @@
 #include "slave.hpp"
 #include <optional>
 
+
+#define VendorID 0x000000fb
+#define ProductCode 0x65520000
+
+#define SMBSlavePos 0,0
+#define SMB VendorID,ProductCode
+
+
 namespace ethercat_interface
 {   
     
@@ -19,6 +27,7 @@ namespace ethercat_interface
             m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
             m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
             m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+            std::cout << "SLAVE PDO ENTRY SIZE: " << m_SlaveInfo.pdoEntryInfo.indexes.size() << std::endl;
             m_SlavePDOs = new ec_pdo_info_t[2];
         }
 
@@ -29,7 +38,8 @@ namespace ethercat_interface
 
         void Slave::configure_slave()
         {
-            m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
+
+             m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
             m_SlaveInfo.alias,
             m_SlaveInfo.position,
             m_SlaveInfo.vendorID,
@@ -38,27 +48,62 @@ namespace ethercat_interface
             m_SlaveInfo.pdoEntryInfo.subindexes,
             m_SlaveOffsets);
 
-        m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
-            m_SlaveInfo.pdoEntryInfo.indexes,
-            m_SlaveInfo.pdoEntryInfo.subindexes,
-            m_SlaveInfo.pdoEntryInfo.bitLengths);
+            /* m_SlavePdoEntryRegistries[0] = {SMBSlavePos, SMB, 0x6040, 0, &off.ctrl_word};
+            m_SlavePdoEntryRegistries[1] = {SMBSlavePos, SMB, 0x60FF, 0, &off.target_velocity};
+            m_SlavePdoEntryRegistries[2] = {SMBSlavePos, SMB, 0x60B1, 0, &off.velocity_offset};
+            m_SlavePdoEntryRegistries[3] = {SMBSlavePos, SMB, 0x6060, 0, &off.operation_mode};
+            m_SlavePdoEntryRegistries[4] = {SMBSlavePos, SMB, 0x60FE, 1, &off.digital_output};
+	        m_SlavePdoEntryRegistries[5] = {SMBSlavePos, SMB, 0x6041, 0, &off.status_word};
+            m_SlavePdoEntryRegistries[6] = {SMBSlavePos, SMB, 0x6064, 0, &off.current_position}; 
+	        m_SlavePdoEntryRegistries[7] = {SMBSlavePos, SMB, 0x606C, 0, &off.current_velocity};
+	        m_SlavePdoEntryRegistries[8] = {SMBSlavePos, SMB, 0x6077, 0, &off.current_torque};
+            m_SlavePdoEntryRegistries[9] = {SMBSlavePos, SMB, 0x6061, 0, &off.mode_display};
+            m_SlavePdoEntryRegistries[10] = {SMBSlavePos, SMB, 0x60FD, 0, &off.digital_input};
+            m_SlavePdoEntryRegistries[11] = {}; */
+            
+            m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
+                m_SlaveInfo.pdoEntryInfo.indexes,
+                m_SlaveInfo.pdoEntryInfo.subindexes,
+                m_SlaveInfo.pdoEntryInfo.bitLengths);
 
-        m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
-            m_SlavePdoEntries,
-            m_SlaveInfo.ioMappingInfo.RxPDO_Address,
-            m_SlaveInfo.ioMappingInfo.RxPDO_Size,
-            m_SlaveInfo.ioMappingInfo.TxPDO_Address,
-            m_SlaveInfo.ioMappingInfo.TxPDO_Size);
+            /* m_SlavePdoEntries[0] = {0x6040, 0x00, 16};
+            m_SlavePdoEntries[1] = {0x60ff, 0x00, 32};
+            m_SlavePdoEntries[2] = {0x60b1, 0x00, 32};
+            m_SlavePdoEntries[3] = {0x6060, 0x00, 8};
+            m_SlavePdoEntries[4] = {0x60fe, 0x01, 32};
+            m_SlavePdoEntries[5] = {0x6041, 0x00, 16};
+            m_SlavePdoEntries[6] = {0x6064, 0x00, 32};
+            m_SlavePdoEntries[7] = {0x606c, 0x00, 32};
+            m_SlavePdoEntries[8] = {0x6077, 0x00, 16};
+            m_SlavePdoEntries[9] = {0x6061, 0x00, 8};
+            m_SlavePdoEntries[10] = {0x60fd, 0x00, 32}; */
 
-        m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
-            m_SlaveInfo.slaveSyncInfo.numSyncManagers,
-            ethercat_interface::utilities::intToEcDirectionEnum(m_SlaveInfo.slaveSyncInfo.syncManagerDirections),
-            m_SlaveInfo.slaveSyncInfo.numPDOs,
-            m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
-            m_SlavePDOs,
-            ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes));
+            m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
+                m_SlavePdoEntries,
+                m_SlaveInfo.ioMappingInfo.RxPDO_Address,
+                m_SlaveInfo.ioMappingInfo.RxPDO_Size,
+                m_SlaveInfo.ioMappingInfo.TxPDO_Address,
+                m_SlaveInfo.ioMappingInfo.TxPDO_Size);
 
-            std::cout << "Configured slave " << m_SlaveName << std::endl;
+            /* m_SlavePDOs[0]={0x1600, 5, m_SlavePdoEntries + 0};
+            m_SlavePDOs[1]={0x1a00, 6, m_SlavePdoEntries + 5}; */
+
+            m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
+                m_SlaveInfo.slaveSyncInfo.numSyncManagers,
+                ethercat_interface::utilities::intToEcDirectionEnum(m_SlaveInfo.slaveSyncInfo.syncManagerDirections),
+                m_SlaveInfo.slaveSyncInfo.numPDOs,
+                m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
+                m_SlavePDOs,
+                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes));
+
+                /* m_SlaveSyncs[0] = {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE};
+                m_SlaveSyncs[1] = {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE};
+                m_SlaveSyncs[2] = {2, EC_DIR_OUTPUT, 1, m_SlavePDOs + 0, EC_WD_ENABLE};
+                m_SlaveSyncs[3] = {3, EC_DIR_INPUT, 1, m_SlavePDOs + 1, EC_WD_DISABLE};
+                m_SlaveSyncs[4] = {0xff};
+ */
+
+                std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
 
         void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr)
@@ -155,15 +200,31 @@ namespace ethercat_interface
         )
         {
             std::size_t numEntries = indexes.size();
-
+            
             ec_pdo_entry_info_t* entries = new ec_pdo_entry_info_t[numEntries];
-            std::cout << "PDO ENTRIES" << std::endl;
             for(std::size_t i = 0; i < numEntries; i++)
             {   
                 std::cout << indexes[i] << " " << subindexes[i] << " " << bit_lengths[i] << std::endl;
+                /* if(subindexes[i] == '0')
+                {   
+                    std::cout << "sifir";
+                    entries[i] = {
+                    indexes[i],
+                    0x00, 
+                    (uint8_t)bit_lengths[i]};
+                }
+                else if(subindexes[i] == '1')
+                {
+                    std::cout << "bir";
+                    entries[i] = {
+                    indexes[i],
+                    0x01, 
+                    (uint8_t)bit_lengths[i]};
+                } */
+
                 entries[i] = {
                     indexes[i],
-                    subindexes[i],
+                    subindexes[i], 
                     (uint8_t)bit_lengths[i]};
             }
 

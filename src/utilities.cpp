@@ -79,6 +79,32 @@ namespace ethercat_interface
             return watchdogModes;
         }
 
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix)
+        {
+            std::vector<uint8_t> hexas;
+
+            for(std::size_t i = 0; i < to_fix.size(); i++)
+            {
+                if(to_fix[i] == '0')
+                {   
+                    std::cout << "sifir";
+                    hexas.emplace_back(0x00);
+                }    
+                else if(to_fix[i] == '1')
+                {   
+                    std::cout << "bir";
+                    hexas.emplace_back(0x01);
+                }
+                else
+                {
+                    std::cout << "bune";
+                    continue;
+                }
+            }
+
+            return hexas;
+        }
+
         SlaveInfo parse_config_file(
             const std::string& file_name,
             const std::string& slave_name
@@ -101,7 +127,7 @@ namespace ethercat_interface
                 info.alias = slave_config["slave_alias"].as<uint>();
 
                 info.pdoEntryInfo.indexes = slave_config["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
-                info.pdoEntryInfo.subindexes = slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint8_t>>();
+                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint8_t>>());
                 info.pdoEntryInfo.bitLengths = slave_config["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
                 info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();

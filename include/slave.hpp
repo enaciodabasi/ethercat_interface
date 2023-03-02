@@ -127,7 +127,6 @@ namespace ethercat_interface
         {
             public:
 
-
             Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
             ~Slave();
 
