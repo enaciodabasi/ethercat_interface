@@ -18,7 +18,7 @@ class Master : public ethercat_interface::controller::Controller
     void cyclic_task() override;
 
     void loadSlaves() override;
-    int32_t target_velocity = 0;
+    int32_t target_velocity = 500;
     int counter1 = 0;
     double counter2 = 0.0;
     void exchangeDomainPD()

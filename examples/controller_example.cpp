@@ -32,20 +32,20 @@ void Master::cyclic_task()
 
     //std::cout << "STATES UPDATED\n";
 
-    /* status = EPOS4_0->readFromSlave<uint16_t>("status_word");
-    std::cout << status << std::endl;
+    status = EPOS4_0->readFromSlave<uint16_t>("status_word");
     opmode = EPOS4_0->readFromSlave<uint8_t>("operation_mode");
     current_velocity = EPOS4_0->readFromSlave<int32_t>("current_velocity");
     ctrl1 = EPOS4_0->readFromSlave<uint16_t>("ctrl_word");
-    EPOS4_0->writeToSlave("operation_mode", 9); */
+    EPOS4_0->writeToSlave("operation_mode", 9);
     //std::cout << "Written initial values" << std::endl;
 
     
-    /* 
+    
     if (EPOS4_0->getCurrentSlaveState().operational && (EPOS4_0->getCurrentSlaveState().al_state == 0X08) && (m_CurrentDomainState.working_counter > 2))
     {
         status = EPOS4_0->readFromSlave<uint16_t>("status_word");
-
+        EPOS4_0->writeToSlave<int32_t>("target_velocity", 500);
+        std::cout << "vel: " << EPOS4_0->readFromSlave<int32_t>("current_velocity") << std::endl;
         if(command == 0x0000 && !(status & 0x0008))
         {
             if(status & 0x0007)
@@ -82,7 +82,7 @@ void Master::cyclic_task()
     
 	    	if(counter1 % 100 == 0)
 	    	{
-	    		target_velocity = std::sin(counter2*M_PI/180.0)*2000.0/(std::sin(M_PI/2.0));
+	    		target_velocity = 500;
 	    		counter2++;
     
 	    	} 
@@ -105,7 +105,10 @@ void Master::cyclic_task()
             flip = !flip;
         } 
         counter3++;
-    } */
+    }
+
+
+    //std::cout << "Velocity" << vel << std::endl;
 
     ecrt_domain_queue(m_Domain);
     ecrt_master_send(m_EthercatMaster);
