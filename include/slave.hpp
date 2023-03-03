@@ -22,6 +22,7 @@
 
 #include "offset.hpp"
 #include "utilities.hpp"
+#include "state.hpp"
 
 
 namespace ethercat_interface
@@ -127,6 +128,7 @@ namespace ethercat_interface
         {
             public:
 
+
             Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
             ~Slave();
 
@@ -225,9 +227,13 @@ namespace ethercat_interface
 
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
+            virtual bool updateSlaveStatus();
+
             private:
 
             bool LOGGING_ENABLED = false;
+
+            SlaveStatus m_Status; // Status Word read from the EtherCAT master.
 
         };
 
