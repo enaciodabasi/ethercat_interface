@@ -10,7 +10,6 @@ Master::Master()
 
 void Master::cyclic_task()
 {
-
     static uint16_t command = 0x0000;
 	static uint16_t command_old = 0x000;
 	static uint16_t status_old= 0x0000;
@@ -24,49 +23,68 @@ void Master::cyclic_task()
     ecrt_master_receive(m_EthercatMaster);
     ecrt_domain_process(m_Domain);
 
-    //std::cout << "Received master and domain" << std::endl;
-
     updateDomainState();
     updateMasterState();
     EPOS4_0->updateSlaveState();
 
-    //std::cout << "STATES UPDATED\n";
 
+    //std::cout << "OPERATION MODE" << (int)EPOS4_0->readFromSlave<int8_t>("mode_display") << std::endl;
+    
     status = EPOS4_0->readFromSlave<uint16_t>("status_word");
     opmode = EPOS4_0->readFromSlave<uint8_t>("operation_mode");
     current_velocity = EPOS4_0->readFromSlave<int32_t>("current_velocity");
     ctrl1 = EPOS4_0->readFromSlave<uint16_t>("ctrl_word");
-    EPOS4_0->writeToSlave("operation_mode", 9);
-    //std::cout << "Written initial values" << std::endl;
+    EPOS4_0->writeToSlave<int8_t>("operation_mode", 9);
 
+    std::cout << EPOS4_0->readFromSlave<uint16_t>("status_word") << std::endl;
     
+    EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0006);
     
-    if (EPOS4_0->getCurrentSlaveState().operational && (EPOS4_0->getCurrentSlaveState().al_state == 0X08) && (m_CurrentDomainState.working_counter > 2))
+    if(status & 0x0001)
+    {
+        EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0007);
+    }
+
+    if(status & 0x0003)
+    {
+        EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
+    }
+
+    if(status & 0x0007)
+    {
+        EPOS4_0->writeToSlave<uint16_t>("target_velocity", 500);
+    }
+
+    /* if (EPOS4_0->getCurrentSlaveState().operational && (EPOS4_0->getCurrentSlaveState().al_state == 0X08) && (m_CurrentDomainState.working_counter > 2))
     {
         status = EPOS4_0->readFromSlave<uint16_t>("status_word");
-        EPOS4_0->writeToSlave<int32_t>("target_velocity", 500);
-        std::cout << "vel: " << EPOS4_0->readFromSlave<int32_t>("current_velocity") << std::endl;
+        std::cout << "Status: " << status << std::endl;  
         if(command == 0x0000 && !(status & 0x0008))
         {
+            std::cout << "AAAAaa";
             if(status & 0x0007)
-            {
+            {   
+                std::cout << "Writing 0x000f to control word.\n";
                 EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
                 command = 0x0027;
             }
             else
-            {
+            {   
+                std::cout << "Writing 0x0006 to control word\n";
                 EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0006);
                 command = 0x0006;
             }
         }
         else if (command == 0x0006 && (status & 0x0001) )
 	    {
+            std::cout << "Writing 0x0007 to control word\n";
 	    	EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0007);
 	    	command = 0x000f;
 	    }
     
 	    else if (command == 0x000f && (status & 0x0003) )
 	    {
+            std::cout << "Writing 0x0027 to control word\n";
 	    	EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
 	    	command = 0x0027;
     
@@ -74,8 +92,9 @@ void Master::cyclic_task()
     
 	    else if ( command == 0x0027 && (status & 0x0007) )
 	    {
+            std::cout << "hiz yaziyoz\n";
 	    	EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
-	    	EPOS4_0->writeToSlave<int32_t>("target_velocity" ,target_velocity);
+	    	EPOS4_0->writeToSlave<int32_t>("target_velocity" ,1000);
 	    	command = 0x0027;
 	    	counter1 = counter1 + 5;
 	    // Control the motor as a sinusoidal wave which increases and decreases the speed between -3000, +3000 rpm
@@ -90,8 +109,9 @@ void Master::cyclic_task()
     }
     else
     {
-        if(status & 0x0008)
+        if(status & 0x0008 || !(status & 0x0001))
         {
+            //std::cout << "else'in ici";
 			if (flip)
 				EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0080);
 			else
@@ -105,10 +125,7 @@ void Master::cyclic_task()
             flip = !flip;
         } 
         counter3++;
-    }
-
-
-    //std::cout << "Velocity" << vel << std::endl;
+    } */
 
     ecrt_domain_queue(m_Domain);
     ecrt_master_send(m_EthercatMaster);
