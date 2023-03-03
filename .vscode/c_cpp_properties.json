@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/home/naci/ethercat/include/**"
+                "/home/naci/ethercat/include/**",
+                "/home/naci/Projects/igh_master/include/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",
