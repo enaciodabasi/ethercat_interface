@@ -9,6 +9,7 @@ set(SOURCES
     src/controller.cpp
     src/slave.cpp
     src/utilities.cpp
+    src/state.cpp
 )
 
 set(
@@ -46,6 +47,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/offset.hpp
     include/utilities.hpp
     include/controller.hpp
+    include/state.hpp
 )
 
 set_target_properties(${PROJECT_NAME}
