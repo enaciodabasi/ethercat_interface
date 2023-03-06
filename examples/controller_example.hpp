@@ -3,6 +3,7 @@
 #define CONTROLLER_EXAMPLE_HPP
 
 #include "../include/controller.hpp"
+#include "../include/state.hpp"
 #include "offset_example.hpp"
 #include "slave_example.hpp"
 

@@ -1,5 +1,6 @@
 
 #include "controller_example.hpp"
+
 #include <math.h>
 
 Master::Master()
@@ -27,6 +28,10 @@ void Master::cyclic_task()
     updateMasterState();
     EPOS4_0->updateSlaveState();
 
+    ethercat_interface::slave::stateMachine(
+        ethercat_interface::slave::StatusType::OperationEnabled,
+        std::bind(&EPOS4::enableOperation, EPOS4_0)
+    );
 
     //std::cout << "OPERATION MODE" << (int)EPOS4_0->readFromSlave<int8_t>("mode_display") << std::endl;
     
