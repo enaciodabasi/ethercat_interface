@@ -62,7 +62,7 @@ namespace ethercat_interface
         enum class StatusType : uint16_t
         {
             NotReadyToSwitchOn = 0x00,
-            SwitchOnDisabled = 0x28,
+            SwitchOnDisabled = 0x40,
             ReadyToSwitchOn = 0x21,
             SwitchedOn = 0x23,
             OperationEnabled = 0x27,
@@ -76,6 +76,7 @@ namespace ethercat_interface
             return static_cast<std::underlying_type<StatusType>::type>(status);
         }
 
+        
 
     }
 }
