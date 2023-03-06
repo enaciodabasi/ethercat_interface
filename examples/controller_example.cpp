@@ -38,14 +38,16 @@ void Master::cyclic_task()
     ctrl1 = EPOS4_0->readFromSlave<uint16_t>("ctrl_word");
     EPOS4_0->writeToSlave<int8_t>("operation_mode", 9);
 
-    std::cout << EPOS4_0->readFromSlave<uint16_t>("status_word") << std::endl;
+    //std::cout << EPOS4_0->readFromSlave<uint16_t>("status_word") << std::endl;
     
-    EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0006);
+    //EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0006);
     
     m_IsOperationPermitted = EPOS4_0->enableOperation();
     if(m_IsOperationPermitted)
     {
-        // Program logic
+        std::cout << "Operation Permitted" << std::endl;
+        EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
+        EPOS4_0->writeToSlave<int32_t>("target_velocity", 750);    
     }
 
     /* if (EPOS4_0->getCurrentSlaveState().operational && (EPOS4_0->getCurrentSlaveState().al_state == 0X08) && (m_CurrentDomainState.working_counter > 2))
