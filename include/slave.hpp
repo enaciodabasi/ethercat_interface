@@ -16,6 +16,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <variant>
 #include <map>
 
 #include "ecrt.h"
@@ -204,6 +205,16 @@ namespace ethercat_interface
             {
                 this->m_DomainProcessDataPtr = domain_data_ptr;
             }
+
+            /**
+             * @brief Enables to Slave to operate using its state machine.
+             * 
+             * @param target_state 
+             * @param current_status 
+             */
+            virtual void enableOperation(
+                SlaveStatus& current_status
+            );
 
             protected:
 

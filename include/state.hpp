@@ -32,6 +32,8 @@ namespace ethercat_interface
 
         typedef uint16_t SlaveStatus;
 
+        typedef uint16_t SlaveCommand;
+
         /**
          * @brief Control commands to send to the control word of the slave.
          * Each enum holds the value of its bit pattern regarding to the CIA402 Standart.
@@ -58,20 +60,22 @@ namespace ethercat_interface
          */
         enum class StatusType : uint16_t
         {
-            NotReadyToSwitchOn,
-            SwitchOnDisabled,
-            ReadyToSwitchOn,
-            SwitchedOn,
-            OperationEnabled,
-            QuickStopActive,
-            FaultResponseActive,
-            Fault
+            NotReadyToSwitchOn = 0x00,
+            SwitchOnDisabled = 0x28,
+            ReadyToSwitchOn = 0x21,
+            SwitchedOn = 0x23,
+            OperationEnabled = 0x27,
+            QuickStopActive = 0x07,
+            FaultResponseActive = 0x0F,
+            Fault = 0x008
         };
 
         inline uint16_t getStatusValue(const StatusType& status)
         {
             return static_cast<std::underlying_type<StatusType>::type>(status);
         }
+
+        
 
     }
 }
