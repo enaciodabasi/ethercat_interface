@@ -33,6 +33,8 @@ class Master : public ethercat_interface::controller::Controller
 
     ethercat_interface::Offset* offset; 
 
+    bool m_IsOperationPermitted = false;
+
     
 };
 

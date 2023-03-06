@@ -28,10 +28,7 @@ void Master::cyclic_task()
     updateMasterState();
     EPOS4_0->updateSlaveState();
 
-    ethercat_interface::slave::stateMachine(
-        ethercat_interface::slave::StatusType::OperationEnabled,
-        std::bind(&EPOS4::enableOperation, EPOS4_0)
-    );
+    
 
     //std::cout << "OPERATION MODE" << (int)EPOS4_0->readFromSlave<int8_t>("mode_display") << std::endl;
     
@@ -45,19 +42,10 @@ void Master::cyclic_task()
     
     EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0006);
     
-    if(status & 0x0001)
+    m_IsOperationPermitted = EPOS4_0->enableOperation();
+    if(m_IsOperationPermitted)
     {
-        EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x0007);
-    }
-
-    if(status & 0x0003)
-    {
-        EPOS4_0->writeToSlave<uint16_t>("ctrl_word", 0x000f);
-    }
-
-    if(status & 0x0007)
-    {
-        EPOS4_0->writeToSlave<uint16_t>("target_velocity", 500);
+        // Program logic
     }
 
     /* if (EPOS4_0->getCurrentSlaveState().operational && (EPOS4_0->getCurrentSlaveState().al_state == 0X08) && (m_CurrentDomainState.working_counter > 2))
