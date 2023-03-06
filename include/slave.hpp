@@ -235,7 +235,7 @@ namespace ethercat_interface
 
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
-            virtual bool updateSlaveStatus();
+            //virtual bool updateSlaveStatus();
 
             private:
 
