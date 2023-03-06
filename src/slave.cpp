@@ -169,10 +169,16 @@ namespace ethercat_interface
             
         }
 
-        void Slave::enableOperation()
+        bool Slave::enableOperation()
         {
 
             m_Status = this->readFromSlave<uint16_t>("status_word");
+
+            if(m_Status & getStatusValue(StatusType::OperationEnabled))
+            {
+                return true;
+            }
+
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
                 Ready to switch on -> Switched on: Switch on command.
@@ -185,16 +191,19 @@ namespace ethercat_interface
                 if(m_Status & getStatusValue(StatusType::SwitchOnDisabled))
                 {
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
+                    return false;
                 }
                 // If state is Ready to Switch On send the Switch On command.
                 else if(m_Status & getStatusValue(StatusType::ReadyToSwitchOn))
                 {
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
+                    return false;
                 }
                 // If state is Switched On send the Enable Operation command.
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
+                    return false;
                 }
                 
             }
@@ -204,11 +213,12 @@ namespace ethercat_interface
                 {
                     // Send ResetFault to the control word.
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
+                    return false;
 
                 }
             }
-            
 
+            return false;
         }
 
         /*
