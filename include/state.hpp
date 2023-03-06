@@ -23,6 +23,7 @@ https://download.lenze.com/TD/E94AxHE__Technology%20Application%20CiA402%20Devic
 #define DEFS_HPP
 
 #include <iostream>
+#include <functional>
 #include <bitset>
 
 namespace ethercat_interface
@@ -75,7 +76,9 @@ namespace ethercat_interface
             return static_cast<std::underlying_type<StatusType>::type>(status);
         }
 
-        
+        void stateMachine(
+            const StatusType& target_status,
+            std::function<void(void)> function);
 
     }
 }

@@ -209,12 +209,9 @@ namespace ethercat_interface
             /**
              * @brief Enables to Slave to operate using its state machine.
              * 
-             * @param target_state 
-             * @param current_status 
+             *  
              */
-            virtual void enableOperation(
-                SlaveStatus& current_status
-            );
+            virtual void enableOperation();
 
             protected:
 

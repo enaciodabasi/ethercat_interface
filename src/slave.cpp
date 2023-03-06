@@ -169,24 +169,36 @@ namespace ethercat_interface
             
         }
 
-        void Slave::enableOperation(SlaveStatus &current_status)
+        void Slave::enableOperation()
         {
 
-            current_status = this->readFromSlave<uint16_t>("status_word");
+            m_Status = this->readFromSlave<uint16_t>("status_word");
 
             // Check if there is a registered fault in the Slave
-            if(!(current_status & getStatusValue(StatusType::Fault)))
+            if(!(m_Status & getStatusValue(StatusType::Fault)))
             {
                 
-                if(current_status)
+                if(m_Status)
+                {
+                    
+                }
+                else
                 {
                     
                 }
                 
             }
+            else if(1)
+            {
+
+            }
+            else if(1)
+            {
+
+            }
             else // Try to reset the fault.
             {
-                if(current_status & getStatusValue(StatusType::Fault))
+                if(m_Status & getStatusValue(StatusType::Fault))
                 {
                     // Send ResetFault to the control word.
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
