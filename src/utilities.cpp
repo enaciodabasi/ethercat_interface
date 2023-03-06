@@ -87,17 +87,14 @@ namespace ethercat_interface
             {
                 if(to_fix[i] == '0')
                 {   
-                    std::cout << "sifir";
                     hexas.emplace_back(0x00);
                 }    
                 else if(to_fix[i] == '1')
                 {   
-                    std::cout << "bir";
                     hexas.emplace_back(0x01);
                 }
                 else
                 {
-                    std::cout << "bune";
                     continue;
                 }
             }
