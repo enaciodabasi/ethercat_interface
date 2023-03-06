@@ -14,3 +14,11 @@ sudo cmake --build . --target install
 '''
 
 If the libethercat.so file is not found during the build process, change the file path for it in the CMakeLists.txt .
+
+# Usage
+
+Before running the example or your code make sure the EtherCAT system is up and running in your system.
+An example of this process can be found in the setup_ethercat.sh file. In a terminal as root user run:
+'''bash
+./setup_ethercat.sh
+'''
