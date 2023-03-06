@@ -76,9 +76,6 @@ namespace ethercat_interface
             return static_cast<std::underlying_type<StatusType>::type>(status);
         }
 
-        void stateMachine(
-            const StatusType& target_status,
-            std::function<void(void)> function);
 
     }
 }
