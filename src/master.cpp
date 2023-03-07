@@ -69,6 +69,35 @@ namespace ethercat_interface
             m_EthercatMasterState = state;
         }
 
+        void Master::updateSlaveStates()
+        {
+        
+            ec_slave_config_state_t state;
+            ecrt_slave_config_state(
+                this->m_SlaveConfig,
+                &state
+            );
+            
+            if(ENABLE_LOGGING)
+            {
+                if(state.al_state != m_SlaveStates.al_state)
+                {
+                    std::cout << "Slave: State " << state.al_state << std::endl;
+                }
+                if(state.online != m_SlaveStates.online)
+                {
+                    std::cout << "Slave: " << (state.online ? "online" : "offline") << std::endl;
+                }
+                if(state.operational != m_SlaveStates.operational)
+                {
+                    std::cout << "Slave is " << (state.operational ? "" : "not") << "operational" << std::endl;
+                }
+            }
+
+            m_SlaveStates = state;
+            
+        }
+
         void Master::configureDomains()
         {
             for(const auto& d : m_RegisteredDomains)

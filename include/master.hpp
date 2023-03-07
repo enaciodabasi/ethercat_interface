@@ -35,6 +35,8 @@ namespace ethercat_interface
 
             void updateMasterState();
 
+            void updateSlaveStates();
+
             bool activateMaster();
 
             inline void registerDomain(domain::Domain* domain)
@@ -53,6 +55,8 @@ namespace ethercat_interface
             // Slave config pointer.
 
             ec_slave_config* m_SlaveConfig;
+
+            ec_slave_config_state_t m_SlaveStates;
 
             private:
 
