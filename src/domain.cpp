@@ -84,5 +84,13 @@ namespace ethercat_interface
                 s.second->configure_slave();
             }
         }
+
+        void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t* slave_config_ptr)
+        {
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                s.second->setupSlave(master_ptr, m_EthercatDomain, slave_config_ptr);
+            }
+        }
     }
 }

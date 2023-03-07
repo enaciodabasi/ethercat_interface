@@ -143,7 +143,8 @@ namespace ethercat_interface
              */
             virtual void setupSlave(
                 ec_master_t* masterPtr,
-                ec_domain_t* domainPtr
+                ec_domain_t* domainPtr,
+                ec_slave_config_t* slave_config_ptr
             );
 
             inline const std::string getSlaveName() const
@@ -151,7 +152,7 @@ namespace ethercat_interface
                 return m_SlaveName;
             }
 
-            inline ec_slave_config_t* getEthercatSlaveConfig()
+            /* inline ec_slave_config_t* getEthercatSlaveConfig()
             {
                 return m_SlaveConfig;
             }
@@ -159,14 +160,14 @@ namespace ethercat_interface
             inline ec_slave_config_state_t getCurrentSlaveState() const
             {
                 return m_CurrentSlaveState;
-            }
+            } */
 
             inline void setOffsetPtr(Offset* offset)
             {
                 m_SlaveOffsets = offset;
             }
 
-            void updateSlaveState();
+            /* void updateSlaveState(); */
 
             /**
              * @brief 
@@ -217,9 +218,9 @@ namespace ethercat_interface
 
             std::string m_SlaveName;
 
-            ec_slave_config_t* m_SlaveConfig;
+            /* ec_slave_config_t* m_SlaveConfig;
 
-            ec_slave_config_state_t m_CurrentSlaveState;
+            ec_slave_config_state_t m_CurrentSlaveState; */
 
             ec_pdo_entry_reg_t* m_SlavePdoEntryRegistries;
 

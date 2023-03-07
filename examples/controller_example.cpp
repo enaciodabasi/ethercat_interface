@@ -26,7 +26,7 @@ void Master::cyclic_task()
 
     updateDomainState();
     updateMasterState();
-    EPOS4_0->updateSlaveState();
+    //EPOS4_0->updateSlaveState();
 
     
 
@@ -136,6 +136,6 @@ void Master::loadSlaves()
     EPOS4_0->configure_slave();
     //m_Slaves.push_back(EPOS4_0);
 
-    EPOS4_0->setupSlave(m_EthercatMaster, m_Domain);
+    //EPOS4_0->setupSlave(m_EthercatMaster, m_Domain);
 
 }

@@ -106,10 +106,10 @@ namespace ethercat_interface
                 std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
 
-        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr)
+        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t* slave_config_ptr)
         {
 
-            m_SlaveConfig = ecrt_master_slave_config(
+            slave_config_ptr = ecrt_master_slave_config(
                 masterPtr,
                 m_SlaveInfo.alias,
                 m_SlaveInfo.position,
@@ -118,17 +118,18 @@ namespace ethercat_interface
             );
 
         
-            if(!m_SlaveConfig)
+            if(!slave_config_ptr)
             {
                 std::cout << "Can't create slave config" << std::endl;
             }
 
-            if(ecrt_slave_config_pdos(m_SlaveConfig, EC_END, m_SlaveSyncs) != 0)
+            if(ecrt_slave_config_pdos(slave_config_ptr, EC_END, m_SlaveSyncs) != 0)
             {
                 std::cout << "Failed to create Slave Config PDOs." << std::endl;
             }
             else
             {
+                
                 std::cout << "Creation of slave config pdos is successful" << std::endl;
             }
             
@@ -141,7 +142,7 @@ namespace ethercat_interface
             std::cout << "Slave config setup complete." << std::endl;
         }
 
-        void Slave::updateSlaveState()
+        /* void Slave::updateSlaveState()
         {
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
@@ -167,7 +168,7 @@ namespace ethercat_interface
 
             this->m_CurrentSlaveState = state;
             
-        }
+        } */
 
         bool Slave::enableOperation()
         {

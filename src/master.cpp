@@ -68,5 +68,21 @@ namespace ethercat_interface
 
             m_EthercatMasterState = state;
         }
+
+        void Master::configureDomains()
+        {
+            for(const auto& d : m_RegisteredDomains)
+            {
+                d.second->configureSlaves();
+            }
+        }
+
+        void Master::setupDomains()
+        {
+            for(const auto& d : m_RegisteredDomains)
+            {
+                d.second->setupSlaves(m_EthercatMaster, m_SlaveConfig);
+            }
+        }
     }
 }

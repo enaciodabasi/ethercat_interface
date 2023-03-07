@@ -50,6 +50,10 @@ namespace ethercat_interface
 
             ec_master_state_t m_EthercatMasterState;
 
+            // Slave config pointer.
+
+            ec_slave_config* m_SlaveConfig;
+
             private:
 
             unsigned int m_MasterIndex;
@@ -57,6 +61,12 @@ namespace ethercat_interface
             bool ENABLE_LOGGING = false;
 
             std::unordered_map<std::string, domain::Domain*> m_RegisteredDomains;
+
+            // Calls the configureSlaves function for each registered domain.
+            void configureDomains();
+
+            // Calls the setupSlaves function each registered domain.
+            void setupDomains();
 
         };
     }
