@@ -15,6 +15,8 @@
 #include <iostream>
 #include <unordered_map>
 
+#include "domain.hpp"
+
 #include "ecrt.h"
 
 namespace ethercat_interface
@@ -35,6 +37,11 @@ namespace ethercat_interface
 
             bool activateMaster();
 
+            inline void registerDomain(domain::Domain* domain)
+            {
+                m_RegisteredDomains[domain->getDomainName()] = domain;
+            }
+
             protected:
 
             ec_master_t* m_EthercatMaster;
@@ -48,6 +55,8 @@ namespace ethercat_interface
             unsigned int m_MasterIndex;
 
             bool ENABLE_LOGGING = false;
+
+            std::unordered_map<std::string, domain::Domain*> m_RegisteredDomains;
 
         };
     }
