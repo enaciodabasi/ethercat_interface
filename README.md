@@ -1,7 +1,7 @@
 # EtherCAT Interface
 
 This repository aims to create a simple framework for using the EtherCAT Master library IgH.
-The current state supports motor driver slaves that follow the CIA402 standart.
+The current state supports motor driver slaves that follow the CIA402 standard.
 
 # Build and Installation
 
