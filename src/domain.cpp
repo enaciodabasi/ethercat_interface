@@ -20,6 +20,8 @@ namespace ethercat_interface
         )   : m_DomainName(domain_name)
         {
             m_EthercatDomainState = {};
+
+            configureSlaves(); // Configure each slave
         }
 
         Domain::~Domain()
@@ -73,6 +75,14 @@ namespace ethercat_interface
             // Logger.
 
             return true;
+        }
+
+        void Domain::configureSlaves()
+        {
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                s.second->configure_slave();
+            }
         }
     }
 }

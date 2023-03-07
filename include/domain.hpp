@@ -13,7 +13,10 @@
 #define DOMAIN_HPP
 
 #include <iostream>
+#include <unordered_map>
 #include <string>
+
+#include "slave.hpp"
 
 #include "ecrt.h"
 
@@ -42,6 +45,24 @@ namespace ethercat_interface
 
             void updateDomainState();
 
+            inline void registerSlave(slave::Slave* slave)
+            {
+                m_RegisteredSlaves[slave->getSlaveName()] = slave;
+            }
+
+            inline void registerSlaves(std::vector<slave::Slave*> slaves)
+            {
+                for(std::size_t i = 0; i < slaves.size(); i++)
+                {
+                    m_RegisteredSlaves[slaves[i]->getSlaveName()] = slaves[i];
+                }
+            }
+
+            inline const std::string getDomainName() const
+            {
+                return m_DomainName;
+            }
+
         protected:
 
         /**
@@ -53,7 +74,7 @@ namespace ethercat_interface
         bool receiveDomainData();
         
         private:
-
+            
             std::string m_DomainName;
 
             ec_domain_t* m_EthercatDomain;
@@ -62,7 +83,15 @@ namespace ethercat_interface
 
             uint8_t* m_DomainProcessData = nullptr;
 
+            /**
+             * @brief Holds the pointers to the slaves that are registered in this domain.
+             * 
+             */
+            std::unordered_map<std::string, slave::Slave*> m_RegisteredSlaves;
+
             bool createDomain(ec_master_t* master_ptr);
+
+            void configureSlaves();
 
             bool ENABLE_LOGGING = false;
 
