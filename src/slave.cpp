@@ -174,9 +174,8 @@ namespace ethercat_interface
 
             m_Status = this->readFromSlave<uint16_t>("status_word");
             std::cout << (m_Status & getStatusValue(StatusType::OperationEnabled)) << std::endl;
-            if(m_Status & getStatusValue(StatusType::OperationEnabled) == 4)
+            if(m_Status & getStatusValue(StatusType::OperationEnabled) == 39)
             {   
-                std::cout <<"aa";
                 return true;
             }
 
@@ -204,7 +203,7 @@ namespace ethercat_interface
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
-                    return true;
+                    return false;
                 }
                 
             }
