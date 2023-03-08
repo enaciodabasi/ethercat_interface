@@ -26,7 +26,12 @@ namespace ethercat_interface
             if(m_NumOfPdoEntryRegistries != 0)
             {
                 // + 1 is for adding the empty entry registry at the end of the array.
-                m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1]; 
+                m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
+                createDomainPdoEntryRegistries(); 
+            }
+            else
+            {
+                // Log.
             }
 
 
