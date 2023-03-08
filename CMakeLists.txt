@@ -10,6 +10,8 @@ set(SOURCES
     src/slave.cpp
     src/utilities.cpp
     src/state.cpp
+    src/domain.cpp
+    src/master.cpp
 )
 
 set(

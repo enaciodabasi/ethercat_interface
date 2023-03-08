@@ -44,6 +44,13 @@ namespace ethercat_interface
                 m_RegisteredDomains[domain->getDomainName()] = domain;
             }
 
+            inline ec_master_t* getEthercatMasterPtr()
+            {
+                return m_EthercatMaster;
+            }
+
+            ec_domain_t* getDomainPtr(const std::string& domain_name);
+
             protected:
 
             ec_master_t* m_EthercatMaster;
@@ -66,6 +73,7 @@ namespace ethercat_interface
 
             std::unordered_map<std::string, domain::Domain*> m_RegisteredDomains;
 
+            public:
             // Calls the configureSlaves function for each registered domain.
             void configureDomains();
 

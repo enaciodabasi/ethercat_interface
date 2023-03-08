@@ -40,7 +40,22 @@ namespace ethercat_interface
                 return false;
             }
 
+            for(const auto& d : m_RegisteredDomains)
+            {
+                d.second->receiveDomainData();
+            }
+
             return true;
+        }
+
+        ec_domain_t* Master::getDomainPtr(const std::string& domain_name)
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                return nullptr;
+            }
+
+            return m_RegisteredDomains.at(domain_name)->getDomainPtr();
         }
 
         void Master::updateMasterState()
@@ -102,6 +117,7 @@ namespace ethercat_interface
         {
             for(const auto& d : m_RegisteredDomains)
             {
+                d.second->createDomain(m_EthercatMaster);
                 d.second->configureSlaves();
             }
         }

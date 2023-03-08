@@ -92,6 +92,11 @@ namespace ethercat_interface
                 }
             }
 
+            inline ec_domain_t* getDomainPtr()
+            {
+                return m_EthercatDomain;
+            }
+
             inline const std::string getDomainName() const
             {
                 return m_DomainName;
