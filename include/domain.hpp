@@ -30,6 +30,7 @@ namespace ethercat_interface
 
     namespace domain
     {
+
         class Domain
         {
             
@@ -81,6 +82,10 @@ namespace ethercat_interface
 
             ec_domain_state_t m_EthercatDomainState;
 
+            ec_pdo_entry_reg_t* m_DomainPdoEntryRegistries;
+
+            std::size_t m_NumOfPdoEntryRegistries = 0;
+
             uint8_t* m_DomainProcessData = nullptr;
 
             /**
@@ -97,8 +102,9 @@ namespace ethercat_interface
 
             bool ENABLE_LOGGING = false;
 
+            ec_pdo_entry_reg_t* createDomainPdoEntryRegistries();
+
         };
-        
         
         
     }

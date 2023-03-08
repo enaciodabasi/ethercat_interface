@@ -22,6 +22,14 @@ namespace ethercat_interface
             m_EthercatDomainState = {};
 
             configureSlaves(); // Configure each slave
+
+            if(m_NumOfPdoEntryRegistries != 0)
+            {
+                // + 1 is for adding the empty entry registry at the end of the array.
+                m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1]; 
+            }
+
+
         }
 
         Domain::~Domain()
@@ -79,10 +87,16 @@ namespace ethercat_interface
 
         void Domain::configureSlaves()
         {
+            
+            std::size_t tempPdoNum = 0;
+
             for(const auto& s : m_RegisteredSlaves)
             {
                 s.second->configure_slave();
+                tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
             }
+
+            m_NumOfPdoEntryRegistries = tempPdoNum;
         }
 
         void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t* slave_config_ptr)
@@ -91,6 +105,32 @@ namespace ethercat_interface
             {
                 s.second->setupSlave(master_ptr, m_EthercatDomain, slave_config_ptr);
             }
+        }
+
+        ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
+        {   
+            std::size_t i = 0;
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                auto info = s.second->getSlaveInfo();
+                
+                for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
+                {
+                    m_DomainPdoEntryRegistries[i] = {
+                        (uint16_t)info.alias,
+                        (uint16_t)info.position,
+                        (uint32_t)info.vendorID,
+                        (uint32_t)info.productCode,
+                        info.pdoEntryInfo.indexes[j],
+                        info.pdoEntryInfo.subindexes[j],
+                        s.second->getOffset()->getData(s.second->getOffset()->m_OffsetNameIndexes[j])
+                    };
+
+                    i += 1;
+                }
+            }
+
+            m_DomainPdoEntryRegistries[m_NumOfPdoEntryRegistries] = {};
         }
     }
 }

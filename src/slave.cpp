@@ -25,9 +25,8 @@ namespace ethercat_interface
             }
 
             m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
-            m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
+            //m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
             m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-            std::cout << "SLAVE PDO ENTRY SIZE: " << m_SlaveInfo.pdoEntryInfo.indexes.size() << std::endl;
             m_SlavePDOs = new ec_pdo_info_t[2];
         }
 
@@ -39,14 +38,15 @@ namespace ethercat_interface
         void Slave::configure_slave()
         {
 
-             m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
-            m_SlaveInfo.alias,
-            m_SlaveInfo.position,
-            m_SlaveInfo.vendorID,
-            m_SlaveInfo.productCode,
-            m_SlaveInfo.pdoEntryInfo.indexes,
-            m_SlaveInfo.pdoEntryInfo.subindexes,
-            m_SlaveOffsets);
+            /* m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
+                m_SlaveInfo.alias,
+                m_SlaveInfo.position,
+                m_SlaveInfo.vendorID,
+                m_SlaveInfo.productCode,
+                m_SlaveInfo.pdoEntryInfo.indexes,
+                m_SlaveInfo.pdoEntryInfo.subindexes,
+                m_SlaveOffsets
+            ); */
 
             /* m_SlavePdoEntryRegistries[0] = {SMBSlavePos, SMB, 0x6040, 0, &off.ctrl_word};
             m_SlavePdoEntryRegistries[1] = {SMBSlavePos, SMB, 0x60FF, 0, &off.target_velocity};
@@ -64,7 +64,8 @@ namespace ethercat_interface
             m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
                 m_SlaveInfo.pdoEntryInfo.indexes,
                 m_SlaveInfo.pdoEntryInfo.subindexes,
-                m_SlaveInfo.pdoEntryInfo.bitLengths);
+                m_SlaveInfo.pdoEntryInfo.bitLengths)
+            ;
 
             /* m_SlavePdoEntries[0] = {0x6040, 0x00, 16};
             m_SlavePdoEntries[1] = {0x60ff, 0x00, 32};
@@ -83,7 +84,8 @@ namespace ethercat_interface
                 m_SlaveInfo.ioMappingInfo.RxPDO_Address,
                 m_SlaveInfo.ioMappingInfo.RxPDO_Size,
                 m_SlaveInfo.ioMappingInfo.TxPDO_Address,
-                m_SlaveInfo.ioMappingInfo.TxPDO_Size);
+                m_SlaveInfo.ioMappingInfo.TxPDO_Size
+            );
 
             /* m_SlavePDOs[0]={0x1600, 5, m_SlavePdoEntries + 0};
             m_SlavePDOs[1]={0x1a00, 6, m_SlavePdoEntries + 5}; */
@@ -94,7 +96,8 @@ namespace ethercat_interface
                 m_SlaveInfo.slaveSyncInfo.numPDOs,
                 m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
                 m_SlavePDOs,
-                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes));
+                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
+            );
 
                 /* m_SlaveSyncs[0] = {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE};
                 m_SlaveSyncs[1] = {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE};
@@ -134,10 +137,10 @@ namespace ethercat_interface
             }
             
             std::cout << "Checking PDO Entry Registries" << std::endl;
-            if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
+            /* if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
             {
                 std::cout << "Failed during PDO entry registries check." << std::endl;
-            }
+            } */
 
             std::cout << "Slave config setup complete." << std::endl;
         }

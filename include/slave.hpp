@@ -152,6 +152,16 @@ namespace ethercat_interface
                 return m_SlaveName;
             }
 
+            inline const SlaveInfo getSlaveInfo() const
+            {
+                return m_SlaveInfo;
+            }
+
+            Offset* getOffset()
+            {
+                return m_SlaveOffsets;
+            }
+
             /* inline ec_slave_config_t* getEthercatSlaveConfig()
             {
                 return m_SlaveConfig;
