@@ -150,7 +150,7 @@ namespace ethercat_interface
             // TODO: check if the slave with the name slave_name exists and throw exception.
 
             
-            if(m_RegisteredSlaves.find(slave_name); == m_RegisteredSlaves.end())
+            if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
             {
                 // throw exception
                 return;

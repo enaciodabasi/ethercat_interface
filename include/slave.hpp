@@ -131,6 +131,9 @@ namespace ethercat_interface
 
 
             Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
+            
+            Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset = nullptr, bool enable_logging = false);
+
             ~Slave();
 
             virtual void configure_slave();
