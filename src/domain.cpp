@@ -71,6 +71,11 @@ namespace ethercat_interface
                 return false;
             }
 
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                s.second->setDomainProcessDataPtr(m_DomainProcessData);
+            }
+
             return true;
         }
 

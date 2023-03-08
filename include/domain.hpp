@@ -44,8 +44,41 @@ namespace ethercat_interface
         
             ~Domain();
 
+            /**
+             * @brief 
+             * 
+             */
             void updateDomainState();
 
+            /**
+             * @brief 
+             * 
+             * @tparam T 
+             * @param slave_name 
+             * @param value_to_write_name 
+             * @param value_to_write 
+             * @param bit_position 
+             */
+            template<typename T>
+            void write(
+                const std::string& slave_name,
+                const std::string& value_to_write_name,
+                const T& value_to_write,
+                int bit_position = nullptr
+            );
+
+            template<typename T>
+            auto read(
+                const std::string& slave_name,
+                const std::string& value_to_read_name,
+                int bit_position = nullptr
+            );
+
+            /**
+             * @brief: Stores the slave pointers inside the m_RegisteredSlaves Map.
+             * 
+             * @param slave: Pointer to the slave to register. 
+             */
             inline void registerSlave(slave::Slave* slave)
             {
                 m_RegisteredSlaves[slave->getSlaveName()] = slave;
@@ -105,6 +138,50 @@ namespace ethercat_interface
             ec_pdo_entry_reg_t* createDomainPdoEntryRegistries();
 
         };
+
+        template<typename T>
+        void Domain::write(
+            const std::string& slave_name,
+                const std::string& value_to_write_name,
+                const T& value_to_write,
+                int bit_position
+        )
+        {
+            // TODO: check if the slave with the name slave_name exists and throw exception.
+
+            
+            if(m_RegisteredSlaves.find(slave_name); == m_RegisteredSlaves.end())
+            {
+                // throw exception
+                return;
+            }
+
+            m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
+                value_to_write_name,
+                value_to_write,
+                bit_position
+            );
+
+        }
+
+        template<typename T>
+        auto Domain::read(
+            const std::string& slave_name,
+            const std::string& value_to_read_name,
+            int bit_position
+        )
+        {
+            if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
+            {
+
+                return;
+            }
+
+            return m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
+                value_to_read_name,
+                bit_position
+            );
+        }
         
         
     }
