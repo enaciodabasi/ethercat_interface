@@ -35,25 +35,24 @@ epos4_controller::epos4_controller()
     );
 
     dom->registerSlave(epos4);
-
     master->configureDomains();
     master->setupDomains();
     if(!master->activateMaster())
         std::cout << "cant activate master\n";
+
+    
 }
 
 void epos4_controller::cyclic_task()
 {
-    ecrt_master_receive(master->getEthercatMasterPtr());
-    
-    ecrt_domain_process(master->getDomainPtr("domain_0"));
-
+    master->receive("domain_0");
+    master->updateMasterState();
+    master->updateSlaveStates();
     //bool enabled = epos4->enableOperation();
     //
     //dom->write<int32_t>("amr_left_motor", "target_velocity", 500);
 
-    ecrt_domain_queue(master->getDomainPtr("domain_0"));
-    ecrt_master_send(master->getEthercatMasterPtr());
+    master->send("domain_0");
 
 }
 

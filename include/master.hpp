@@ -37,6 +37,8 @@ namespace ethercat_interface
 
             void updateSlaveStates();
 
+            void updateDomainStates();
+
             bool activateMaster();
 
             inline void registerDomain(domain::Domain* domain)

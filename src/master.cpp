@@ -109,13 +109,17 @@ namespace ethercat_interface
             m_EthercatMasterState = state;
         }
 
+        void Master::updateDomainStates()
+        {
+            for(const auto& d : m_RegisteredDomains)
+            {
+                d.second->updateDomainState();
+            }
+        }
+
         void Master::updateSlaveStates()
         {
-            std::cout << "Updating slave states\n";
-            if(!m_SlaveConfig)
-            {
-                std::cout << "Slave config empty\n";
-            }
+
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
                 this->m_SlaveConfig,
@@ -155,7 +159,7 @@ namespace ethercat_interface
         {
             for(const auto& d : m_RegisteredDomains)
             {
-                d.second->setupSlaves(m_EthercatMaster, m_SlaveConfig);
+                d.second->setupSlaves(m_EthercatMaster, &m_SlaveConfig);
                 if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries))
                 {
                     std::cout << "Failed during PDO entry registries check." << std::endl;
