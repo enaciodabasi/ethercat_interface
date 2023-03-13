@@ -149,6 +149,21 @@ namespace ethercat_interface
             const std::string& file_name,
             const std::string& slave_name
         );
+
+        struct DC_Info
+        {
+            uint16_t assign_activate;
+            uint32_t sync0_cycle;
+            int32_t sync0_shift;
+            uint32_t sync1_cycle;
+            int32_t sync1_shift;
+        };
+
+        DC_Info getDcInfo(
+            const std::string& file_name,
+            const std::string& slave_name
+        );
+
     } // End of namespace utilities
 
 } // End of namespace ethercat_interface

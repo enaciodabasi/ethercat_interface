@@ -146,5 +146,34 @@ namespace ethercat_interface
 
             return info;
         }
+
+        DC_Info getDcInfo(
+            const std::string& file_name,
+            const std::string& slave_name
+        )
+        {
+
+            DC_Info dcInfo;
+
+            try
+            {
+                YAML::Node configFile = YAML::LoadFile(file_name);
+                YAML::Node slaveConfig = configFile[slave_name];
+                YAML::Node dcConfig = slaveConfig["dc_info"];
+
+                dcInfo.assign_activate = dcConfig["assign_activate"].as<uint16_t>();
+                dcInfo.sync0_cycle = dcConfig["sync0_cycle"].as<uint32_t>();
+                dcInfo.sync0_shift = dcConfig["sync0_shift"].as<int32_t>();
+                dcInfo.sync1_cycle = dcConfig["sync1_cycle"].as<uint32_t>();
+                dcInfo.sync1_shift = dcConfig["sync1_shift"].as<int32_t>();
+
+            }
+            catch(const YAML::BadFile& ex)
+            {
+                std::cout << ex.what();
+            }
+
+            return dcInfo;
+        }
     }
 }
