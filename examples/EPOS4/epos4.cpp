@@ -45,32 +45,21 @@ epos4_controller::epos4_controller()
 
 void epos4_controller::cyclic_task()
 {
-    static uint16_t command = 0x0000;
-	static uint16_t command_old = 0x000;
-	static uint16_t status_old= 0x0000;
-	uint16_t ctrl1;
-	uint16_t status;
-	int8_t opmode;
-	int32_t current_velocity;
-	static int counter3 = 0;
-	static bool flip;
-    master->receive("domain_0");
+   
     master->updateMasterState();
     master->updateDomainStates();
     master->updateSlaveStates();
 
-
-
     bool enabled = epos4->enableOperation();
 
-    dom->write<int8_t>("epos4_0", "operation_mode", 9, 0);
+    master->write<int8_t>("domain_0", "epos4_0", "operation_mode", 9);
 
     //
     if(enabled)
     {   
         //std::cout << "Operation enabled\n";
-        dom->write<uint16_t>("epos4_0", "ctrl_word", 0x000f, 0);
-        dom->write<int32_t>("epos4_0", "target_velocity", 1500, 0);
+        master->write<uint16_t>("domain_0", "epos4_0", "ctrl_word", 0x000f, 0);
+        master->write<int32_t>("domain_0", "epos4_0", "target_velocity", 400);
     }
 
     master->send("domain_0");
@@ -87,6 +76,17 @@ int main(int argc, char** argv)
         
         epos4.cyclic_task();
     }
+
+    epos4.master->write<int32_t>(
+        "domain_0",
+        "epos4_0",
+        "target_velocity",
+        0
+    );
+    epos4.master->send("domain_0");
+
+    usleep(500000);
+    
 
     return 0;
 }

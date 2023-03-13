@@ -64,14 +64,14 @@ namespace ethercat_interface
                 const std::string& slave_name,
                 const std::string& value_to_write_name,
                 const T& value_to_write,
-                int bit_position = nullptr
+                int bit_position = NULL
             );
 
             template<typename T>
             auto read(
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
-                int bit_position = nullptr
+                int bit_position = NULL
             );
 
             /**
@@ -161,11 +161,19 @@ namespace ethercat_interface
                 return;
             }
 
-            m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
-                value_to_write_name,
-                value_to_write,
-                bit_position
-            );
+            if(bit_position == NULL)
+            {
+                m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
+                    value_to_write_name,
+                    value_to_write
+                );
+            }
+            else
+                m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
+                    value_to_write_name,
+                    value_to_write,
+                    bit_position
+                );
 
         }
 
@@ -181,7 +189,12 @@ namespace ethercat_interface
 
                return -1;
             } */
-
+            if(bit_position == NULL)
+            {
+                return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(
+                value_to_read_name);
+            }
+            
             return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(
                 value_to_read_name,
                 bit_position

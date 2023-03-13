@@ -51,6 +51,23 @@ namespace ethercat_interface
                 return m_EthercatMaster;
             }
 
+            template<typename T>
+            void write(
+                const std::string& domain_name,
+                const std::string& slave_name,
+                const std::string& value_to_write_name,
+                const T& value_to_write,
+                int bit_position = NULL
+            );
+
+            template<typename T>
+            auto read(
+                const std::string& domain_name,
+                const std::string& slave_name,
+                const std::string& value_to_read_name,
+                int bit_position = NULL
+            );
+
             void receive(const std::string& domain_name);
 
             void send(const std::string& domain_name);
@@ -87,7 +104,73 @@ namespace ethercat_interface
             void setupDomains();
 
         };
+
+        template<typename T>
+        void Master::write(
+            const std::string& domain_name,
+            const std::string& slave_name,
+            const std::string& value_to_write_name,
+            const T& value_to_write,
+            int bit_position
+        )
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                // TODO: Throw exception
+                return;
+            }
+
+            if(bit_position == NULL)
+            {
+                m_RegisteredDomains.at(domain_name)->write<T>(
+                    slave_name,
+                    value_to_write_name,
+                    value_to_write
+                );
+            }
+            else
+            {
+                m_RegisteredDomains.at(domain_name)->write<T>(
+                    slave_name,
+                    value_to_write_name,
+                    value_to_write,
+                    bit_position
+                );
+            }
+
+        }
+
+        template<typename T>
+        auto Master::read(
+            const std::string& domain_name,
+            const std::string& slave_name,
+            const std::string& value_to_read_name,
+            int bit_position
+        )
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                // TODO: Throw exception
+                return;
+            }
+
+            if(bit_position == NULL)
+            {
+                return m_RegisteredDomains.at(domain_name)->read<T>(
+                    slave_name,
+                    value_to_read_name
+                );
+            }
+
+            return m_RegisteredDomains.at(domain_name)->read<T>(
+                slave_name,
+                value_to_read_name,
+                bit_position
+            );
+        }
     }
+
+    
 }
 
 #endif // MASTER_HPP
