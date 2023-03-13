@@ -49,6 +49,10 @@ namespace ethercat_interface
                 return m_EthercatMaster;
             }
 
+            void receive(const std::string& domain_name);
+
+            void send(const std::string& domain_name);
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:

@@ -24,6 +24,7 @@ namespace ethercat_interface
                 // Log.
                 exit(0);
             }
+            m_SlaveStates = {};
         }
 
         Master::~Master()
@@ -46,6 +47,30 @@ namespace ethercat_interface
             }
 
             return true;
+        }
+
+        void Master::receive(const std::string& domain_name)
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                // Log.
+                return;
+            }
+
+            ecrt_master_receive(m_EthercatMaster);
+            ecrt_domain_process(m_RegisteredDomains.at(domain_name)->getDomainPtr());
+        }
+
+        void Master::send(const std::string& domain_name)
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                // Log.
+                return;
+            }
+
+            ecrt_domain_queue(m_RegisteredDomains.at(domain_name)->getDomainPtr());
+            ecrt_master_send(m_EthercatMaster);
         }
 
         ec_domain_t* Master::getDomainPtr(const std::string& domain_name)
@@ -86,7 +111,11 @@ namespace ethercat_interface
 
         void Master::updateSlaveStates()
         {
-        
+            std::cout << "Updating slave states\n";
+            if(!m_SlaveConfig)
+            {
+                std::cout << "Slave config empty\n";
+            }
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
                 this->m_SlaveConfig,
