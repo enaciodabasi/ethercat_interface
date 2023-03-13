@@ -24,28 +24,44 @@ An example of this process can be found in the setup_ethercat.sh file. In a term
 ./setup_ethercat.sh
 ```
 
-In order to use the interface with your own slave, inherit from the Slave base class and override the methods that you wish to change. The "slave_example.hpp/.cpp" in the examples directory can provide a starting point.
+The Master and Domain base classes provides the EtherCAT Master and the domains for your slaves.
+
 ```cpp
+#include "ethercat_interface/master.hpp"
+#include "ethercat_interface/domain.hpp"
 #include "ethercat_interface/slave.hpp"
 
-class EPOS4 : public ethercat_interface::slave::Slave
-{   
-}
-
-```
-
-The Controller base class provides the EtherCAT Master and the domains for your slaves. It also has the pure cyclic_task function which should be overriden by your custom Controller-derived class.
-
-```cpp
-#include "ethercat_interface/controller.hpp"
-
-class MyController: public ethercat_interface::controller::Controller
+class MyController
 {
     public:
 
+    MyController()
+    {
+        m_Master0 = new ethercat_interface::master::Master(0);
+
+        m_Domain0 = new ethercat_interface::domain::Domain("domain_0");
+        master->registerDomain(m_Domain0);
+        epos4 = new ethercat_interface::slave::Slave(
+            "epos4_0",
+            "/path/to/config/file/EPOS4/epos4_config.yaml",
+            new ServoOffset(),
+            true
+        );
+
+        m_Domain0->registerSlave(epos4);
+        m_Master0->configureDomains();
+        m_Master0->setupDomains();
+        if(!m_Master0->activateMaster())
+            std::cout << "cant activate master\n";
+    }
+
+    ethercat_interface::master::Master* m_Master0;
+
+    ethercat_interface::domain::Domain* m_Domain0;
+
     private:
 
-    std::unique_ptr<MyCustomSlave> m_MyCustomSlave0;
+    std::unique_ptr<MyCustomSlave> m_EPOS4_0;
 }
 
 ```
