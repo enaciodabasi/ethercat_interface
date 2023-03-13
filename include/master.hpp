@@ -75,7 +75,7 @@ namespace ethercat_interface
 
             unsigned int m_MasterIndex;
 
-            bool ENABLE_LOGGING = false;
+            bool ENABLE_LOGGING = true;
 
             std::unordered_map<std::string, domain::Domain*> m_RegisteredDomains;
 

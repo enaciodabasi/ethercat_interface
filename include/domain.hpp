@@ -176,13 +176,13 @@ namespace ethercat_interface
             int bit_position
         )
         {
-            if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
+            /* if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
             {
 
-                return;
-            }
+               return -1;
+            } */
 
-            return m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
+            return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(
                 value_to_read_name,
                 bit_position
             );

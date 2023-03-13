@@ -40,17 +40,38 @@ epos4_controller::epos4_controller()
     if(!master->activateMaster())
         std::cout << "cant activate master\n";
 
-    
+
 }
 
 void epos4_controller::cyclic_task()
 {
+    static uint16_t command = 0x0000;
+	static uint16_t command_old = 0x000;
+	static uint16_t status_old= 0x0000;
+	uint16_t ctrl1;
+	uint16_t status;
+	int8_t opmode;
+	int32_t current_velocity;
+	static int counter3 = 0;
+	static bool flip;
     master->receive("domain_0");
     master->updateMasterState();
+    master->updateDomainStates();
     master->updateSlaveStates();
-    //bool enabled = epos4->enableOperation();
+
+
+
+    bool enabled = epos4->enableOperation();
+
+    dom->write<int8_t>("epos4_0", "operation_mode", 9, 0);
+
     //
-    //dom->write<int32_t>("amr_left_motor", "target_velocity", 500);
+    if(enabled)
+    {   
+        //std::cout << "Operation enabled\n";
+        dom->write<uint16_t>("epos4_0", "ctrl_word", 0x000f, 0);
+        dom->write<int32_t>("epos4_0", "target_velocity", 1500, 0);
+    }
 
     master->send("domain_0");
 

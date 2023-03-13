@@ -192,9 +192,9 @@ namespace ethercat_interface
 
         bool Slave::enableOperation()
         {
-
             m_Status = this->readFromSlave<uint16_t>("status_word");
-            std::cout << (m_Status & getStatusValue(StatusType::OperationEnabled)) << std::endl;
+            //if(m_Status == 0) return false;
+            //std::cout << m_Status << std::endl;
             if(m_Status & getStatusValue(StatusType::OperationEnabled) == 39)
             {   
                 return true;
@@ -208,22 +208,27 @@ namespace ethercat_interface
             // Check if there is a registered fault in the Slave
             if(!(m_Status & getStatusValue(StatusType::Fault)))
             {   
+                //std::cout << "no fault\n";
                 // If state is Switch on disabled send the Shutdown command.
-                if(m_Status & getStatusValue(StatusType::SwitchOnDisabled))
+                if((m_Status & getStatusValue(StatusType::SwitchOnDisabled)))
                 {   
+                    std::cout << "switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 //// If state is Ready to Switch On send the Switch On command.
                 else if(m_Status & getStatusValue(StatusType::ReadyToSwitchOn) == 4)
                 {
+                    std::cout << "ready to switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
-                // If state is Switched On send the Enable Operation command.
+                //// If state is Switched On send the Enable Operation command.
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
+                    std::cout << "switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
+
                     return false;
                 }
                 
@@ -233,6 +238,7 @@ namespace ethercat_interface
                 if(m_Status & getStatusValue(StatusType::Fault))
                 {
                     // Send ResetFault to the control word.
+                    std::cout << "fault exists\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
                     return false;
 
