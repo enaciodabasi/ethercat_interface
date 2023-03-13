@@ -6,7 +6,6 @@ find_package(yaml-cpp REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
-    src/controller.cpp
     src/slave.cpp
     src/utilities.cpp
     src/state.cpp
@@ -48,7 +47,6 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/slave.hpp
     include/offset.hpp
     include/utilities.hpp
-    include/controller.hpp
     include/state.hpp
 )
 

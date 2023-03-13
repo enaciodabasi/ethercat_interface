@@ -46,6 +46,33 @@ namespace ethercat_interface
             m_SlavePDOs = new ec_pdo_info_t[2];
         }
 
+        Slave::Slave(
+            const std::string& slave_name,
+            const std::string& config_file_path,
+            Offset* offset,
+            bool enable_logging,
+            bool enable_dc
+        )   : m_SlaveName(slave_name), LOGGING_ENABLED(enable_logging), ENABLE_DC(enable_dc)
+        {
+            if(offset != nullptr)
+            {
+                m_SlaveOffsets = offset;
+            }
+
+            if(enable_dc)
+            {
+                m_DcInfo = utilities::getDcInfo(
+                    config_file_path,
+                    slave_name
+                );
+            }
+
+            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+
+            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+            m_SlavePDOs = new ec_pdo_info_t[2];
+        }
+
         Slave::~Slave()
         {   
             //delete m_SlaveOffsets;
@@ -151,8 +178,19 @@ namespace ethercat_interface
                 
                 std::cout << "Creation of slave config pdos is successful" << std::endl;
             }
-            
-            std::cout << "Checking PDO Entry Registries" << std::endl;
+
+            if(ENABLE_DC)
+            {
+                ecrt_slave_config_dc(
+                    (*slave_config_ptr),
+                    m_DcInfo.assign_activate,
+                    m_DcInfo.sync0_cycle,
+                    m_DcInfo.sync0_shift,
+                    m_DcInfo.sync1_cycle,
+                    m_DcInfo.sync1_shift
+                );  
+            }
+
             /* if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
             {
                 std::cout << "Failed during PDO entry registries check." << std::endl;
@@ -244,7 +282,7 @@ namespace ethercat_interface
 
                 }
             }
-
+            
             return false;
         }
 

@@ -112,7 +112,7 @@ namespace ethercat_interface
          */
         bool receiveDomainData();
         
-        private:
+        protected:
             
             std::string m_DomainName;
 

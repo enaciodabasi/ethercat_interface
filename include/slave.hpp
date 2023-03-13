@@ -134,6 +134,14 @@ namespace ethercat_interface
             
             Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset = nullptr, bool enable_logging = false);
 
+            Slave(
+                const std::string& slave_name,
+                const std::string& config_file_path,
+                Offset* offset = nullptr,
+                bool enable_logging = false,
+                bool enable_dc = false
+            );
+
             ~Slave();
 
             virtual void configure_slave();
@@ -244,14 +252,16 @@ namespace ethercat_interface
             SlaveInfo m_SlaveInfo;
 
             Offset* m_SlaveOffsets; 
-
+            
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
             //virtual bool updateSlaveStatus();
 
-            private:
-
             bool LOGGING_ENABLED = false;
+
+            bool ENABLE_DC = false;
+
+            DC_Info m_DcInfo;
 
             SlaveStatus m_Status; // Status Word read from the EtherCAT master.
 
