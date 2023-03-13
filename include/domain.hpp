@@ -136,7 +136,7 @@ namespace ethercat_interface
 
             void configureSlaves();
 
-            void setupSlaves(ec_master_t* master_ptr, ec_slave_config_t* slave_config_ptr);
+            void setupSlaves(ec_master_t* master_ptr, ec_slave_config_t** slave_config_ptr);
 
             bool ENABLE_LOGGING = false;
 

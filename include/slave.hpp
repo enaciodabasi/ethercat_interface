@@ -147,7 +147,7 @@ namespace ethercat_interface
             virtual void setupSlave(
                 ec_master_t* masterPtr,
                 ec_domain_t* domainPtr,
-                ec_slave_config_t* slave_config_ptr
+                ec_slave_config_t** slave_config_ptr
             );
 
             inline const std::string getSlaveName() const

@@ -22,17 +22,8 @@ namespace ethercat_interface
             m_EthercatDomainState = {};
 
             configureSlaves(); // Configure each slave
-
-            if(m_NumOfPdoEntryRegistries != 0)
-            {
-                // + 1 is for adding the empty entry registry at the end of the array.
-                m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
-                createDomainPdoEntryRegistries(); 
-            }
-            else
-            {
-                // Log.
-            }
+            std::cout << "Number of PDO entries to register\n";
+            
 
 
         }
@@ -105,11 +96,26 @@ namespace ethercat_interface
                 s.second->configure_slave();
                 tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
             }
-
+            
             m_NumOfPdoEntryRegistries = tempPdoNum;
+
+            std::cout << "Configured slaves for domain " << m_DomainName << std::endl;
+
+            if(m_NumOfPdoEntryRegistries != 0)
+            {   
+                std::cout << "Registering domain PDO entries\n";
+                // + 1 is for adding the empty entry registry at the end of the array.
+                m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
+                createDomainPdoEntryRegistries(); 
+            }
+            else
+            {
+                // Log.
+                
+            }
         }
 
-        void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t* slave_config_ptr)
+        void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t** slave_config_ptr)
         {
             for(const auto& s : m_RegisteredSlaves)
             {
@@ -120,12 +126,14 @@ namespace ethercat_interface
         ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
         {   
             std::size_t i = 0;
+            std::cout << "Creating domain pdo entry registries.\n";
             for(const auto& s : m_RegisteredSlaves)
             {
                 auto info = s.second->getSlaveInfo();
                 
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {
+                    
                     m_DomainPdoEntryRegistries[i] = {
                         (uint16_t)info.alias,
                         (uint16_t)info.position,
@@ -139,7 +147,7 @@ namespace ethercat_interface
                     i += 1;
                 }
             }
-
+            std::cout << "domain pdo entry regs done inserting empty reg.\n";
             m_DomainPdoEntryRegistries[m_NumOfPdoEntryRegistries] = {};
         }
     }

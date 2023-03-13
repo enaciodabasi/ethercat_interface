@@ -125,10 +125,10 @@ namespace ethercat_interface
                 std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
 
-        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t* slave_config_ptr)
+        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t** slave_config_ptr)
         {
 
-            slave_config_ptr = ecrt_master_slave_config(
+            (*slave_config_ptr) = ecrt_master_slave_config(
                 masterPtr,
                 m_SlaveInfo.alias,
                 m_SlaveInfo.position,
@@ -142,7 +142,7 @@ namespace ethercat_interface
                 std::cout << "Can't create slave config" << std::endl;
             }
 
-            if(ecrt_slave_config_pdos(slave_config_ptr, EC_END, m_SlaveSyncs) != 0)
+            if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
             {
                 std::cout << "Failed to create Slave Config PDOs." << std::endl;
             }
@@ -157,7 +157,8 @@ namespace ethercat_interface
             {
                 std::cout << "Failed during PDO entry registries check." << std::endl;
             } */
-
+            //slave_config_ptr = tempConf;
+            //delete tempConf;
             std::cout << "Slave config setup complete." << std::endl;
         }
 
