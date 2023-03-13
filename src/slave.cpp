@@ -25,9 +25,24 @@ namespace ethercat_interface
             }
 
             m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
-            m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
+            //m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
             m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-            std::cout << "SLAVE PDO ENTRY SIZE: " << m_SlaveInfo.pdoEntryInfo.indexes.size() << std::endl;
+            m_SlavePDOs = new ec_pdo_info_t[2];
+        }
+
+        Slave::Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset, bool enable_logging)
+            : m_SlaveName(slave_name)
+        {
+            m_SlaveInfo = utilities::parse_config_file(config_file_path, slave_name);
+
+            if(offset != nullptr)
+            {
+                m_SlaveOffsets = offset;
+            }
+
+            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+
+            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
             m_SlavePDOs = new ec_pdo_info_t[2];
         }
 
@@ -39,14 +54,15 @@ namespace ethercat_interface
         void Slave::configure_slave()
         {
 
-             m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
-            m_SlaveInfo.alias,
-            m_SlaveInfo.position,
-            m_SlaveInfo.vendorID,
-            m_SlaveInfo.productCode,
-            m_SlaveInfo.pdoEntryInfo.indexes,
-            m_SlaveInfo.pdoEntryInfo.subindexes,
-            m_SlaveOffsets);
+            /* m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
+                m_SlaveInfo.alias,
+                m_SlaveInfo.position,
+                m_SlaveInfo.vendorID,
+                m_SlaveInfo.productCode,
+                m_SlaveInfo.pdoEntryInfo.indexes,
+                m_SlaveInfo.pdoEntryInfo.subindexes,
+                m_SlaveOffsets
+            ); */
 
             /* m_SlavePdoEntryRegistries[0] = {SMBSlavePos, SMB, 0x6040, 0, &off.ctrl_word};
             m_SlavePdoEntryRegistries[1] = {SMBSlavePos, SMB, 0x60FF, 0, &off.target_velocity};
@@ -64,7 +80,8 @@ namespace ethercat_interface
             m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
                 m_SlaveInfo.pdoEntryInfo.indexes,
                 m_SlaveInfo.pdoEntryInfo.subindexes,
-                m_SlaveInfo.pdoEntryInfo.bitLengths);
+                m_SlaveInfo.pdoEntryInfo.bitLengths)
+            ;
 
             /* m_SlavePdoEntries[0] = {0x6040, 0x00, 16};
             m_SlavePdoEntries[1] = {0x60ff, 0x00, 32};
@@ -83,7 +100,8 @@ namespace ethercat_interface
                 m_SlaveInfo.ioMappingInfo.RxPDO_Address,
                 m_SlaveInfo.ioMappingInfo.RxPDO_Size,
                 m_SlaveInfo.ioMappingInfo.TxPDO_Address,
-                m_SlaveInfo.ioMappingInfo.TxPDO_Size);
+                m_SlaveInfo.ioMappingInfo.TxPDO_Size
+            );
 
             /* m_SlavePDOs[0]={0x1600, 5, m_SlavePdoEntries + 0};
             m_SlavePDOs[1]={0x1a00, 6, m_SlavePdoEntries + 5}; */
@@ -94,7 +112,8 @@ namespace ethercat_interface
                 m_SlaveInfo.slaveSyncInfo.numPDOs,
                 m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
                 m_SlavePDOs,
-                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes));
+                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
+            );
 
                 /* m_SlaveSyncs[0] = {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE};
                 m_SlaveSyncs[1] = {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE};
@@ -106,10 +125,10 @@ namespace ethercat_interface
                 std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
 
-        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr)
+        void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t** slave_config_ptr)
         {
 
-            m_SlaveConfig = ecrt_master_slave_config(
+            (*slave_config_ptr) = ecrt_master_slave_config(
                 masterPtr,
                 m_SlaveInfo.alias,
                 m_SlaveInfo.position,
@@ -118,30 +137,32 @@ namespace ethercat_interface
             );
 
         
-            if(!m_SlaveConfig)
+            if(!slave_config_ptr)
             {
                 std::cout << "Can't create slave config" << std::endl;
             }
 
-            if(ecrt_slave_config_pdos(m_SlaveConfig, EC_END, m_SlaveSyncs) != 0)
+            if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
             {
                 std::cout << "Failed to create Slave Config PDOs." << std::endl;
             }
             else
             {
+                
                 std::cout << "Creation of slave config pdos is successful" << std::endl;
             }
             
             std::cout << "Checking PDO Entry Registries" << std::endl;
-            if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
+            /* if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
             {
                 std::cout << "Failed during PDO entry registries check." << std::endl;
-            }
-
+            } */
+            //slave_config_ptr = tempConf;
+            //delete tempConf;
             std::cout << "Slave config setup complete." << std::endl;
         }
 
-        void Slave::updateSlaveState()
+        /* void Slave::updateSlaveState()
         {
             ec_slave_config_state_t state;
             ecrt_slave_config_state(
@@ -167,13 +188,13 @@ namespace ethercat_interface
 
             this->m_CurrentSlaveState = state;
             
-        }
+        } */
 
         bool Slave::enableOperation()
         {
-
             m_Status = this->readFromSlave<uint16_t>("status_word");
-            std::cout << (m_Status & getStatusValue(StatusType::OperationEnabled)) << std::endl;
+            //if(m_Status == 0) return false;
+            //std::cout << m_Status << std::endl;
             if(m_Status & getStatusValue(StatusType::OperationEnabled) == 39)
             {   
                 return true;
@@ -187,22 +208,27 @@ namespace ethercat_interface
             // Check if there is a registered fault in the Slave
             if(!(m_Status & getStatusValue(StatusType::Fault)))
             {   
+                //std::cout << "no fault\n";
                 // If state is Switch on disabled send the Shutdown command.
-                if(m_Status & getStatusValue(StatusType::SwitchOnDisabled))
+                if((m_Status & getStatusValue(StatusType::SwitchOnDisabled)))
                 {   
+                    std::cout << "switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 //// If state is Ready to Switch On send the Switch On command.
                 else if(m_Status & getStatusValue(StatusType::ReadyToSwitchOn) == 4)
                 {
+                    std::cout << "ready to switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
-                // If state is Switched On send the Enable Operation command.
+                //// If state is Switched On send the Enable Operation command.
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
+                    std::cout << "switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
+
                     return false;
                 }
                 
@@ -212,6 +238,7 @@ namespace ethercat_interface
                 if(m_Status & getStatusValue(StatusType::Fault))
                 {
                     // Send ResetFault to the control word.
+                    std::cout << "fault exists\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
                     return false;
 

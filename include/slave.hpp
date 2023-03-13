@@ -131,6 +131,9 @@ namespace ethercat_interface
 
 
             Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
+            
+            Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset = nullptr, bool enable_logging = false);
+
             ~Slave();
 
             virtual void configure_slave();
@@ -143,7 +146,8 @@ namespace ethercat_interface
              */
             virtual void setupSlave(
                 ec_master_t* masterPtr,
-                ec_domain_t* domainPtr
+                ec_domain_t* domainPtr,
+                ec_slave_config_t** slave_config_ptr
             );
 
             inline const std::string getSlaveName() const
@@ -151,7 +155,17 @@ namespace ethercat_interface
                 return m_SlaveName;
             }
 
-            inline ec_slave_config_t* getEthercatSlaveConfig()
+            inline const SlaveInfo getSlaveInfo() const
+            {
+                return m_SlaveInfo;
+            }
+
+            Offset* getOffset()
+            {
+                return m_SlaveOffsets;
+            }
+
+            /* inline ec_slave_config_t* getEthercatSlaveConfig()
             {
                 return m_SlaveConfig;
             }
@@ -159,14 +173,14 @@ namespace ethercat_interface
             inline ec_slave_config_state_t getCurrentSlaveState() const
             {
                 return m_CurrentSlaveState;
-            }
+            } */
 
             inline void setOffsetPtr(Offset* offset)
             {
                 m_SlaveOffsets = offset;
             }
 
-            void updateSlaveState();
+            /* void updateSlaveState(); */
 
             /**
              * @brief 
@@ -180,7 +194,6 @@ namespace ethercat_interface
             template<typename T>
             auto readFromSlave(
                 const std::string& value_to_read_name, 
-                uint8_t* domain_process_data_ptr = nullptr,
                 int bit_position = NULL
             );
             
@@ -197,7 +210,6 @@ namespace ethercat_interface
             void writeToSlave(
                 const std::string& value_to_write_name,
                 const T& new_val, 
-                uint8_t* domain_process_data_ptr = nullptr,
                 int bit_position = NULL
             );
 
@@ -217,9 +229,9 @@ namespace ethercat_interface
 
             std::string m_SlaveName;
 
-            ec_slave_config_t* m_SlaveConfig;
+            /* ec_slave_config_t* m_SlaveConfig;
 
-            ec_slave_config_state_t m_CurrentSlaveState;
+            ec_slave_config_state_t m_CurrentSlaveState; */
 
             ec_pdo_entry_reg_t* m_SlavePdoEntryRegistries;
 
@@ -246,12 +258,8 @@ namespace ethercat_interface
         };
 
         template<typename T>
-        auto Slave::readFromSlave(const std::string& value_to_read_name, uint8_t* domain_process_data_ptr, int bit_position)
+        auto Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
         {
-            if(domain_process_data_ptr != nullptr)
-            {
-                m_DomainProcessDataPtr = domain_process_data_ptr;
-            }
 
             auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
 
@@ -339,15 +347,9 @@ namespace ethercat_interface
         void Slave::writeToSlave(
             const std::string& value_to_write_name,
             const T& new_val,
-            uint8_t* domain_process_data_ptr,
             int bit_position
         )
         {
-
-            if(domain_process_data_ptr != nullptr)
-            {
-                m_DomainProcessDataPtr = domain_process_data_ptr;
-            }
 
             auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name);
 
@@ -439,7 +441,6 @@ namespace ethercat_interface
             }
         }
 
-        
 
     }
     
