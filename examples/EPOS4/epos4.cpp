@@ -52,6 +52,7 @@ void epos4_controller::cyclic_task()
 
     bool enabled = epos4->enableOperation();
 
+    if(enabled)
     master->write<int8_t>("domain_0", "epos4_0", "operation_mode", 9);
 
     //
