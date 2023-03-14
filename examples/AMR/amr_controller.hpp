@@ -21,6 +21,8 @@ class AMR_Controller
     slave::Slave* el7221_9014_0;
     slave::Slave* el7221_9014_1;
 
+    void cyclic_task();
+
 
     private:
 

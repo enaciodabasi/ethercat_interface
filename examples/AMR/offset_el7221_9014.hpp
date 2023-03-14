@@ -47,11 +47,11 @@ void EL7221_9014_Offset::init_OffsetMap()
     m_OffsetNameIndexMap["op_mode"] = &m_Data.op_mode;
     m_OffsetNameIndexes.emplace_back("op_mode");
 	
+    m_OffsetNameIndexMap["current_position"] = &m_Data.current_position;
+	m_OffsetNameIndexes.emplace_back("current_position");
+    
 	m_OffsetNameIndexMap["status_word"] = &m_Data.status_word;
 	m_OffsetNameIndexes.emplace_back("status_word");
-	
-	m_OffsetNameIndexMap["current_position"] = &m_Data.current_position;
-	m_OffsetNameIndexes.emplace_back("current_position");
 	
 	m_OffsetNameIndexMap["current_velocity"] = &m_Data.current_velocity;
 	m_OffsetNameIndexes.emplace_back("current_velocity");

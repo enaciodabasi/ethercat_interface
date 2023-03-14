@@ -13,8 +13,8 @@ EL7221_9014_0:
  type: "driver"
  vendor_id: 0x00000002
  product_id: 0x1c353052
- slave_position: 0
- slave_alias: 1
+ slave_position: 1
+ slave_alias: 0
 
  pdo_entry_info:
   indexes:
@@ -44,6 +44,14 @@ EL7221_9014_0:
   rxpdo_size: 3
   txpdo_address: 0x1a00
   txpdo_size: 3
+  rxpdo_indexes:
+   - 0x1600
+   - 0x1601
+   - 0x1608
+  txpdo_indexes:
+   - 0x1a00
+   - 0x1a01
+   - 0x1a02
 
  slave_sync_info:
 
@@ -88,8 +96,8 @@ EL7221_9014_1:
  type: "driver"
  vendor_id: 0x00000002
  product_id: 0x1c353052
- slave_position: 0
- slave_alias: 2
+ slave_position: 2
+ slave_alias: 0
 
  pdo_entry_info:
   indexes:
@@ -119,6 +127,14 @@ EL7221_9014_1:
   rxpdo_size: 3
   txpdo_address: 0x1a00
   txpdo_size: 3
+  rxpdo_indexes:
+   - 0x1600
+   - 0x1601
+   - 0x1608
+  txpdo_indexes:
+   - 0x1a00
+   - 0x1a01
+   - 0x1a02
 
  slave_sync_info:
 
