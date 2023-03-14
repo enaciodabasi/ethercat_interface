@@ -17,6 +17,7 @@
 #include <vector>
 #include <variant>
 #include <optional>
+#include <map>
 
 #include <yaml-cpp/yaml.h>
 
@@ -74,6 +75,19 @@ namespace ethercat_interface
         std::vector<ec_direction_t> intToEcDirectionEnum(const std::vector<int>& directions);
 
         std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int>& watchdog_modes);
+
+        class toHexaHelper
+        {
+            public:
+
+            toHexaHelper();
+
+            
+            private:
+
+            std::map<char, uint8_t> charHexMap;
+
+        };
 
         std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix);
 

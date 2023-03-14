@@ -79,25 +79,140 @@ namespace ethercat_interface
             return watchdogModes;
         }
 
+        toHexaHelper::toHexaHelper()
+        {   
+            uint8_t count = 0x00;
+            for(uint8_t i = 0; i <= 255; i++)
+            {
+                charHexMap[static_cast<char>(i)] = count;
+
+                count += 0x01;
+                
+            }
+        }
+
         std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix)
         {
             std::vector<uint8_t> hexas;
-
             for(std::size_t i = 0; i < to_fix.size(); i++)
             {
                 if(to_fix[i] == '0')
-                {   
+                {
                     hexas.emplace_back(0x00);
-                }    
+                }
                 else if(to_fix[i] == '1')
-                {   
+                {
                     hexas.emplace_back(0x01);
                 }
                 else
-                {
-                    continue;
-                }
+                continue;
             }
+            // This is bad practice.
+           /*  for(std::size_t i = 0; i < to_fix.size(); i++)
+            {
+                switch (to_fix[i])
+                {
+                case '0':
+                    hexas.emplace_back(0x00);
+                    break;
+                case '1':
+                    hexas.emplace_back(0x01);
+                    break;
+                case '2':
+                    hexas.emplace_back(0x02);
+                    break;
+                case '3':
+                    hexas.emplace_back(0x03);
+                    break;
+                case '4':
+                    hexas.emplace_back(0x04);
+                    break;
+                case '5':
+                    hexas.emplace_back(0x05);
+                    break;
+                case '6':
+                    hexas.emplace_back(0x06);
+                    break;
+                case '7':
+                    hexas.emplace_back(0x07);
+                    break;
+                case '8':
+                    hexas.emplace_back(0x08);
+                    break;
+                case '9':
+                    hexas.emplace_back(0x09);
+                    break;
+                case '10':
+                    hexas.emplace_back(0x0A);
+                    break;
+                case '11':
+                    hexas.emplace_back(0x0B);
+                    break;
+                case '12':
+                    hexas.emplace_back(0x0C);
+                    break;
+                case '13':
+                    hexas.emplace_back(0x0D);
+                    break;
+                case '14':
+                    hexas.emplace_back(0x0E);
+                    break;
+                case '15':
+                    hexas.emplace_back(0x0F);
+                    break;
+                case '16':
+                    hexas.emplace_back(0x10);
+                    break;
+                case '17':
+                    hexas.emplace_back(0x11);
+                    break;
+                case '18':
+                    hexas.emplace_back(0x12);
+                    break;
+                case '19':
+                    hexas.emplace_back(0x13);
+                    break;
+                case '20':
+                    hexas.emplace_back(0x14);
+                    break;
+                case '21':
+                    hexas.emplace_back(0x15);
+                    break;
+                case '22':
+                    hexas.emplace_back(0x16);
+                    break;
+                case '23':
+                    hexas.emplace_back(0x17);
+                    break;
+                case '24':
+                    hexas.emplace_back(0x18);
+                    break;
+                case '25':
+                    hexas.emplace_back(0x19);
+                    break;
+                case '26':
+                    hexas.emplace_back(0x1A);
+                    break;
+                case '27':
+                    hexas.emplace_back(0x1B);
+                    break;
+                case '28':
+                    hexas.emplace_back(0x1C);
+                    break;
+                case '29':
+                    hexas.emplace_back(0x1D);
+                    break;
+                case '30':
+                    hexas.emplace_back(0x1E);
+                    break;
+                case '31':
+                    hexas.emplace_back(0x1F);
+                    break;
+                default:
+                    break;
+                }
+            } */
+            
 
             return hexas;
         }
