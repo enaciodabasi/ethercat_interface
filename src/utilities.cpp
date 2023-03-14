@@ -91,22 +91,10 @@ namespace ethercat_interface
             }
         }
 
-        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix)
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix)
         {
             std::vector<uint8_t> hexas;
-            /* for(std::size_t i = 0; i < to_fix.size(); i++)
-            {
-                if(to_fix[i] == '0')
-                {
-                    hexas.emplace_back(0x00);
-                }
-                else if(to_fix[i] == '1')
-                {
-                    hexas.emplace_back(0x01);
-                }
-                else
-                continue;
-            } */
+        
             // This is bad practice.
             for(std::size_t i = 0; i < to_fix.size(); i++)
             {
@@ -211,9 +199,10 @@ namespace ethercat_interface
                 default:
                     break;
                 }
+
             }
             
-
+            
             return hexas;
         }
 
@@ -232,14 +221,25 @@ namespace ethercat_interface
                 YAML::Node slave_config  = config_file[slave_name];
 
                 info.slaveName = slave_name;
-
+                const std::string typeStr = slave_config["type"].as<std::string>();
                 info.vendorID = slave_config["vendor_id"].as<int>();
                 info.productCode = slave_config["product_id"].as<int>();
                 info.position = slave_config["slave_position"].as<uint>();
                 info.alias = slave_config["slave_alias"].as<uint>();
 
+                if(typeStr == "coupler" || typeStr == "Coupler")
+                {
+                    info.slaveType = SlaveType::Coupler;
+                    return info;
+                }
+                else if(typeStr == "driver" || typeStr == "Driver")
+                {
+                    info.slaveType = SlaveType::Driver;
+                }
+                
                 info.pdoEntryInfo.indexes = slave_config["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
-                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint8_t>>());
+                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
+                
                 info.pdoEntryInfo.bitLengths = slave_config["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
                 info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
@@ -256,7 +256,12 @@ namespace ethercat_interface
 
             }catch(const YAML::BadFile& ex)
             {
+                
                 std::cout << ex.what();
+            }
+            catch(const YAML::TypedBadConversion<unsigned short>& ex)
+            {
+                info.toString();
             }
 
             return info;
@@ -272,6 +277,7 @@ namespace ethercat_interface
 
             try
             {
+                
                 YAML::Node configFile = YAML::LoadFile(file_name);
                 YAML::Node slaveConfig = configFile[slave_name];
                 YAML::Node dcConfig = slaveConfig["dc_info"];

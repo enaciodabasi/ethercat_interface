@@ -89,7 +89,7 @@ namespace ethercat_interface
 
         };
 
-        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix);
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix);
 
         struct SlaveSyncInfo
         {
@@ -132,10 +132,16 @@ namespace ethercat_interface
             }
         };
 
+        enum class SlaveType
+        {
+            Coupler,
+            Driver
+        };
 
         struct SlaveInfo
         {
             std::string slaveName;
+            SlaveType slaveType;
             int vendorID;
             int productCode;
             int position;

@@ -93,6 +93,10 @@ namespace ethercat_interface
 
             for(const auto& s : m_RegisteredSlaves)
             {
+                if(s.second->getSlaveType() == utilities::SlaveType::Coupler)
+                {
+                    continue;
+                }
                 s.second->configure_slave();
                 tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
             }

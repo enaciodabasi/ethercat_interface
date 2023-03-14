@@ -82,47 +82,12 @@ namespace ethercat_interface
 
         void Slave::configure_slave()
         {
-
-            /* m_SlavePdoEntryRegistries = ethercat_interface::slave::createDomainRegistries(
-                m_SlaveInfo.alias,
-                m_SlaveInfo.position,
-                m_SlaveInfo.vendorID,
-                m_SlaveInfo.productCode,
-                m_SlaveInfo.pdoEntryInfo.indexes,
-                m_SlaveInfo.pdoEntryInfo.subindexes,
-                m_SlaveOffsets
-            ); */
-
-            /* m_SlavePdoEntryRegistries[0] = {SMBSlavePos, SMB, 0x6040, 0, &off.ctrl_word};
-            m_SlavePdoEntryRegistries[1] = {SMBSlavePos, SMB, 0x60FF, 0, &off.target_velocity};
-            m_SlavePdoEntryRegistries[2] = {SMBSlavePos, SMB, 0x60B1, 0, &off.velocity_offset};
-            m_SlavePdoEntryRegistries[3] = {SMBSlavePos, SMB, 0x6060, 0, &off.operation_mode};
-            m_SlavePdoEntryRegistries[4] = {SMBSlavePos, SMB, 0x60FE, 1, &off.digital_output};
-	        m_SlavePdoEntryRegistries[5] = {SMBSlavePos, SMB, 0x6041, 0, &off.status_word};
-            m_SlavePdoEntryRegistries[6] = {SMBSlavePos, SMB, 0x6064, 0, &off.current_position}; 
-	        m_SlavePdoEntryRegistries[7] = {SMBSlavePos, SMB, 0x606C, 0, &off.current_velocity};
-	        m_SlavePdoEntryRegistries[8] = {SMBSlavePos, SMB, 0x6077, 0, &off.current_torque};
-            m_SlavePdoEntryRegistries[9] = {SMBSlavePos, SMB, 0x6061, 0, &off.mode_display};
-            m_SlavePdoEntryRegistries[10] = {SMBSlavePos, SMB, 0x60FD, 0, &off.digital_input};
-            m_SlavePdoEntryRegistries[11] = {}; */
             
             m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
                 m_SlaveInfo.pdoEntryInfo.indexes,
                 m_SlaveInfo.pdoEntryInfo.subindexes,
                 m_SlaveInfo.pdoEntryInfo.bitLengths)
             ;
-
-            /* m_SlavePdoEntries[0] = {0x6040, 0x00, 16};
-            m_SlavePdoEntries[1] = {0x60ff, 0x00, 32};
-            m_SlavePdoEntries[2] = {0x60b1, 0x00, 32};
-            m_SlavePdoEntries[3] = {0x6060, 0x00, 8};
-            m_SlavePdoEntries[4] = {0x60fe, 0x01, 32};
-            m_SlavePdoEntries[5] = {0x6041, 0x00, 16};
-            m_SlavePdoEntries[6] = {0x6064, 0x00, 32};
-            m_SlavePdoEntries[7] = {0x606c, 0x00, 32};
-            m_SlavePdoEntries[8] = {0x6077, 0x00, 16};
-            m_SlavePdoEntries[9] = {0x6061, 0x00, 8};
-            m_SlavePdoEntries[10] = {0x60fd, 0x00, 32}; */
 
             m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
                 m_SlavePdoEntries,
@@ -132,8 +97,6 @@ namespace ethercat_interface
                 m_SlaveInfo.ioMappingInfo.TxPDO_Size
             );
 
-            /* m_SlavePDOs[0]={0x1600, 5, m_SlavePdoEntries + 0};
-            m_SlavePDOs[1]={0x1a00, 6, m_SlavePdoEntries + 5}; */
 
             m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
                 m_SlaveInfo.slaveSyncInfo.numSyncManagers,
@@ -143,13 +106,6 @@ namespace ethercat_interface
                 m_SlavePDOs,
                 ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
             );
-
-                /* m_SlaveSyncs[0] = {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE};
-                m_SlaveSyncs[1] = {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE};
-                m_SlaveSyncs[2] = {2, EC_DIR_OUTPUT, 1, m_SlavePDOs + 0, EC_WD_ENABLE};
-                m_SlaveSyncs[3] = {3, EC_DIR_INPUT, 1, m_SlavePDOs + 1, EC_WD_DISABLE};
-                m_SlaveSyncs[4] = {0xff};
- */
 
                 std::cout << "Configured slave " << m_SlaveName << std::endl;
         }
@@ -165,6 +121,10 @@ namespace ethercat_interface
                 m_SlaveInfo.productCode
             );
 
+            if(m_SlaveInfo.slaveType == SlaveType::Coupler)
+            {
+                return;
+            }
         
             if(!slave_config_ptr)
             {
@@ -367,7 +327,6 @@ namespace ethercat_interface
             pdos[0] = {RxPDO_start, RxPDO_size, entriesArray + 0};
             pdos[1] = {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size};
             std::cout << (uint16_t)RxPDO_start << " " << TxPDO_start << " " << (uint)RxPDO_size << " " << (uint)TxPDO_size << std::endl;
-            
             return pdos;
         }                                                              
 

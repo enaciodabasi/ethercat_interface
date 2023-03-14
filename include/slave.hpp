@@ -168,6 +168,11 @@ namespace ethercat_interface
                 return m_SlaveInfo;
             }
 
+            inline const SlaveType getSlaveType() const
+            {
+                return m_SlaveInfo.slaveType;
+            }
+
             Offset* getOffset()
             {
                 return m_SlaveOffsets;
