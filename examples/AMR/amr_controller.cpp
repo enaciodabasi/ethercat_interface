@@ -123,29 +123,30 @@ void AMR_Controller::cyclic_task()
             "op_mode",
             0x09
         );
-        m->write<int8_t>(
+       
+
+        bool el0_enabled = el7221_9014_0->enableOperation();
+         m->write<int8_t>(
             "dc_domain",
             "EL7221_9014_1",
             "op_mode",
             0x09
         );
-
-        bool el0_enabled = el7221_9014_0->enableOperation();
-        
         bool el1_enabled = el7221_9014_1->enableOperation();
-        if(el0_enabled && el1_enabled)
+        if(el0_enabled || el1_enabled)
         {
+            std::cout << "Both enabled\n";
             m->write<int32_t>(
                 "dc_domain",
                 "EL7221_9014_0",
                 "target_velocity",
-                300000
+                600000
             );
             m->write<int32_t>(
                 "dc_domain",
                 "EL7221_9014_1",
                 "target_velocity",
-                300000
+                600000
             );
         }
         ecrt_master_sync_reference_clock_to(m->getEthercatMasterPtr(), TIMESPEC2NS(time));

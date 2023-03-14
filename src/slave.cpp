@@ -161,10 +161,12 @@ namespace ethercat_interface
             m_Status = this->readFromSlave<uint16_t>("status_word");
             //if(m_Status == 0) return false;
             std::cout << m_Status << std::endl;
-            if((m_Status & 0x1027))
-            {   
+            if(m_Status == 0x1027)
                 return true;
-            }
+            //if((m_Status & getStatusValue(StatusType::OperationEnabled) == 21))
+            //{   
+            //    return true;
+            //}
 
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
@@ -192,7 +194,7 @@ namespace ethercat_interface
                 //// If state is Switched On send the Enable Operation command.
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
-                    std::cout << "switched on\n";
+                    std::cout << "switched on" << m_SlaveName << std::endl;
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
 
                     return false;
