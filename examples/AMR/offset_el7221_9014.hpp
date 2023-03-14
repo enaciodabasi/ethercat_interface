@@ -1,4 +1,4 @@
-#include "offset.hpp"
+#include "../../include/offset.hpp"
 
 class EL7221_9014_Offset : public ethercat_interface::Offset
 {
