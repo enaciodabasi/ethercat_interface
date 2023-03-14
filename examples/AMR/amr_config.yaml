@@ -1,2 +1,94 @@
-amr:
+EK1100_0:
  
+ type: "coupler"
+
+ vendor_id: 0x00000002
+
+ product_id: 0x044c2c52
+
+ slave_position: 0
+ slave_alias: 0
+
+EL7221_9014_0:
+ type: "driver"
+ vendor_id: 0x00000002
+ product_id: 0x1c353052
+ slave_position: 0
+ slave_alias: 1
+
+ pdo_entry_info:
+  indexes:
+
+  subindexes:
+  
+  bit_lengths:
+  
+  rxpdo_address:
+  rxpdo_size:
+  txpdo_address:
+  txpdo_size:
+
+ slave_sync_info:
+
+  num_sync_managers:
+
+  sync_manager_directions:
+
+  number_of_pdos:
+
+  pdo_index_diff:
+
+  watchdog_mode:
+
+  dc_info:
+   assign_activate: 
+
+   sync0_cycle:
+
+   sync0_shift:
+
+   sync1_cycle:
+
+   sync1_shift:
+
+EL7221_9014_1:
+ type: "driver"
+ vendor_id: 0x00000002
+ product_id: 0x1c353052
+ slave_position: 0
+ slave_alias: 2
+
+ pdo_entry_info:
+  indexes:
+
+  subindexes:
+  
+  bit_lengths:
+  
+  rxpdo_address:
+  rxpdo_size:
+  txpdo_address:
+  txpdo_size:
+
+ slave_sync_info:
+
+  num_sync_managers:
+
+  sync_manager_directions:
+
+  number_of_pdos:
+
+  pdo_index_diff:
+
+  watchdog_mode:
+
+  dc_info:
+   assign_activate: 
+
+   sync0_cycle:
+
+   sync0_shift:
+
+   sync1_cycle:
+
+   sync1_shift:
