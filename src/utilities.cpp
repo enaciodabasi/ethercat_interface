@@ -94,7 +94,7 @@ namespace ethercat_interface
         std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix)
         {
             std::vector<uint8_t> hexas;
-            for(std::size_t i = 0; i < to_fix.size(); i++)
+            /* for(std::size_t i = 0; i < to_fix.size(); i++)
             {
                 if(to_fix[i] == '0')
                 {
@@ -106,9 +106,9 @@ namespace ethercat_interface
                 }
                 else
                 continue;
-            }
+            } */
             // This is bad practice.
-           /*  for(std::size_t i = 0; i < to_fix.size(); i++)
+            for(std::size_t i = 0; i < to_fix.size(); i++)
             {
                 switch (to_fix[i])
                 {
@@ -211,7 +211,7 @@ namespace ethercat_interface
                 default:
                     break;
                 }
-            } */
+            }
             
 
             return hexas;

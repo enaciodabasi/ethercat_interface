@@ -67,6 +67,8 @@ namespace ethercat_interface
                 );
             }
 
+            m_SlaveInfo = utilities::parse_config_file(config_file_path, slave_name);
+
             m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
 
             m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
