@@ -66,12 +66,9 @@ namespace ethercat_interface
          * @return Array of ec_pdo_info_t's. 
          */
         ec_pdo_info_t* createSlavePDOs(
-            std::size_t num_entries,
             ec_pdo_entry_info_t* entriesArray,
-            uint16_t RxPDO_start,
-            uint16_t TxPDO_start,
-            int RxPDO_size,
-            int TxPDO_size
+            std::vector<uint16_t> rxPdo_indexes,
+            std::vector<uint16_t> txPdo_indexes
         );
 
         /**

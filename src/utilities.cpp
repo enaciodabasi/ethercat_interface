@@ -94,106 +94,110 @@ namespace ethercat_interface
         std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix)
         {
             std::vector<uint8_t> hexas;
+
+            
         
             // This is bad practice.
             for(std::size_t i = 0; i < to_fix.size(); i++)
             {
+                std::cout << to_fix[i] << std::endl;
+                
                 switch (to_fix[i])
                 {
-                case '0':
+                case 0:
                     hexas.emplace_back(0x00);
                     break;
-                case '1':
+                case 1:
                     hexas.emplace_back(0x01);
                     break;
-                case '2':
+                case 2:
                     hexas.emplace_back(0x02);
                     break;
-                case '3':
+                case 3:
                     hexas.emplace_back(0x03);
                     break;
-                case '4':
+                case 4:
                     hexas.emplace_back(0x04);
                     break;
-                case '5':
+                case 5:
                     hexas.emplace_back(0x05);
                     break;
-                case '6':
+                case 6:
                     hexas.emplace_back(0x06);
                     break;
-                case '7':
+                case 7:
                     hexas.emplace_back(0x07);
                     break;
-                case '8':
+                case 8:
                     hexas.emplace_back(0x08);
                     break;
-                case '9':
+                case 9:
                     hexas.emplace_back(0x09);
                     break;
-                case '10':
+                case 10:
                     hexas.emplace_back(0x0A);
                     break;
-                case '11':
+                case 11:
                     hexas.emplace_back(0x0B);
                     break;
-                case '12':
+                case 12:
                     hexas.emplace_back(0x0C);
                     break;
-                case '13':
+                case 13:
                     hexas.emplace_back(0x0D);
                     break;
-                case '14':
+                case 14:
                     hexas.emplace_back(0x0E);
                     break;
-                case '15':
+                case 15:
                     hexas.emplace_back(0x0F);
                     break;
-                case '16':
+                case 16:
                     hexas.emplace_back(0x10);
                     break;
-                case '17':
+                case 17:
                     hexas.emplace_back(0x11);
                     break;
-                case '18':
+                case 18:
                     hexas.emplace_back(0x12);
                     break;
-                case '19':
+                case 19:
                     hexas.emplace_back(0x13);
                     break;
-                case '20':
+                case 20:
                     hexas.emplace_back(0x14);
                     break;
-                case '21':
+                case 21:
                     hexas.emplace_back(0x15);
                     break;
-                case '22':
+                case 22:
                     hexas.emplace_back(0x16);
                     break;
-                case '23':
+                case 23:
                     hexas.emplace_back(0x17);
                     break;
-                case '24':
+                case 24:
                     hexas.emplace_back(0x18);
                     break;
-                case '25':
+                case 25:
                     hexas.emplace_back(0x19);
                     break;
-                case '26':
+                case 26:
                     hexas.emplace_back(0x1A);
                     break;
-                case '27':
+                case 27:
                     hexas.emplace_back(0x1B);
                     break;
-                case '28':
+                case 28:
                     hexas.emplace_back(0x1C);
                     break;
-                case '29':
+                case 29:
                     hexas.emplace_back(0x1D);
                     break;
-                case '30':
+                case 30:
                     hexas.emplace_back(0x1E);
                     break;
-                case '31':
+                case 31:
                     hexas.emplace_back(0x1F);
                     break;
                 default:
@@ -246,6 +250,8 @@ namespace ethercat_interface
                 info.ioMappingInfo.TxPDO_Address = slave_config["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
                 info.ioMappingInfo.RxPDO_Size = slave_config["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
                 info.ioMappingInfo.TxPDO_Size = slave_config["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
+                info.ioMappingInfo.RxPDO_Indexes = slave_config["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
+                info.ioMappingInfo.TxPDO_Indexes = slave_config["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
 
                 info.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(slave_config["slave_sync_info"]["num_sync_managers"].as<int>());
                 info.slaveSyncInfo.syncManagerDirections = slave_config["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();

@@ -61,12 +61,21 @@ namespace ethercat_interface
             unsigned int RxPDO_Size;
             unsigned int TxPDO_Size;
 
+            std::vector<uint16_t> RxPDO_Indexes;
+            std::vector<uint16_t> TxPDO_Indexes;
+
             void toString()
             {
-                std::cout << "RxPDO start address: " << RxPDO_Address << std::endl;
-                std::cout << "TxPDO start address: " << TxPDO_Address << std::endl;
-                std::cout << "RxPDO size: " << RxPDO_Size << std::endl;
-                std::cout << "TxPDO size: " << TxPDO_Size << std::endl;
+                std::cout << "RxPDO Indexes:";
+                for(auto r : RxPDO_Indexes)
+                {
+                    std::cout << "\n" << r << " ";
+                }
+                std::cout << "TxPDO Indexes:";
+                for(auto t : TxPDO_Indexes)
+                {
+                    std::cout << "\n" << t << " ";
+                }
             }
         };
 

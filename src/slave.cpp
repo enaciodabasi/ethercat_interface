@@ -72,7 +72,8 @@ namespace ethercat_interface
             m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
 
             m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-            m_SlavePDOs = new ec_pdo_info_t[2];
+            
+            m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
         }
 
         Slave::~Slave()
@@ -91,10 +92,8 @@ namespace ethercat_interface
 
             m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
                 m_SlavePdoEntries,
-                m_SlaveInfo.ioMappingInfo.RxPDO_Address,
-                m_SlaveInfo.ioMappingInfo.RxPDO_Size,
-                m_SlaveInfo.ioMappingInfo.TxPDO_Address,
-                m_SlaveInfo.ioMappingInfo.TxPDO_Size
+                m_SlaveInfo.ioMappingInfo.RxPDO_Indexes,
+                m_SlaveInfo.ioMappingInfo.TxPDO_Indexes
             );
 
 
@@ -112,7 +111,7 @@ namespace ethercat_interface
 
         void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t** slave_config_ptr)
         {
-
+            std::cout << "Setting slave " << m_SlaveName << " up" << std::endl;
             (*slave_config_ptr) = ecrt_master_slave_config(
                 masterPtr,
                 m_SlaveInfo.alias,
@@ -153,49 +152,16 @@ namespace ethercat_interface
                 );  
             }
 
-            /* if(ecrt_domain_reg_pdo_entry_list(domainPtr, m_SlavePdoEntryRegistries))
-            {
-                std::cout << "Failed during PDO entry registries check." << std::endl;
-            } */
-            //slave_config_ptr = tempConf;
-            //delete tempConf;
             std::cout << "Slave config setup complete." << std::endl;
         }
 
-        /* void Slave::updateSlaveState()
-        {
-            ec_slave_config_state_t state;
-            ecrt_slave_config_state(
-                this->m_SlaveConfig,
-                &state
-            );
-            
-            if(this->LOGGING_ENABLED)
-            {
-                if(state.al_state != m_CurrentSlaveState.al_state)
-                {
-                    std::cout << "Slave: State " << state.al_state << std::endl;
-                }
-                if(state.online != m_CurrentSlaveState.online)
-                {
-                    std::cout << "Slave: " << (state.online ? "online" : "offline") << std::endl;
-                }
-                if(state.operational != m_CurrentSlaveState.operational)
-                {
-                    std::cout << "Slave is " << (state.operational ? "" : "not") << "operational" << std::endl;
-                }
-            }
-
-            this->m_CurrentSlaveState = state;
-            
-        } */
 
         bool Slave::enableOperation()
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
             //if(m_Status == 0) return false;
-            //std::cout << m_Status << std::endl;
-            if(m_Status & getStatusValue(StatusType::OperationEnabled) == 39)
+            std::cout << m_Status << std::endl;
+            if((m_Status & 0x1027))
             {   
                 return true;
             }
@@ -244,6 +210,45 @@ namespace ethercat_interface
 
                 }
             }
+
+            /* if(!(m_Status & 0x0008))
+            {   
+                //std::cout << "no fault\n";
+                // If state is Switch on disabled send the Shutdown command.
+                if((m_Status & 0x0040))
+                {   
+                    std::cout << "switch on disabled\n";
+                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
+                    return false;
+                }
+                //// If state is Ready to Switch On send the Switch On command.
+                else if((m_Status & 0x0021))
+                {
+                    std::cout << "ready to switch on\n";
+                    writeToSlave<uint16_t>("ctrl_word", 0x0007);
+                    return false;
+                }
+                //// If state is Switched On send the Enable Operation command.
+                else if(m_Status & 0x0023)
+                {
+                    std::cout << "switched on\n";
+                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
+
+                    return false;
+                }
+                
+            }
+            else // Try to reset the fault.
+            {
+                if(m_Status & 0x008)
+                {
+                    // Send ResetFault to the control word.
+                    std::cout << "fault exists\n";
+                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
+                    return false;
+
+                }
+            } */
             
             return false;
         }
@@ -283,7 +288,7 @@ namespace ethercat_interface
             ec_pdo_entry_info_t* entries = new ec_pdo_entry_info_t[numEntries];
             for(std::size_t i = 0; i < numEntries; i++)
             {   
-                std::cout << indexes[i] << " " << subindexes[i] << " " << bit_lengths[i] << std::endl;
+                            
                 /* if(subindexes[i] == '0')
                 {   
                     std::cout << "sifir";
@@ -300,7 +305,7 @@ namespace ethercat_interface
                     0x01, 
                     (uint8_t)bit_lengths[i]};
                 } */
-
+                
                 entries[i] = {
                     indexes[i],
                     subindexes[i], 
@@ -332,27 +337,31 @@ namespace ethercat_interface
 
         // -----------------------------------
         ec_pdo_info_t* createSlavePDOs(
-            std::size_t num_entries,
             ec_pdo_entry_info_t* entriesArray,
-            uint16_t RxPDO_start,
-            uint16_t TxPDO_start,
-            int RxPDO_size,
-            int TxPDO_size
+            std::vector<uint16_t> rxPdo_indexes,
+            std::vector<uint16_t> txPdo_indexes
         )
         {   
-            
-            ec_pdo_info_t* slavePDOs = new ec_pdo_info_t[num_entries];
+        
+            std::size_t pdoSize = rxPdo_indexes.size() + txPdo_indexes.size();
+            ec_pdo_info_t* slavePDOs = new ec_pdo_info_t[pdoSize];
             int t_counter = 0;
-            for(std::size_t i = 0; i < RxPDO_size + TxPDO_size; i++)
+            for(std::size_t i = 0; i < pdoSize; i++)
             {   
-                if(i < RxPDO_size)
-                    *(slavePDOs + i) = {(uint16_t)(RxPDO_start + i), 1, (entriesArray + i)};
-                else
+                
+                if(i < rxPdo_indexes.size())
                 {
-                    *(slavePDOs + i) = {(uint16_t)(TxPDO_start + t_counter), 1, (entriesArray + i)};
-                    t_counter += 1;
+                    *(slavePDOs + i) = {rxPdo_indexes[i], 1, entriesArray + i};
+                    
                 }
                     
+                else
+                {
+                    
+                    *(slavePDOs + i) = {txPdo_indexes[i - txPdo_indexes.size()], 1, entriesArray + i};
+                    
+                }
+                t_counter += 1;
             }
 
             return slavePDOs;
