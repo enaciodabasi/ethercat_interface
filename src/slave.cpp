@@ -159,14 +159,9 @@ namespace ethercat_interface
         bool Slave::enableOperation()
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
-            //if(m_Status == 0) return false;
             std::cout << m_Status << std::endl;
-            if(m_Status == 0x1027)
+            /* if(m_Status == 0x1027)
                 return true;
-            //if((m_Status & getStatusValue(StatusType::OperationEnabled) == 21))
-            //{   
-            //    return true;
-            //}
 
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
@@ -174,9 +169,8 @@ namespace ethercat_interface
                 Switched on -> Operation enabled: Enable operation command. 
              */
             // Check if there is a registered fault in the Slave
-            if(!(m_Status & getStatusValue(StatusType::Fault)))
+            /* if(!(m_Status & getStatusValue(StatusType::Fault)))
             {   
-                //std::cout << "no fault\n";
                 // If state is Switch on disabled send the Shutdown command.
                 if((m_Status & getStatusValue(StatusType::SwitchOnDisabled)))
                 {   
@@ -211,46 +205,38 @@ namespace ethercat_interface
                     return false;
 
                 }
+            } */
+ 
+            if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
+            {
+                return true;
             }
 
-            /* if(!(m_Status & 0x0008))
-            {   
-                //std::cout << "no fault\n";
-                // If state is Switch on disabled send the Shutdown command.
-                if((m_Status & 0x0040))
-                {   
-                    std::cout << "switch on disabled\n";
+            if (!isStatusCorrect(m_Status, StatusType::Fault))
+            {
+                if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
+                {
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
-                //// If state is Ready to Switch On send the Switch On command.
-                else if((m_Status & 0x0021))
+                else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
                 {
-                    std::cout << "ready to switch on\n";
-                    writeToSlave<uint16_t>("ctrl_word", 0x0007);
+                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
-                //// If state is Switched On send the Enable Operation command.
-                else if(m_Status & 0x0023)
+                else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
                 {
-                    std::cout << "switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
-
                     return false;
                 }
                 
             }
-            else // Try to reset the fault.
+            else
             {
-                if(m_Status & 0x008)
-                {
-                    // Send ResetFault to the control word.
-                    std::cout << "fault exists\n";
-                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
-                    return false;
-
-                }
-            } */
+                writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
+                return false;
+            }
+            
             
             return false;
         }
