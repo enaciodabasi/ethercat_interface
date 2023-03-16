@@ -14,6 +14,8 @@ class EL7221_9014_Offset : public ethercat_interface::Offset
         uint current_position;
         uint status_word;
         uint current_velocity;
+        uint current_torque;
+        uint op_mode_display;
     };
 
     offset m_Data;
@@ -46,14 +48,20 @@ void EL7221_9014_Offset::init_OffsetMap()
 	
     m_OffsetNameIndexMap["op_mode"] = &m_Data.op_mode;
     m_OffsetNameIndexes.emplace_back("op_mode");
+
+    m_OffsetNameIndexMap["status_word"] = &m_Data.status_word;
+	m_OffsetNameIndexes.emplace_back("status_word");
 	
     m_OffsetNameIndexMap["current_position"] = &m_Data.current_position;
 	m_OffsetNameIndexes.emplace_back("current_position");
-    
-	m_OffsetNameIndexMap["status_word"] = &m_Data.status_word;
-	m_OffsetNameIndexes.emplace_back("status_word");
 	
 	m_OffsetNameIndexMap["current_velocity"] = &m_Data.current_velocity;
 	m_OffsetNameIndexes.emplace_back("current_velocity");
+
+    m_OffsetNameIndexMap["current_torque"] = &m_Data.current_torque;
+	m_OffsetNameIndexes.emplace_back("current_torque");
+
+    m_OffsetNameIndexMap["op_mode_display"] = &m_Data.op_mode_display;
+    m_OffsetNameIndexes.emplace_back("op_mode_display");
 
 }
