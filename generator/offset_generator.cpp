@@ -73,14 +73,14 @@ int main(int argc, char** argv)
     {
         newFile << "\t\t" << "uint " << name << ";\n";
     }
-    newFile << "\t}\n";
+    newFile << "\t};\n";
     newFile << "\toffset m_Data;\n";
     newFile << "\tvoid setData();\n";
     newFile << "\tvoid setData(void* data)override;\n";
-    newFile << "\tinit_OffsetMap() override;\n";
+    newFile << "\tvoid init_OffsetMap() override;\n";
     newFile << "};\n";
 
-    newFile << className << "::" << className << "();\n{\n";
+    newFile << className << "::" << className << "()\n{\n";
     newFile << "\tinit_OffsetMap();\n";
     newFile << "\tm_NumOffsets = m_OffsetNameIndexes.size();\n}\n";
 
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 
     for(auto name : *pdoNames)
     {
-        newFile << "\tm_OffsetNameIndexMap[" << name << "] = &m_Data." << name << ";\n";
+        newFile << "\tm_OffsetNameIndexMap[\"" << name << "\"] = &m_Data." << name << ";\n";
     }
 
     newFile << "}\n";

@@ -64,3 +64,10 @@ install(
     RUNTIME DESTINATION bin
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ethercat_interface
 )
+
+add_executable(
+    offset_generator
+    generator/offset_generator.cpp
+)
+target_link_libraries(offset_generator ${YAML_CPP_LIBRARIES})
+target_include_directories(offset_generator PUBLIC ${YAML_CPP_INCLUDE_DIRS})
