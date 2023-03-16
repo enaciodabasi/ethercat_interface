@@ -72,6 +72,10 @@ namespace ethercat_interface
 
             void send(const std::string& domain_name);
 
+            void setMasterTime(const uint64_t& app_time);
+
+            void syncMasterClock(const uint64_t& sync_time);
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:

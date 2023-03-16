@@ -73,6 +73,17 @@ namespace ethercat_interface
             ecrt_master_send(m_EthercatMaster);
         }
 
+        void Master::setMasterTime(const uint64_t &app_time)
+        {
+            ecrt_master_application_time(m_EthercatMaster, app_time);
+        }
+
+        void Master::syncMasterClock(const uint64_t &sync_time)
+        {
+            ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);
+            ecrt_master_sync_slave_clocks(m_EthercatMaster);
+        }
+
         ec_domain_t* Master::getDomainPtr(const std::string& domain_name)
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
