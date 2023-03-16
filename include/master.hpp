@@ -88,8 +88,6 @@ namespace ethercat_interface
 
             ec_slave_config_state_t m_SlaveStates;
 
-            private:
-
             unsigned int m_MasterIndex;
 
             bool ENABLE_LOGGING = true;

@@ -23,6 +23,7 @@ https://download.lenze.com/TD/E94AxHE__Technology%20Application%20CiA402%20Devic
 #define DEFS_HPP
 
 #include <iostream>
+#include <vector>
 #include <functional>
 #include <bitset>
 
@@ -74,6 +75,73 @@ namespace ethercat_interface
         inline uint16_t getStatusValue(const StatusType& status)
         {
             return static_cast<std::underlying_type<StatusType>::type>(status);
+        }
+
+        class StatusHelper
+        {
+            public:
+
+            /**
+             * @brief Pair first: StatusType Enum, second: Vector of integers containing the unimportant bit's indexes.
+             * 
+             */
+            typedef std::vector<int> UnimportantBitIndexes;
+
+            static UnimportantBitIndexes getNotImportantBits(StatusType type)
+            {
+                switch (type)
+                {
+                case StatusType::NotReadyToSwitchOn:
+                    return NotReadyToSwitchOn;
+                    break;
+                case StatusType::SwitchOnDisabled:
+                    return SwitchOnDisabled;
+                    break;
+                case StatusType::ReadyToSwitchOn:
+                    return ReadyToSwitchOn;
+                    break;
+                case StatusType::SwitchedOn:
+                    return SwitchedOn;
+                    break;
+                case StatusType::OperationEnabled:
+                    return OperationEnabled;
+                    break;
+                case StatusType::QuickStopActive:
+                    return QuickStopActive;
+                    break;
+                case StatusType::FaultResponseActive:
+                    return FaultResponseActive;
+                    break;
+                case StatusType::Fault:
+                    return Fault;
+                    break;
+                default:
+                    break;
+                }
+            }
+
+            static UnimportantBitIndexes NotReadyToSwitchOn;
+
+            static UnimportantBitIndexes SwitchOnDisabled;
+
+            static UnimportantBitIndexes ReadyToSwitchOn;
+
+            static UnimportantBitIndexes SwitchedOn;
+
+            static UnimportantBitIndexes OperationEnabled;
+
+            static UnimportantBitIndexes QuickStopActive;
+
+            static UnimportantBitIndexes FaultResponseActive;
+
+            static UnimportantBitIndexes Fault;
+        };
+
+        bool isStatusCorrect(SlaveStatus current_status, StatusType target_status);
+
+        namespace CIA402
+        {
+
         }
 
         

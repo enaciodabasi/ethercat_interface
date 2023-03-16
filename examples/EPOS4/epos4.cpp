@@ -31,7 +31,8 @@ epos4_controller::epos4_controller()
         "epos4_0",
         "/home/naci/Projects/igh_master/examples/EPOS4/epos4_config.yaml",
         new ServoOffset(),
-        true
+        true,
+        false
     );
 
     dom->registerSlave(epos4);

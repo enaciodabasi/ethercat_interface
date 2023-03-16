@@ -79,26 +79,134 @@ namespace ethercat_interface
             return watchdogModes;
         }
 
-        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix)
+        toHexaHelper::toHexaHelper()
+        {   
+            uint8_t count = 0x00;
+            for(uint8_t i = 0; i <= 255; i++)
+            {
+                charHexMap[static_cast<char>(i)] = count;
+
+                count += 0x01;
+                
+            }
+        }
+
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix)
         {
             std::vector<uint8_t> hexas;
 
+            
+        
+            // This is bad practice.
             for(std::size_t i = 0; i < to_fix.size(); i++)
             {
-                if(to_fix[i] == '0')
-                {   
-                    hexas.emplace_back(0x00);
-                }    
-                else if(to_fix[i] == '1')
-                {   
-                    hexas.emplace_back(0x01);
-                }
-                else
+                std::cout << to_fix[i] << std::endl;
+                
+                switch (to_fix[i])
                 {
-                    continue;
+                case 0:
+                    hexas.emplace_back(0x00);
+                    break;
+                case 1:
+                    hexas.emplace_back(0x01);
+                    break;
+                case 2:
+                    hexas.emplace_back(0x02);
+                    break;
+                case 3:
+                    hexas.emplace_back(0x03);
+                    break;
+                case 4:
+                    hexas.emplace_back(0x04);
+                    break;
+                case 5:
+                    hexas.emplace_back(0x05);
+                    break;
+                case 6:
+                    hexas.emplace_back(0x06);
+                    break;
+                case 7:
+                    hexas.emplace_back(0x07);
+                    break;
+                case 8:
+                    hexas.emplace_back(0x08);
+                    break;
+                case 9:
+                    hexas.emplace_back(0x09);
+                    break;
+                case 10:
+                    hexas.emplace_back(0x0A);
+                    break;
+                case 11:
+                    hexas.emplace_back(0x0B);
+                    break;
+                case 12:
+                    hexas.emplace_back(0x0C);
+                    break;
+                case 13:
+                    hexas.emplace_back(0x0D);
+                    break;
+                case 14:
+                    hexas.emplace_back(0x0E);
+                    break;
+                case 15:
+                    hexas.emplace_back(0x0F);
+                    break;
+                case 16:
+                    hexas.emplace_back(0x10);
+                    break;
+                case 17:
+                    hexas.emplace_back(0x11);
+                    break;
+                case 18:
+                    hexas.emplace_back(0x12);
+                    break;
+                case 19:
+                    hexas.emplace_back(0x13);
+                    break;
+                case 20:
+                    hexas.emplace_back(0x14);
+                    break;
+                case 21:
+                    hexas.emplace_back(0x15);
+                    break;
+                case 22:
+                    hexas.emplace_back(0x16);
+                    break;
+                case 23:
+                    hexas.emplace_back(0x17);
+                    break;
+                case 24:
+                    hexas.emplace_back(0x18);
+                    break;
+                case 25:
+                    hexas.emplace_back(0x19);
+                    break;
+                case 26:
+                    hexas.emplace_back(0x1A);
+                    break;
+                case 27:
+                    hexas.emplace_back(0x1B);
+                    break;
+                case 28:
+                    hexas.emplace_back(0x1C);
+                    break;
+                case 29:
+                    hexas.emplace_back(0x1D);
+                    break;
+                case 30:
+                    hexas.emplace_back(0x1E);
+                    break;
+                case 31:
+                    hexas.emplace_back(0x1F);
+                    break;
+                default:
+                    break;
                 }
-            }
 
+            }
+            
+            
             return hexas;
         }
 
@@ -117,20 +225,33 @@ namespace ethercat_interface
                 YAML::Node slave_config  = config_file[slave_name];
 
                 info.slaveName = slave_name;
-
+                const std::string typeStr = slave_config["type"].as<std::string>();
                 info.vendorID = slave_config["vendor_id"].as<int>();
                 info.productCode = slave_config["product_id"].as<int>();
                 info.position = slave_config["slave_position"].as<uint>();
                 info.alias = slave_config["slave_alias"].as<uint>();
 
+                if(typeStr == "coupler" || typeStr == "Coupler")
+                {
+                    info.slaveType = SlaveType::Coupler;
+                    return info;
+                }
+                else if(typeStr == "driver" || typeStr == "Driver")
+                {
+                    info.slaveType = SlaveType::Driver;
+                }
+                
                 info.pdoEntryInfo.indexes = slave_config["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
-                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint8_t>>());
+                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
+                
                 info.pdoEntryInfo.bitLengths = slave_config["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
                 info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
                 info.ioMappingInfo.TxPDO_Address = slave_config["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
                 info.ioMappingInfo.RxPDO_Size = slave_config["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
                 info.ioMappingInfo.TxPDO_Size = slave_config["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
+                info.ioMappingInfo.RxPDO_Indexes = slave_config["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
+                info.ioMappingInfo.TxPDO_Indexes = slave_config["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
 
                 info.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(slave_config["slave_sync_info"]["num_sync_managers"].as<int>());
                 info.slaveSyncInfo.syncManagerDirections = slave_config["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();
@@ -141,10 +262,45 @@ namespace ethercat_interface
 
             }catch(const YAML::BadFile& ex)
             {
+                
                 std::cout << ex.what();
+            }
+            catch(const YAML::TypedBadConversion<unsigned short>& ex)
+            {
+                info.toString();
             }
 
             return info;
+        }
+
+        DC_Info getDcInfo(
+            const std::string& file_name,
+            const std::string& slave_name
+        )
+        {
+
+            DC_Info dcInfo;
+
+            try
+            {
+                
+                YAML::Node configFile = YAML::LoadFile(file_name);
+                YAML::Node slaveConfig = configFile[slave_name];
+                YAML::Node dcConfig = slaveConfig["dc_info"];
+
+                dcInfo.assign_activate = dcConfig["assign_activate"].as<uint16_t>();
+                dcInfo.sync0_cycle = dcConfig["sync0_cycle"].as<uint32_t>();
+                dcInfo.sync0_shift = dcConfig["sync0_shift"].as<int32_t>();
+                dcInfo.sync1_cycle = dcConfig["sync1_cycle"].as<uint32_t>();
+                dcInfo.sync1_shift = dcConfig["sync1_shift"].as<int32_t>();
+
+            }
+            catch(const YAML::BadFile& ex)
+            {
+                std::cout << ex.what();
+            }
+
+            return dcInfo;
         }
     }
 }

@@ -1,0 +1,176 @@
+EK1100_0:
+ 
+ type: "coupler"
+
+ vendor_id: 0x00000002
+
+ product_id: 0x044c2c52
+
+ slave_position: 0
+ slave_alias: 0
+
+EL7221_9014_0:
+ type: "driver"
+ vendor_id: 0x00000002
+ product_id: 0x1c353052
+ slave_position: 1
+ slave_alias: 0
+
+ pdo_entry_info:
+  indexes:
+   - 0x7010
+   - 0x7010
+   - 0x7010
+   - 0x6000
+   - 0x6010
+   - 0x6010
+  subindexes:
+   - 1
+   - 6
+   - 3
+   - 17
+   - 1
+   - 7
+  
+  bit_lengths:
+   - 16
+   - 32
+   - 8
+   - 32
+   - 16
+   - 32
+  
+  rxpdo_address: 0x1600
+  rxpdo_size: 3
+  txpdo_address: 0x1a00
+  txpdo_size: 3
+  rxpdo_indexes:
+   - 0x1600
+   - 0x1601
+   - 0x1608
+  txpdo_indexes:
+   - 0x1a00
+   - 0x1a01
+   - 0x1a02
+
+ slave_sync_info:
+
+  num_sync_managers: 4
+
+  sync_manager_directions:
+   - 1
+   - 2
+   - 1
+   - 2
+
+  number_of_pdos:
+   - 0
+   - 0
+   - 3
+   - 3
+
+  pdo_index_diff:
+   - "NULL"
+   - "NULL"
+   - 0
+   - 3
+
+  watchdog_mode:
+   - 2
+   - 2
+   - 2
+   - 2
+
+ dc_info:
+   assign_activate: 0x0700
+
+   sync0_cycle: 2000000
+
+   sync0_shift: 30000
+
+   sync1_cycle: 2000000
+
+   sync1_shift: 1000
+
+EL7221_9014_1:
+ type: "driver"
+ vendor_id: 0x00000002
+ product_id: 0x1c353052
+ slave_position: 2
+ slave_alias: 0
+
+ pdo_entry_info:
+  indexes:
+   - 0x7010
+   - 0x7010
+   - 0x7010
+   - 0x6000
+   - 0x6010
+   - 0x6010
+  subindexes:
+   - 1
+   - 6
+   - 3
+   - 17
+   - 1
+   - 7
+  
+  bit_lengths:
+   - 16
+   - 32
+   - 8
+   - 32
+   - 16
+   - 32
+  
+  rxpdo_address: 0x1600
+  rxpdo_size: 3
+  txpdo_address: 0x1a00
+  txpdo_size: 3
+  rxpdo_indexes:
+   - 0x1600
+   - 0x1601
+   - 0x1608
+  txpdo_indexes:
+   - 0x1a00
+   - 0x1a01
+   - 0x1a02
+
+ slave_sync_info:
+
+  num_sync_managers: 4
+
+  sync_manager_directions:
+   - 1
+   - 2
+   - 1
+   - 2
+
+  number_of_pdos:
+   - 0
+   - 0
+   - 3
+   - 3
+
+  pdo_index_diff:
+   - "NULL"
+   - "NULL"
+   - 0
+   - 3
+
+  watchdog_mode:
+   - 2
+   - 2
+   - 2
+   - 2
+
+ dc_info:
+   assign_activate: 0x0700
+
+   sync0_cycle: 2000000
+
+   sync0_shift: 30000
+
+   sync1_cycle: 2000000
+
+   sync1_shift: 1000

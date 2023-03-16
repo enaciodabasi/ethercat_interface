@@ -17,6 +17,7 @@
 #include <vector>
 #include <variant>
 #include <optional>
+#include <map>
 
 #include <yaml-cpp/yaml.h>
 
@@ -60,12 +61,21 @@ namespace ethercat_interface
             unsigned int RxPDO_Size;
             unsigned int TxPDO_Size;
 
+            std::vector<uint16_t> RxPDO_Indexes;
+            std::vector<uint16_t> TxPDO_Indexes;
+
             void toString()
             {
-                std::cout << "RxPDO start address: " << RxPDO_Address << std::endl;
-                std::cout << "TxPDO start address: " << TxPDO_Address << std::endl;
-                std::cout << "RxPDO size: " << RxPDO_Size << std::endl;
-                std::cout << "TxPDO size: " << TxPDO_Size << std::endl;
+                std::cout << "RxPDO Indexes:";
+                for(auto r : RxPDO_Indexes)
+                {
+                    std::cout << "\n" << r << " ";
+                }
+                std::cout << "TxPDO Indexes:";
+                for(auto t : TxPDO_Indexes)
+                {
+                    std::cout << "\n" << t << " ";
+                }
             }
         };
 
@@ -75,7 +85,20 @@ namespace ethercat_interface
 
         std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int>& watchdog_modes);
 
-        std::vector<uint8_t> toHexadecimal(const std::vector<uint8_t>& to_fix);
+        class toHexaHelper
+        {
+            public:
+
+            toHexaHelper();
+
+            
+            private:
+
+            std::map<char, uint8_t> charHexMap;
+
+        };
+
+        std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix);
 
         struct SlaveSyncInfo
         {
@@ -118,10 +141,16 @@ namespace ethercat_interface
             }
         };
 
+        enum class SlaveType
+        {
+            Coupler,
+            Driver
+        };
 
         struct SlaveInfo
         {
             std::string slaveName;
+            SlaveType slaveType;
             int vendorID;
             int productCode;
             int position;
@@ -149,6 +178,21 @@ namespace ethercat_interface
             const std::string& file_name,
             const std::string& slave_name
         );
+
+        struct DC_Info
+        {
+            uint16_t assign_activate;
+            uint32_t sync0_cycle;
+            int32_t sync0_shift;
+            uint32_t sync1_cycle;
+            int32_t sync1_shift;
+        };
+
+        DC_Info getDcInfo(
+            const std::string& file_name,
+            const std::string& slave_name
+        );
+
     } // End of namespace utilities
 
 } // End of namespace ethercat_interface

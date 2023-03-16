@@ -15,6 +15,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <string>
+#include <map>
 
 #include "slave.hpp"
 
@@ -112,7 +113,7 @@ namespace ethercat_interface
          */
         bool receiveDomainData();
         
-        private:
+        protected:
             
             std::string m_DomainName;
 
@@ -130,7 +131,7 @@ namespace ethercat_interface
              * @brief Holds the pointers to the slaves that are registered in this domain.
              * 
              */
-            std::unordered_map<std::string, slave::Slave*> m_RegisteredSlaves;
+            std::map<std::string, slave::Slave*> m_RegisteredSlaves;
 
             bool createDomain(ec_master_t* master_ptr);
 

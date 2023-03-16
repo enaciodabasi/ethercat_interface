@@ -66,12 +66,9 @@ namespace ethercat_interface
          * @return Array of ec_pdo_info_t's. 
          */
         ec_pdo_info_t* createSlavePDOs(
-            std::size_t num_entries,
             ec_pdo_entry_info_t* entriesArray,
-            uint16_t RxPDO_start,
-            uint16_t TxPDO_start,
-            int RxPDO_size,
-            int TxPDO_size
+            std::vector<uint16_t> rxPdo_indexes,
+            std::vector<uint16_t> txPdo_indexes
         );
 
         /**
@@ -134,6 +131,14 @@ namespace ethercat_interface
             
             Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset = nullptr, bool enable_logging = false);
 
+            Slave(
+                const std::string& slave_name,
+                const std::string& config_file_path,
+                Offset* offset = nullptr,
+                bool enable_logging = false,
+                bool enable_dc = false
+            );
+
             ~Slave();
 
             virtual void configure_slave();
@@ -158,6 +163,11 @@ namespace ethercat_interface
             inline const SlaveInfo getSlaveInfo() const
             {
                 return m_SlaveInfo;
+            }
+
+            inline const SlaveType getSlaveType() const
+            {
+                return m_SlaveInfo.slaveType;
             }
 
             Offset* getOffset()
@@ -244,14 +254,16 @@ namespace ethercat_interface
             SlaveInfo m_SlaveInfo;
 
             Offset* m_SlaveOffsets; 
-
+            
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
             //virtual bool updateSlaveStatus();
 
-            private:
-
             bool LOGGING_ENABLED = false;
+
+            bool ENABLE_DC = false;
+
+            DC_Info m_DcInfo;
 
             SlaveStatus m_Status; // Status Word read from the EtherCAT master.
 
