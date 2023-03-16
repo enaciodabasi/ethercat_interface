@@ -98,6 +98,16 @@ EL7221_9014_0:
 
    sync1_shift: 1000
 
+ generator_info:
+  - "ctrl_word"
+  - "target_velocity"
+  - "op_mode"
+  - "status_word"
+  - "current_position"
+  - "current_velocity"
+  - "current_torque"
+  - "op_mode_display"
+
 EL7221_9014_1:
  type: "driver"
  vendor_id: 0x00000002
