@@ -11,6 +11,7 @@ set(SOURCES
     src/state.cpp
     src/domain.cpp
     src/master.cpp
+    src/dc_sync.c
 )
 
 set(

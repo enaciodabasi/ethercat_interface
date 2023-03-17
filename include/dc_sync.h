@@ -13,8 +13,8 @@ long int period_nanosec(int frequency);
 
 uint64_t timespecToNanoSec(struct timespec ts);
 
-struct timespec addTimespec(struct timespect time1, struct timespec time2);
+struct timespec addTimespec(struct timespec time1, struct timespec time2);
 
-int sleep_task(clockid_t clock_to_use, int flag, const timespec* required_duration, timespec* remaining_duration);
+int sleep_task(clockid_t clock_to_use, int flag, const struct timespec* required_duration, struct timespec* remaining_duration);
 
 #endif // DC_SYNC_H
