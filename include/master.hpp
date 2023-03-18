@@ -16,6 +16,7 @@
 #include <unordered_map>
 
 #include "domain.hpp"
+#include "logger.hpp"
 
 #include "ecrt.h"
 
@@ -29,6 +30,11 @@ namespace ethercat_interface
 
             Master(
                 unsigned int master_index
+            );
+
+            Master(
+                unsigned int master_index,
+                std::shared_ptr<logger::Logger> logger
             );
 
             virtual ~Master();
@@ -93,6 +99,8 @@ namespace ethercat_interface
             ec_slave_config_state_t m_SlaveStates;
 
             unsigned int m_MasterIndex;
+
+            std::shared_ptr<logger::Logger> m_Logger;
 
             bool ENABLE_LOGGING = true;
 

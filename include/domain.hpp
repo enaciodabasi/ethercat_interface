@@ -18,6 +18,7 @@
 #include <map>
 
 #include "slave.hpp"
+#include "logger.hpp"
 
 #include "ecrt.h"
 
@@ -40,7 +41,8 @@ namespace ethercat_interface
         public:
         
             Domain(
-                const std::string& domain_name
+                const std::string& domain_name,
+                std::shared_ptr<logger::Logger> logger = nullptr
             );
         
             ~Domain();
@@ -141,6 +143,8 @@ namespace ethercat_interface
 
             bool ENABLE_LOGGING = false;
 
+            std::shared_ptr<logger::Logger> m_Logger;
+
             ec_pdo_entry_reg_t* createDomainPdoEntryRegistries();
 
         };
@@ -192,8 +196,7 @@ namespace ethercat_interface
             } */
             if(bit_position == NULL)
             {
-                return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(
-                value_to_read_name);
+                return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(value_to_read_name);
             }
             
             return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(

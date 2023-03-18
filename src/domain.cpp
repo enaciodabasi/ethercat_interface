@@ -13,12 +13,21 @@
 
 namespace ethercat_interface
 {
+    using namespace logger;
+
     namespace domain
     {
         Domain::Domain(
-            const std::string& domain_name
+            const std::string& domain_name,
+            std::shared_ptr<Logger> logger
         )   : m_DomainName(domain_name)
         {
+
+            if(logger != nullptr)
+            {
+                m_Logger = logger;
+                ENABLE_LOGGING = true;
+            }
             m_EthercatDomainState = {};
 
             configureSlaves(); // Configure each slave
@@ -39,12 +48,12 @@ namespace ethercat_interface
             {
                 if(state.working_counter != m_EthercatDomainState.working_counter)
                 {
-                    std::cout << "Domain WC:" << state.working_counter << std::endl; 
+                    m_Logger->log(INFO, m_DomainName, "Domain WC:" + std::to_string(state.working_counter)); 
                 }
 
                 if(state.wc_state != m_EthercatDomainState.wc_state)
                 {
-                    std::cout << "Domain State: " << state.wc_state << std::endl;
+                    m_Logger->log(INFO, m_DomainName, "Domain State: " + std::to_string(state.wc_state));
                 }
             }
 
@@ -87,13 +96,13 @@ namespace ethercat_interface
         {
             
             std::size_t tempPdoNum = 0;
-
+            m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
             for(const auto& s : m_RegisteredSlaves)
             {
-                std::cout << "Configuring Slave: " << s.second->getSlaveName() << std::endl;
+                
                 if(s.second->getSlaveType() == utilities::SlaveType::Coupler)
                 {   
-                    std::cout << "Coupler" << std::endl;
+                    m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
                     continue;
                 }
                 //auto inf = s.second->getSlaveInfo();
@@ -110,7 +119,8 @@ namespace ethercat_interface
         }
 
         void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t** slave_config_ptr)
-        {
+        {   
+            m_Logger->log(INFO, m_DomainName, "Setting up slaves of the domain.");
             for(const auto& s : m_RegisteredSlaves)
             {
                 s.second->setupSlave(master_ptr, m_EthercatDomain, slave_config_ptr);
@@ -118,14 +128,14 @@ namespace ethercat_interface
 
             if(m_NumOfPdoEntryRegistries != 0)
             {   
-                std::cout << "Registering domain PDO entries\n";
+                m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
                 // + 1 is for adding the empty entry registry at the end of the array.
                 m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
                 this->createDomainPdoEntryRegistries(); 
             }
             else
             {
-                // Log.
+                m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
                 
             }
         }
@@ -133,21 +143,15 @@ namespace ethercat_interface
         ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
         {   
             std::size_t i = 0;
-            std::cout << "Creating domain pdo entry registries.\n";
+            
             for(const auto& s : m_RegisteredSlaves)
             {
                 auto info = s.second->getSlaveInfo();
                 if(info.slaveType == SlaveType::Coupler)
                     continue;
-                
-                std::cout << s.second->getSlaveName() << std::endl;
-                
+                                
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
-                {
-                    /* std::cout << (uint16_t)info.alias << " " << (uint16_t)info.position << " "
-                     << " " << (uint32_t)info.vendorID << " " << (uint32_t)info.productCode <<
-                     "index: " << (uint)info.pdoEntryInfo.indexes[j] << " " << (uint)info.pdoEntryInfo.subindexes[j] << std::endl; 
-                     */
+                {  
                     
                     m_DomainPdoEntryRegistries[i] = {
                         (uint16_t)info.alias,
@@ -163,8 +167,7 @@ namespace ethercat_interface
                 }
                 
             }
-            std::cout << "Number of pdo regs:" << i << std::endl;
-            std::cout << "domain pdo entry regs done inserting empty reg.\n";
+
             m_DomainPdoEntryRegistries[m_NumOfPdoEntryRegistries] = {};
         }
     }

@@ -11,7 +11,7 @@
 
 namespace ethercat_interface
 {   
-    
+    using namespace logger;
     namespace slave
     {
         Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset, bool enable_logging)
@@ -50,10 +50,16 @@ namespace ethercat_interface
             const std::string& slave_name,
             const std::string& config_file_path,
             Offset* offset,
-            bool enable_logging,
+            std::shared_ptr<Logger> logger,
             bool enable_dc
-        )   : m_SlaveName(slave_name), LOGGING_ENABLED(enable_logging), ENABLE_DC(enable_dc)
-        {
+        )   : m_SlaveName(slave_name), ENABLE_DC(enable_dc)
+        {   
+            if(logger != nullptr)
+            {
+                m_Logger = logger;
+                LOGGING_ENABLED = true;
+            }
+
             if(offset != nullptr)
             {
                 m_SlaveOffsets = offset;
@@ -78,7 +84,7 @@ namespace ethercat_interface
 
         Slave::~Slave()
         {   
-            //delete m_SlaveOffsets;
+            delete m_SlaveOffsets;
         }
 
         void Slave::configure_slave()
@@ -106,12 +112,12 @@ namespace ethercat_interface
                 ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
             );
 
-                std::cout << "Configured slave " << m_SlaveName << std::endl;
+            m_Logger->log(INFO, m_SlaveName, "Loaded slave configuration.");
         }
 
         void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t** slave_config_ptr)
         {
-            std::cout << "Setting slave " << m_SlaveName << " up" << std::endl;
+            
             (*slave_config_ptr) = ecrt_master_slave_config(
                 masterPtr,
                 m_SlaveInfo.alias,
@@ -127,17 +133,17 @@ namespace ethercat_interface
         
             if(!slave_config_ptr)
             {
-                std::cout << "Can't create slave config" << std::endl;
+                m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
             }
 
             if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
             {
-                std::cout << "Failed to create Slave Config PDOs." << std::endl;
+                m_Logger->log(ERROR, m_SlaveName, "Can't specify PDO configuration for the slave.");
             }
             else
             {
                 
-                std::cout << "Creation of slave config pdos is successful" << std::endl;
+                m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
             }
 
             if(ENABLE_DC)
@@ -152,7 +158,7 @@ namespace ethercat_interface
                 );  
             }
 
-            std::cout << "Slave config setup complete." << std::endl;
+            m_Logger->log(INFO, m_SlaveName, "Successfully set up the slave.");
         }
 
 
@@ -315,11 +321,10 @@ namespace ethercat_interface
                 {RxPDO_start, RxPDO_size, entriesArray + 0},
                 {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size}
             }; */
-            std::cout << "PDO_INFO\n";
             ec_pdo_info_t* pdos = new ec_pdo_info_t[2];
             pdos[0] = {RxPDO_start, RxPDO_size, entriesArray + 0};
             pdos[1] = {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size};
-            std::cout << (uint16_t)RxPDO_start << " " << TxPDO_start << " " << (uint)RxPDO_size << " " << (uint)TxPDO_size << std::endl;
+            //std::cout << (uint16_t)RxPDO_start << " " << TxPDO_start << " " << (uint)RxPDO_size << " " << (uint)TxPDO_size << std::endl;
             return pdos;
         }                                                              
 
@@ -391,9 +396,7 @@ namespace ethercat_interface
                 {
                     domain_registries[i] = {};
                     break; 
-                }
-                //std::cout << offset->m_OffsetNameIndexes[i] << std::endl;
-                std::cout << subindexes[i] << std::endl;
+                }                
                 unsigned int* op = new unsigned int();
                 op = offset->getData(offset->m_OffsetNameIndexes.at(i));
                 domain_registries[i] = {

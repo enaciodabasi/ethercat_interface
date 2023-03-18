@@ -12,6 +12,7 @@ set(SOURCES
     src/domain.cpp
     src/master.cpp
     src/dc_sync.c
+    src/logger.cpp
 )
 
 set(

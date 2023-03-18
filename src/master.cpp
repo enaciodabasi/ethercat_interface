@@ -12,6 +12,8 @@
 
 namespace ethercat_interface
 {
+
+    using namespace logger;
     namespace master
     {
 
@@ -27,6 +29,23 @@ namespace ethercat_interface
             m_SlaveStates = {};
         }
 
+        Master::Master(unsigned int master_index, std::shared_ptr<Logger> logger)
+            : m_MasterIndex(master_index)
+        {
+            
+            m_Logger = logger;
+
+            m_EthercatMaster = ecrt_request_master(m_MasterIndex);
+            if(!m_EthercatMaster)
+            {
+                m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Can't request master.");
+            }
+            else
+            {
+                m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Successfully requested master.");
+            }
+        }
+
         Master::~Master()
         {
             ecrt_release_master(m_EthercatMaster);
@@ -37,7 +56,7 @@ namespace ethercat_interface
         {
             if(ecrt_master_activate(m_EthercatMaster))
             {
-                // Log.
+                m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Can't activate master.");
                 return false;
             }
 
@@ -53,7 +72,7 @@ namespace ethercat_interface
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
             {
-                // Log.
+                m_Logger->log(ERROR, std::string("Master " + m_MasterIndex), "Can't find a registered domain with the name " + domain_name);
                 return;
             }
 
@@ -65,7 +84,7 @@ namespace ethercat_interface
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
             {
-                // Log.
+                m_Logger->log(ERROR, std::string("Master " + m_MasterIndex), "Can't find a registered domain with the name " + domain_name);
                 return;
             }
 
@@ -103,17 +122,17 @@ namespace ethercat_interface
             {
                 if(state.slaves_responding != m_EthercatMasterState.slaves_responding)
                 {
-                    std::cout << state.slaves_responding << " slaves are responding." << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), state.slaves_responding + " slaves are responding");
                 }
 
                 if(state.link_up != m_EthercatMasterState.link_up)
                 {
-                    std::cout << "Link is " << (state.link_up ? "up" : "down") << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Link is" + std::string((state.link_up ? "up" : "down")));
                 }
 
                 if(state.al_states != m_EthercatMasterState.al_states)
                 {
-                    std::cout << "AL States: " << state.al_states << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "AL States: " + state.al_states);
                 } 
             }
 
@@ -141,15 +160,15 @@ namespace ethercat_interface
             {
                 if(state.al_state != m_SlaveStates.al_state)
                 {
-                    std::cout << "Slave: State " << state.al_state << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Slave State: + state.al_state");
                 }
                 if(state.online != m_SlaveStates.online)
                 {
-                    std::cout << "Slave: " << (state.online ? "online" : "offline") << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Slave: " + std::string((state.online ? "online" : "offline")));
                 }
                 if(state.operational != m_SlaveStates.operational)
                 {
-                    std::cout << "Slave is " << (state.operational ? "" : "not") << "operational" << std::endl;
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Slave is " + std::string((state.operational ? " " : "not ")) + "operational.");
                 }
             }
 
@@ -173,7 +192,7 @@ namespace ethercat_interface
                 d.second->setupSlaves(m_EthercatMaster, &m_SlaveConfig);
                 if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries))
                 {
-                    std::cout << "Failed during PDO entry registries check." << std::endl;
+                    m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
                 }
             }
         }
