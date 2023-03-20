@@ -190,7 +190,7 @@ namespace ethercat_interface
             for(const auto& d : m_RegisteredDomains)
             {
                 d.second->setupSlaves(m_EthercatMaster, &m_SlaveConfig);
-                if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries))
+                if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries) != 0)
                 {
                     m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
                 }

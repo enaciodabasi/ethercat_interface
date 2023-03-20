@@ -165,9 +165,9 @@ namespace ethercat_interface
         bool Slave::enableOperation()
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
+            
             std::cout << m_Status << std::endl;
-            /* if(m_Status == 0x1027)
-                return true;
+            /* 
 
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
@@ -175,7 +175,9 @@ namespace ethercat_interface
                 Switched on -> Operation enabled: Enable operation command. 
              */
             // Check if there is a registered fault in the Slave
-            /* if(!(m_Status & getStatusValue(StatusType::Fault)))
+            if(m_Status == 0x1027)
+                return true;
+            if(!(m_Status & getStatusValue(StatusType::Fault)))
             {   
                 // If state is Switch on disabled send the Shutdown command.
                 if((m_Status & getStatusValue(StatusType::SwitchOnDisabled)))
@@ -211,27 +213,30 @@ namespace ethercat_interface
                     return false;
 
                 }
-            } */
+            }
  
-            if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
+            /* if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
             {
                 return true;
-            }
+            } */
 
-            if (!isStatusCorrect(m_Status, StatusType::Fault))
+            /* if (!isStatusCorrect(m_Status, StatusType::Fault))
             {
                 if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
-                {
+                {   
+                    std::cout << "Switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
                 {
+                    std::cout << "Ready To switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
                 else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
                 {
+                    std::cout << "Switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
                     return false;
                 }
@@ -242,7 +247,7 @@ namespace ethercat_interface
                 writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
                 return false;
             }
-            
+             */
             
             return false;
         }
@@ -299,7 +304,7 @@ namespace ethercat_interface
                     0x01, 
                     (uint8_t)bit_lengths[i]};
                 } */
-                
+                std::cout << std::hex << "indexes:" << indexes[i] << " subindex:" << (uint16_t)subindexes[i] << std::dec << "bit_lenghts:" << bit_lengths[i] << std::endl;
                 entries[i] = {
                     indexes[i],
                     subindexes[i], 
@@ -335,25 +340,24 @@ namespace ethercat_interface
             std::vector<uint16_t> txPdo_indexes
         )
         {   
-        
+
             std::size_t pdoSize = rxPdo_indexes.size() + txPdo_indexes.size();
             ec_pdo_info_t* slavePDOs = new ec_pdo_info_t[pdoSize];
             int t_counter = 0;
-            for(std::size_t i = 0; i < pdoSize; i++)
+            for(std::size_t i = 0; i < rxPdo_indexes.size(); i++)
             {   
+                std::cout << std::hex << rxPdo_indexes[i] << "  +" << t_counter << std::endl;
+
+                *(slavePDOs + t_counter) = {rxPdo_indexes[i], 1, entriesArray + t_counter};
                 
-                if(i < rxPdo_indexes.size())
-                {
-                    *(slavePDOs + i) = {rxPdo_indexes[i], 1, entriesArray + i};
-                    
-                }
-                    
-                else
-                {
-                    
-                    *(slavePDOs + i) = {txPdo_indexes[i - txPdo_indexes.size()], 1, entriesArray + i};
-                    
-                }
+                t_counter += 1;
+            }
+
+            for(std::size_t i = 0; i < txPdo_indexes.size(); i++)
+            {
+                std::cout << std::hex << txPdo_indexes[i] << " +" << t_counter << std::endl;
+                *(slavePDOs + t_counter) = {txPdo_indexes[i], 1, entriesArray + t_counter};
+                
                 t_counter += 1;
             }
 

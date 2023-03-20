@@ -23,6 +23,8 @@ class AMR_Controller
 
     void cyclic_task();
 
+    std::shared_ptr<logger::Logger> m_Logger;
+
 
     private:
 

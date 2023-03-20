@@ -11,6 +11,7 @@ set(SOURCES
     src/state.cpp
     src/domain.cpp
     src/master.cpp
+    include/dc_sync.h
     src/dc_sync.c
     src/logger.cpp
 )
@@ -50,6 +51,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/offset.hpp
     include/utilities.hpp
     include/state.hpp
+    include/dc_sync.h
 )
 
 set_target_properties(${PROJECT_NAME}

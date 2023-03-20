@@ -142,18 +142,28 @@ namespace ethercat_interface
 
         ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
         {   
-            std::size_t i = 0;
-            
+            ec_pdo_entry_reg_t* temp = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
+            int i = 0;
             for(const auto& s : m_RegisteredSlaves)
             {
                 auto info = s.second->getSlaveInfo();
                 if(info.slaveType == SlaveType::Coupler)
+                {
                     continue;
-                                
+                }
+
+
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
-                    
-                    m_DomainPdoEntryRegistries[i] = {
+                    std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
+                        (uint16_t)info.position << " " <<
+                        (uint32_t)info.vendorID << " " << 
+                        (uint32_t)info.productCode << " " << 
+                        info.pdoEntryInfo.indexes[j] << " " <<
+                        (uint16_t)info.pdoEntryInfo.subindexes[j] << " " << s.second->getOffset()->m_OffsetNameIndexes.at(j) << std::endl;
+                
+
+                    *(temp + i) = {
                         (uint16_t)info.alias,
                         (uint16_t)info.position,
                         (uint32_t)info.vendorID,
@@ -163,12 +173,13 @@ namespace ethercat_interface
                         s.second->getOffset()->getData(s.second->getOffset()->m_OffsetNameIndexes[j])
                     };
                     
-                    i += 1;
+                    i+= 1;
                 }
                 
             }
+            *(temp + m_NumOfPdoEntryRegistries -1) = {};
 
-            m_DomainPdoEntryRegistries[m_NumOfPdoEntryRegistries] = {};
+            m_DomainPdoEntryRegistries = temp;
         }
     }
 }

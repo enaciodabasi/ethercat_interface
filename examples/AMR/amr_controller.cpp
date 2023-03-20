@@ -39,12 +39,14 @@ void signal_handler(int isg)
 }
 
 AMR_Controller::AMR_Controller()
-{
+{   
+    m_Logger = std::make_shared<logger::Logger>("/home/naci/Projects/igh_master/logs/", logger::FILE);
+
     ek1100 = new slave::Slave(
         "EK1100_0",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         nullptr,
-        true,
+        m_Logger,
         false
     );
     
@@ -52,22 +54,24 @@ AMR_Controller::AMR_Controller()
         "EL7221_9014_0",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         new EL7221_9014_Offset(),
-        true,
+        m_Logger,
         true
     );
     el7221_9014_1 = new slave::Slave(
         "EL7221_9014_1",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         new EL7221_9014_Offset(),
-        true,
+        m_Logger,
         true
     );
     m = new master::Master(
-        0
+        0,
+        m_Logger
     );
 
     dom = new domain::Domain(
-        "dc_domain"
+        "dc_domain",
+        m_Logger
     );
     m->registerDomain(dom);
 
@@ -108,6 +112,7 @@ void AMR_Controller::cyclic_task()
     clock_gettime(CLOCK_TO_USE, &wakeupTime);
     while(run_cyclic)
     {
+
         wakeupTime = timespec_add(wakeupTime, cycletime);
         clock_nanosleep(CLOCK_TO_USE, TIMER_ABSTIME, &wakeupTime, NULL);
         ecrt_master_application_time(m->getEthercatMasterPtr(), TIMESPEC2NS(wakeupTime));
@@ -136,12 +141,14 @@ void AMR_Controller::cyclic_task()
         if(el0_enabled || el1_enabled)
         {
             std::cout << "Both enabled\n";
+            // sol
             m->write<int32_t>(
                 "dc_domain",
                 "EL7221_9014_0",
                 "target_velocity",
                 600000
             );
+            // sag
             m->write<int32_t>(
                 "dc_domain",
                 "EL7221_9014_1",
