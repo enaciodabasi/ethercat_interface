@@ -140,6 +140,31 @@ namespace ethercat_interface
             }
         }
 
+        bool Domain::enableSlaves()
+        {
+            bool areAllEnabled = false;
+
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                if(s.second->getSlaveInfo().slaveType == SlaveType::Coupler)
+                {
+                    continue;
+                }
+                bool isEnabled = s.second->enableOperation();
+                if(isEnabled)
+                {
+                    areAllEnabled = true;
+                }
+                else
+                {
+                    areAllEnabled = false;
+                }
+            }
+
+            return areAllEnabled;
+
+        }
+
         ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
         {   
             ec_pdo_entry_reg_t* temp = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];

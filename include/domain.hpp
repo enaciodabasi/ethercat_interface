@@ -47,6 +47,8 @@ namespace ethercat_interface
         
             ~Domain();
 
+            bool enableSlaves();
+
             /**
              * @brief 
              * 

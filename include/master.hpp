@@ -82,6 +82,8 @@ namespace ethercat_interface
 
             void syncMasterClock(const uint64_t& sync_time);
 
+            bool enableSlaves();
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:

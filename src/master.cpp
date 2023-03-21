@@ -103,6 +103,27 @@ namespace ethercat_interface
             ecrt_master_sync_slave_clocks(m_EthercatMaster);
         }
 
+        bool Master::enableSlaves()
+        {
+            bool areAllEnabled = false;
+
+            for(const auto& d : m_RegisteredDomains)
+            {
+                bool isEnabled = d.second->enableSlaves();
+
+                if(isEnabled)
+                {
+                    areAllEnabled = true;
+                }
+                else
+                {
+                    areAllEnabled = false;
+                }
+            }
+
+            return areAllEnabled;
+        }
+
         ec_domain_t* Master::getDomainPtr(const std::string& domain_name)
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
