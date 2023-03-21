@@ -14,37 +14,6 @@ namespace ethercat_interface
     using namespace logger;
     namespace slave
     {
-        Slave::Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset, bool enable_logging)
-            : m_SlaveName(slave_name), m_SlaveInfo(slave_info), LOGGING_ENABLED(enable_logging)
-        {
-            
-            if(offset != nullptr)
-            {
-                m_SlaveOffsets = offset;
-                std::cout << "Created Offset." << std::endl;
-            }
-
-            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
-            //m_SlavePdoEntryRegistries = new ec_pdo_entry_reg_t[m_SlaveInfo.pdoEntryInfo.indexes.size() + 1];
-            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-            m_SlavePDOs = new ec_pdo_info_t[2];
-        }
-
-        Slave::Slave(const std::string& slave_name, const std::string& config_file_path, Offset* offset, bool enable_logging)
-            : m_SlaveName(slave_name)
-        {
-            m_SlaveInfo = utilities::parse_config_file(config_file_path, slave_name);
-
-            if(offset != nullptr)
-            {
-                m_SlaveOffsets = offset;
-            }
-
-            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
-
-            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-            m_SlavePDOs = new ec_pdo_info_t[2];
-        }
 
         Slave::Slave(
             const std::string& slave_name,
@@ -74,12 +43,15 @@ namespace ethercat_interface
             }
 
             m_SlaveInfo = utilities::parse_config_file(config_file_path, slave_name);
+            if(m_SlaveInfo.slaveType != SlaveType::Coupler)
+            {
+                m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
 
-            m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+                m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
 
-            m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+                m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
+            }
             
-            m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
         }
 
         Slave::~Slave()
@@ -182,21 +154,19 @@ namespace ethercat_interface
                 // If state is Switch on disabled send the Shutdown command.
                 if((m_Status & getStatusValue(StatusType::SwitchOnDisabled)))
                 {   
-                    std::cout << "switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 //// If state is Ready to Switch On send the Switch On command.
                 else if(m_Status & getStatusValue(StatusType::ReadyToSwitchOn) == 4)
                 {
-                    std::cout << "ready to switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
                 //// If state is Switched On send the Enable Operation command.
                 else if(m_Status & getStatusValue(StatusType::SwitchedOn))
                 {
-                    std::cout << "switched on" << m_SlaveName << std::endl;
+
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
 
                     return false;
@@ -208,7 +178,7 @@ namespace ethercat_interface
                 if(m_Status & getStatusValue(StatusType::Fault))
                 {
                     // Send ResetFault to the control word.
-                    std::cout << "fault exists\n";
+                    //std::cout << "fault exists\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
                     return false;
 

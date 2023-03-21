@@ -127,16 +127,6 @@ namespace ethercat_interface
         {
             public:
 
-
-            Slave(const std::string& slave_name, SlaveInfo slave_info, Offset* offset = nullptr, bool enable_logging = false);
-            
-            Slave(
-                const std::string& slave_name, 
-                const std::string& config_file_path, 
-                Offset* offset = nullptr, 
-                bool enable_logging = false
-            );
-
             Slave(
                 const std::string& slave_name,
                 const std::string& config_file_path,
@@ -180,16 +170,6 @@ namespace ethercat_interface
             {
                 return m_SlaveOffsets;
             }
-
-            /* inline ec_slave_config_t* getEthercatSlaveConfig()
-            {
-                return m_SlaveConfig;
-            }
-
-            inline ec_slave_config_state_t getCurrentSlaveState() const
-            {
-                return m_CurrentSlaveState;
-            } */
 
             inline void setOffsetPtr(Offset* offset)
             {
