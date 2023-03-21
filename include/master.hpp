@@ -67,7 +67,7 @@ namespace ethercat_interface
             );
 
             template<typename T>
-            auto read(
+            T read(
                 const std::string& domain_name,
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
@@ -153,7 +153,7 @@ namespace ethercat_interface
         }
 
         template<typename T>
-        auto Master::read(
+        T Master::read(
             const std::string& domain_name,
             const std::string& slave_name,
             const std::string& value_to_read_name,
@@ -163,7 +163,7 @@ namespace ethercat_interface
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
             {
                 // TODO: Throw exception
-                return;
+                
             }
 
             if(bit_position == NULL)

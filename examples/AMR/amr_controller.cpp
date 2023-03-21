@@ -122,23 +122,39 @@ void AMR_Controller::cyclic_task()
         m->updateDomainStates();
         m->updateSlaveStates();
 
-        m->write<int8_t>(
+        /* m->write<int8_t>(
             "dc_domain",
             "EL7221_9014_0",
             "op_mode",
             0x09
-        );
+        ); */
        
 
-        bool el0_enabled = el7221_9014_0->enableOperation();
+        /* bool el0_enabled = el7221_9014_0->enableOperation();
          m->write<int8_t>(
             "dc_domain",
             "EL7221_9014_1",
             "op_mode",
             0x09
         );
-        bool el1_enabled = el7221_9014_1->enableOperation();
-        if(el0_enabled || el1_enabled)
+        bool el1_enabled = el7221_9014_1->enableOperation(); */
+    
+        bool slavesEnabled = m->enableSlaves();
+
+        m->write<int8_t>(
+            "dc_domain",
+            "EL7221_9014_1",
+            "op_mode",
+            0x09
+        );
+        m->write<int8_t>(
+            "dc_domain",
+            "EL7221_9014_0",
+            "op_mode",
+            0x09
+        );
+
+        if(slavesEnabled)
         {
             std::cout << "Both enabled\n";
             // sol

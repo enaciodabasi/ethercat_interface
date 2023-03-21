@@ -166,7 +166,7 @@ namespace ethercat_interface
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
             
-            std::cout << m_Status << std::endl;
+            //std::cout << m_Status << std::endl;
             /* 
 
             /*
