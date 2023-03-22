@@ -30,6 +30,8 @@ namespace ethercat_interface
     {   
         struct PdoEntryInfo
         {
+            PdoEntryInfo();
+            
             std::vector<uint16_t> indexes;
             std::vector<uint8_t> subindexes;
             std::vector<uint16_t> bitLengths;
@@ -56,6 +58,8 @@ namespace ethercat_interface
 
         struct IoMappingInfo
         {
+            IoMappingInfo();
+
             uint16_t RxPDO_Address;
             uint16_t TxPDO_Address;
             unsigned int RxPDO_Size;
@@ -102,7 +106,8 @@ namespace ethercat_interface
 
         struct SlaveSyncInfo
         {
-            
+            SlaveSyncInfo();
+
             std::size_t numSyncManagers;
 
             std::vector<int> syncManagerDirections;
@@ -149,6 +154,8 @@ namespace ethercat_interface
 
         struct SlaveInfo
         {
+            SlaveInfo();
+
             std::string slaveName;
             SlaveType slaveType;
             int vendorID;
@@ -181,6 +188,7 @@ namespace ethercat_interface
 
         struct DC_Info
         {
+            DC_Info();
             uint16_t assign_activate;
             uint32_t sync0_cycle;
             int32_t sync0_shift;

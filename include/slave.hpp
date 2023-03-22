@@ -229,8 +229,6 @@ namespace ethercat_interface
 
             ec_slave_config_state_t m_CurrentSlaveState; */
 
-            ec_pdo_entry_reg_t* m_SlavePdoEntryRegistries;
-
             ec_pdo_entry_info_t* m_SlavePdoEntries;
 
             ec_pdo_info_t* m_SlavePDOs;

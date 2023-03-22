@@ -4,6 +4,55 @@ namespace ethercat_interface
 {
     namespace utilities
     {
+
+        PdoEntryInfo::PdoEntryInfo()
+        {
+            indexes = std::vector<uint16_t>();
+            subindexes = std::vector<uint8_t>();
+            bitLengths = std::vector<uint16_t>();
+        }
+
+        IoMappingInfo::IoMappingInfo()
+        {
+            RxPDO_Address = 0;
+            TxPDO_Address = 0;
+            RxPDO_Size = 0;
+            TxPDO_Size = 0;
+            RxPDO_Indexes = std::vector<uint16_t>();
+            TxPDO_Indexes = std::vector<uint16_t>();
+        }
+
+        SlaveSyncInfo::SlaveSyncInfo()
+        {
+            numSyncManagers = 0;
+            syncManagerDirections = std::vector<int>();
+            numPDOs = std::vector<uint>();
+            pdoIndexDiff = std::vector<std::optional<int>>();
+            watchdogModes = std::vector<int>();
+        }
+        
+        SlaveInfo::SlaveInfo()
+        {
+            slaveName = std::string();
+            vendorID = 0;
+            productCode = 0;
+            position = 0;
+            alias = 0;
+
+            pdoEntryInfo = PdoEntryInfo();
+            ioMappingInfo = IoMappingInfo();
+            slaveSyncInfo = SlaveSyncInfo();
+        }
+
+        DC_Info::DC_Info()
+        {
+            assign_activate = 0;
+            sync0_cycle = 0;
+            sync0_shift = 0;
+            sync1_cycle = 0;
+            sync1_shift = 0;
+        }
+
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
         {
             std::vector<std::optional<int>> newDiffs;

@@ -57,6 +57,10 @@ namespace ethercat_interface
         Slave::~Slave()
         {   
             delete m_SlaveOffsets;
+            delete m_SlavePdoEntries;
+            delete m_SlavePDOs;
+            delete m_SlaveSyncs;
+            delete m_DomainProcessDataPtr;
         }
 
         void Slave::configure_slave()
