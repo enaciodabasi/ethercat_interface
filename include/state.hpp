@@ -141,7 +141,21 @@ namespace ethercat_interface
 
         namespace CIA402
         {
+            namespace state_machine
+            {
+                class StateMachine // is it finite?
+                {
+                    public:
 
+                    StateMachine();
+                    ~StateMachine();
+
+                    private:
+
+                    
+
+                };
+            }
         }
 
         

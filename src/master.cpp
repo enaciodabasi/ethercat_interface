@@ -97,9 +97,11 @@ namespace ethercat_interface
             ecrt_master_application_time(m_EthercatMaster, app_time);
         }
 
-        void Master::syncMasterClock(const uint64_t &sync_time)
+        void Master::syncMasterClock(const uint64_t &sync_time, bool sync_ref_clock)
         {
-            ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);
+            if(sync_ref_clock)
+                ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);
+
             ecrt_master_sync_slave_clocks(m_EthercatMaster);
         }
 

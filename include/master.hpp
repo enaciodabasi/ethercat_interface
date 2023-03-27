@@ -80,7 +80,7 @@ namespace ethercat_interface
 
             void setMasterTime(const uint64_t& app_time);
 
-            void syncMasterClock(const uint64_t& sync_time);
+            void syncMasterClock(const uint64_t& sync_time, bool sync_ref_clock);
 
             bool enableSlaves();
 
