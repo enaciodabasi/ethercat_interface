@@ -237,7 +237,7 @@ namespace ethercat_interface
                 void updateEndTime();
             };
 
-            void measureTime(TimeMeasureInfo_s& tmInfo_s);
+            void measureTime(TimeMeasureInfo_s& tmInfo_s, timespec wakeupTime);
 
             long timeDiff(timespec t1, timespec t2);
 
