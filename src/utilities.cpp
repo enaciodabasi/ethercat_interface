@@ -387,12 +387,15 @@ namespace ethercat_interface
                 latency_min_ns = 0xffffffff;
             }
 
-            void TimeMeasureInfo_s::printTimingStats()
+            std::string TimeMeasureInfo_s::getTimingStats()
             {
-                std::cout.precision(10);
-                std::cout << "Period: " << period_min_ns << " ... " << period_max_ns << std::endl;
-                std::cout << "Exec:: " << exec_min_ns << " ... " << exec_max_ns << std::endl;
-                std::cout << "Latency: " << latency_min_ns << " ... " << latency_max_ns << std::endl;
+                //std::cout.precision(10);
+                std::string str;
+                str + "Period: " + std::to_string(period_min_ns) + " ... " + std::to_string(period_max_ns) + "\n";
+                str + "Exec: " + std::to_string(exec_min_ns) + " ... " + std::to_string(exec_max_ns) + "\n";
+                str + "Latency: " + std::to_string(latency_min_ns) + " ... " + std::to_string(latency_max_ns) + "\n";
+
+                return str;
             }
 
             void TimeMeasureInfo_s::updateEndTime()

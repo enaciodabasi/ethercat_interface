@@ -232,7 +232,7 @@ namespace ethercat_interface
 
                 void updateMinMax();
                 void resetMinMax();
-                void printTimingStats();
+                std::string getTimingStats();
 
                 void updateEndTime();
             };
