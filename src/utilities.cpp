@@ -391,9 +391,9 @@ namespace ethercat_interface
             {
                 //std::cout.precision(10);
                 std::string str;
-                str + "Period: " + std::to_string(period_min_ns) + " ... " + std::to_string(period_max_ns) + "\n";
-                str + "Exec: " + std::to_string(exec_min_ns) + " ... " + std::to_string(exec_max_ns) + "\n";
-                str + "Latency: " + std::to_string(latency_min_ns) + " ... " + std::to_string(latency_max_ns) + "\n";
+                str += "Period: " + std::to_string(period_min_ns) + " ... " + std::to_string(period_max_ns) + "\n";
+                str += "Exec: " + std::to_string(exec_min_ns) + " ... " + std::to_string(exec_max_ns) + "\n";
+                str += "Latency: " + std::to_string(latency_min_ns) + " ... " + std::to_string(latency_max_ns) + "\n";
 
                 return str;
             }
