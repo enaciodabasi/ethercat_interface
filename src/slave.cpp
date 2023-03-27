@@ -142,7 +142,6 @@ namespace ethercat_interface
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
             
-            std::cout << m_Status << ": " << std::bitset<8>(m_Status).to_string() << std::endl;
             /* 
 
             /*
@@ -198,19 +197,19 @@ namespace ethercat_interface
             {
                 if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
                 {   
-                    std::cout << "Switch on disabled\n";
+                    //std::cout << "Switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
                 {
-                    std::cout << "Ready To switch on\n";
+                    //std::cout << "Ready To switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
                 else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
                 {
-                    std::cout << "Switched on\n";
+                    //std::cout << "Switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
                     return false;
                 }
