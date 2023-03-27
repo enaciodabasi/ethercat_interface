@@ -18,6 +18,9 @@
 #include <variant>
 #include <optional>
 #include <map>
+#include <time.h>
+#include <stdint.h>
+#include <sys/time.h>
 
 #include <yaml-cpp/yaml.h>
 
@@ -200,6 +203,45 @@ namespace ethercat_interface
             const std::string& file_name,
             const std::string& slave_name
         );
+
+        // Contains functions and other helpers for debugging the EtherCAT Interface.
+        namespace debug 
+        {   
+            // 
+            auto constexpr NANOSEC_PER_SEC = 1000000000L;
+
+            struct TimeMeasureInfo_s
+            {
+                struct timespec startTime{};
+                struct timespec endTime{};
+                struct timespec lastStartTime{};
+
+                uint32_t period_ns{0};
+                uint32_t period_min_ns{0};
+                uint32_t period_max_ns{0};
+                
+                uint32_t latency_ns{0};
+                uint32_t latency_min_ns{0};
+                uint32_t latency_max_ns{0};
+                
+                uint32_t exec_ns{0};
+                uint32_t exec_min_ns{0};
+                uint32_t exec_max_ns{0};
+
+                int usedClock = CLOCK_MONOTONIC;
+
+                void updateMinMax();
+                void resetMinMax();
+                void printTimingStats();
+
+                void updateEndTime();
+            };
+
+            void measureTime(TimeMeasureInfo_s& tmInfo_s);
+
+            long timeDiff(timespec t1, timespec t2);
+
+        } // End of namespace debug.
 
     } // End of namespace utilities
 
