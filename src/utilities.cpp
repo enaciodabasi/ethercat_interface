@@ -400,7 +400,6 @@ namespace ethercat_interface
 
             void TimeMeasureInfo_s::updateEndTime()
             {
-                this->resetMinMax();
                 clock_gettime(usedClock, &endTime);   
             }
 
@@ -417,7 +416,7 @@ namespace ethercat_interface
 
             long timeDiff(timespec t1, timespec t2)
             {
-                auto diff = ((t2.tv_sec - t1.tv_sec) * NANOSEC_PER_SEC + (t2.tv_nsec - t2.tv_nsec));
+                auto diff = ((t2.tv_sec - t1.tv_sec) * NANOSEC_PER_SEC + (t2.tv_nsec - t1.tv_nsec));
 
                 return diff;
             }
