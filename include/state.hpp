@@ -27,6 +27,7 @@ https://download.lenze.com/TD/E94AxHE__Technology%20Application%20CiA402%20Devic
 #include <functional>
 #include <bitset>
 
+
 namespace ethercat_interface
 {
     namespace slave
@@ -139,24 +140,7 @@ namespace ethercat_interface
 
         bool isStatusCorrect(SlaveStatus current_status, StatusType target_status);
 
-        namespace CIA402
-        {
-            namespace state_machine
-            {
-                class StateMachine // is it finite?
-                {
-                    public:
-
-                    StateMachine();
-                    ~StateMachine();
-
-                    private:
-
-                    
-
-                };
-            }
-        }
+        
 
         
 
