@@ -25,6 +25,7 @@
 #include "utilities.hpp"
 #include "state.hpp"
 #include "logger.hpp"
+#include "state_machine.hpp"
 
 
 namespace ethercat_interface
@@ -249,7 +250,11 @@ namespace ethercat_interface
 
             DC_Info m_DcInfo;
 
+            std::shared_ptr<uint16_t> m_SlaveStatus;
+
             SlaveStatus m_Status; // Status Word read from the EtherCAT master.
+
+            state_machine::CIA402::StateMachine* m_StateMachine;
 
         };
 

@@ -351,5 +351,75 @@ namespace ethercat_interface
 
             return dcInfo;
         }
+
+        namespace debug
+        {
+            
+            void TimeMeasureInfo_s::updateMinMax()
+            {
+                if (latency_ns > latency_max_ns) {
+                    latency_max_ns = latency_ns;
+                }
+                if (latency_ns < latency_min_ns) {
+                    latency_min_ns = latency_ns;
+                }
+                if (period_ns > period_max_ns) {
+                    period_max_ns = period_ns;
+                }
+                if (period_ns < period_min_ns) {
+                    period_min_ns = period_ns;
+                }
+                if (exec_ns > exec_max_ns) {
+                    exec_max_ns = exec_ns;
+                }
+                if (exec_ns < exec_min_ns) {
+                    exec_min_ns = exec_ns;
+                }
+            }
+
+            void TimeMeasureInfo_s::resetMinMax()
+            {
+                period_max_ns = 0;
+                period_min_ns = 0xffffffff;
+                exec_max_ns = 0;
+                exec_min_ns = 0xffffffff;
+                latency_max_ns = 0;
+                latency_min_ns = 0xffffffff;
+            }
+
+            std::string TimeMeasureInfo_s::getTimingStats()
+            {
+                //std::cout.precision(10);
+                std::string str;
+                str += "Period: " + std::to_string(period_min_ns) + " ... " + std::to_string(period_max_ns) + "\n";
+                str += "Exec: " + std::to_string(exec_min_ns) + " ... " + std::to_string(exec_max_ns) + "\n";
+                str += "Latency: " + std::to_string(latency_min_ns) + " ... " + std::to_string(latency_max_ns) + "\n";
+
+                return str;
+            }
+
+            void TimeMeasureInfo_s::updateEndTime()
+            {
+                clock_gettime(usedClock, &endTime);   
+            }
+
+            void measureTime(TimeMeasureInfo_s& tmInfo_s, timespec wakeupTime)
+            {
+                clock_gettime(tmInfo_s.usedClock, &tmInfo_s.startTime);
+                tmInfo_s.latency_ns = timeDiff(wakeupTime, tmInfo_s.startTime);
+                tmInfo_s.period_ns = timeDiff(tmInfo_s.lastStartTime, tmInfo_s.startTime);
+                tmInfo_s.exec_ns = timeDiff(tmInfo_s.lastStartTime, tmInfo_s.endTime);
+                tmInfo_s.lastStartTime = tmInfo_s.startTime;
+                
+                tmInfo_s.updateMinMax();
+            }
+
+            long timeDiff(timespec t1, timespec t2)
+            {
+                auto diff = ((t2.tv_sec - t1.tv_sec) * NANOSEC_PER_SEC + (t2.tv_nsec - t1.tv_nsec));
+
+                return diff;
+            }
+        }
     }
 }

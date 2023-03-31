@@ -3,6 +3,8 @@ project(ethercat_interface)
 
 find_package(yaml-cpp REQUIRED) 
 
+find_package(Boost REQUIRED)
+
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
@@ -14,6 +16,7 @@ set(SOURCES
     include/dc_sync.h
     src/dc_sync.c
     src/logger.cpp
+    src/state_machine.cpp
 )
 
 set(
@@ -37,11 +40,13 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${etherlab_include}
     ${YAML_CPP_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIR}
 )
 target_link_libraries(
     ${PROJECT_NAME}
     ${etherlab_lib}
     ${YAML_CPP_LIBRARIES}
+    ${Boost_LIBRARIES}
 )
 
 #set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -52,6 +57,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/utilities.hpp
     include/state.hpp
     include/dc_sync.h
+    include/state_machine.hpp
 )
 
 set_target_properties(${PROJECT_NAME}
