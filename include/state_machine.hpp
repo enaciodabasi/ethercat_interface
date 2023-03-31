@@ -13,6 +13,7 @@
 #include <memory>
 #include <functional>
 #include <unordered_map>
+#include <optional>
 
 #include "slave.hpp"
 
@@ -52,11 +53,22 @@ namespace ethercat_interface
                 
                 State m_CurrentState = State::SwitchOnDisabled; 
 
-                typedef std::pair<State, Command> Transition;
-                typedef std::vector<Transition> NextStates;
+                const std::vector<State> m_States = {
+                    State::NotReadyToSwitchOn,
+                    State::SwitchOnDisabled,
+                    State::ReadyToSwitchOn,
+                    State::SwitchedOn,
+                    State::OperationEnabled,
+                    State::QuickStopActive,
+                    State::FaultResponseActive,
+                    State::Fault
+                };
 
-                const std::unordered_map<State, NextStates> m_TransitionTable = {
-                    {State::SwitchOnDisabled, 
+                typedef std::unordered_map<State, Command> Transitions;
+                typedef std::unordered_map<State, Transitions> TransitionTable;
+                
+                const TransitionTable m_TransitionTable = {
+                     {State::SwitchOnDisabled, 
                         {
                             {State::ReadyToSwitchOn, Command::Shutdown}
                         }
@@ -86,7 +98,6 @@ namespace ethercat_interface
                     }
                     }
                 };
-                
                 
             };
 

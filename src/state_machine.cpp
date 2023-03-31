@@ -33,27 +33,72 @@ namespace ethercat_interface
             bool StateMachine::switchState(const State& target_state)
             {
                 bool isSwitchSuccessful = false;
+                uint16_t currentStatus;
 
-                switch (target_state)
+                if(auto res = m_SlaveStatusPtr.lock()) // Get temporary ownership of the status.
                 {
-                case State::SwitchOnDisabled:
-                    
-                case State::ReadyToSwitchOn:
-                    
-                    break;
-                case State::SwitchedOn:
-                    
-                    break;
-                case State::OperationEnabled:
-                    
-                    break;
-                case State::QuickStopActive:
-                    
-                    break;
-                default:
-                    isSwitchSuccessful = false;
-                    break;
+                    currentStatus = *res;
                 }
+                
+                // Get the current state of the slave by comparing the status word with the State's.
+                std::optional<State> optState;
+                for(const auto state : m_States)
+                {
+                    if(statusCheck(currentStatus, state)) 
+                    {
+                        optState = state;
+                        break;
+                    }
+                    else
+                    {
+                        optState = std::nullopt;
+                    }
+                }
+
+                // If the current status word does not match with any of the predefined
+                // State's, return false.
+                if(optState == std::nullopt) 
+                {
+                    return false;
+                }
+
+                const State currentState = optState.value();
+
+                auto possibleTransitions = m_TransitionTable.find(currentState);
+                if(possibleTransitions == m_TransitionTable.end())
+                {
+                    return false;
+                }
+
+                auto transitionToTarget = possibleTransitions->second.find(target_state);
+                if(transitionToTarget == possibleTransitions->second.end())
+                {
+                    return false;
+                }
+
+                
+
+
+                /* switch (currentState)
+                {
+                    case State::SwitchOnDisabled:
+
+                    case State::ReadyToSwitchOn:
+
+                        break;
+                    case State::SwitchedOn:
+
+                        break;
+                    case State::OperationEnabled:
+
+                        break;
+                    case State::QuickStopActive:
+
+                        break;
+                    default:
+                        isSwitchSuccessful = false;
+                        break;
+                } */
                 
                 return isSwitchSuccessful;
             }
