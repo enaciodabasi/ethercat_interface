@@ -51,7 +51,17 @@ namespace ethercat_interface
 
                 m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
             }
-            
+
+            m_SlaveStatus = std::make_shared<uint16_t>();
+
+            m_StateMachine = new state_machine::CIA402::StateMachine(m_SlaveStatus);
+            m_StateMachine->setWriteCallback(std::bind(
+                    &Slave::writeToSlave<uint16_t>,
+                    this,
+                    std::placeholders::_1,
+                    std::placeholders::_2,
+                    std::placeholders::_3
+                ));
         }
 
         Slave::~Slave()
@@ -65,6 +75,7 @@ namespace ethercat_interface
 
         void Slave::configure_slave()
         {
+
             
             m_SlavePdoEntries = ethercat_interface::slave::createSlavePdoEntries(
                 m_SlaveInfo.pdoEntryInfo.indexes,

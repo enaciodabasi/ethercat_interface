@@ -10,11 +10,11 @@
  */
 
 #include <iostream>
+#include <memory>
+#include <functional>
+#include <unordered_map>
 
-#include <boost/statechart/state_machine.hpp>
-#include <boost/statechart/state.hpp>
-#include <boost/statechart/event.hpp>
-#include <boost/mpl/list.hpp>
+#include "slave.hpp"
 
 namespace ethercat_interface
 {   
@@ -23,116 +23,75 @@ namespace ethercat_interface
         
         namespace CIA402
         {
-            enum class State;
-            enum class Command;
+            enum class State : uint16_t;
+            enum class ControlCommand : uint16_t;
             
             class StateMachine
             {
                 public:
                 
                 StateMachine();
-                StateMachine(uint16_t* slave_status_ptr);
+                StateMachine(std::shared_ptr<uint16_t>& slave_status_ptr);
+
                 ~StateMachine();
 
-                std::unique_ptr<uint16_t> m_SlaveStatusPtr; 
+                std::weak_ptr<uint16_t> m_SlaveStatusPtr; 
 
-                inline void setStatusPtr(uint16_t* slave_status_ptr)
+                inline void setStatusPtr(std::shared_ptr<uint16_t>& slave_status_ptr)
                 {
-                    m_SlaveStatusPtr = std::make_unique<uint16_t>(slave_status_ptr);
+                    m_SlaveStatusPtr = slave_status_ptr;
                 }
+
+                void setWriteCallback(std::function<void(const std::string&, const uint16_t&, int)> function_ptr);
                 
+                bool switchState(const State& target_state);
+
                 private:
 
-                // Forward declarations of the states:
-                // Starting state: Drive Disabled
-                struct DriveDisabled_m;
-                // Inner states of the Drive Disabled state.
-                struct NotReadyToSwitchOn;
-                struct SwitchOnDisabled;
-                struct ReadyToSwitchOn;
+                std::function<void(const std::string&, const uint16_t&, int)> writeControlCommand;
+                
+                State m_CurrentState = State::SwitchOnDisabled; 
 
-                // Drive Active
-                struct DriveActive_m;
-                // Inner states of the Drive Active State;
-                struct SwitchedOn;
-                struct OperationEnabled;
-                struct QuickStopActive;
+                typedef std::pair<State, Command> Transition;
+                typedef std::vector<Transition> NextStates;
 
-                // Fault
-                struct Fault_m;
-                struct FaultReactionActive;
-                struct Fault;
-
-                // -------------------- Events --------------------
-                // ------------------------------------------------
-
-                struct MoveToDriveDisabledState : boost::statechart::event<MoveToDriveDisabledState>{};
-
-                struct MoveToDriveActiveState : boost::statechart::event<MoveToDriveActiveState>{};
-
-                struct MoveToFaultState : boost::statechart::event<MoveToFaultState>{};
-
-                struct MoveToReadyToSwitchOnState : boost::statechart::event<MoveToReadyToSwitchOnState>{};
-
-                // -------------------- Definitions of the States ---------------------
-                // --------------------------------------------------------------------
-
-                struct m_StateMachine : boost::statechart::state_machine<m_StateMachine, DriveDisabled_m>
-                {
-
-                };
-
-                struct DriveDisabled_m : boost::statechart::state<DriveDisabled_m, m_StateMachine, NotReadyToSwitchOn>
-                {
-
-                };
-
-                struct NotReadyToSwitchOn : boost::statechart::state<NotReadyToSwitchOn, DriveDisabled_m>
-                {
-
-                };
-
-                struct SwitchOnDisabled : boost::statechart::state<SwitchOnDisabled, DriveDisabled_m>
-                {
-
-                };
-
-                struct DriveActive_m : boost::statechart::state<DriveActive_m, m_StateMachine, SwitchedOn>
-                {
-
-                };
-
-                struct SwitchedOn : boost::statechart::state<SwitchedOn, DriveActive_m>
-                {
-                 
+                const std::unordered_map<State, NextStates> m_TransitionTable = {
+                    {State::SwitchOnDisabled, 
+                        {
+                            {State::ReadyToSwitchOn, Command::Shutdown}
+                        }
+                    },
+                    {State::ReadyToSwitchOn, 
+                        {
+                            {State::SwitchedOn, Command::SwitchOn}, 
+                            {State::SwitchOnDisabled, Command::QuickStop}
+                        }
+                    },
+                    {State::SwitchedOn, 
+                        {
+                            {State::OperationEnabled, Command::EnableOperation}, 
+                            {State::SwitchOnDisabled, Command::QuickStop}
+                        }
+                    },
+                    {State::OperationEnabled, 
+                        {
+                            {State::ReadyToSwitchOn, Command::Shutdown},
+                            {State::QuickStopActive, Command::QuickStop}, 
+                            {State::SwitchedOn, Command::DisableOperation}
+                        }
+                    },
+                    {State::Fault, 
+                    {
+                        {State::SwitchOnDisabled, Command::ResetFault}
+                    }
+                    }
                 };
                 
-                struct OperationEnabled : boost::statechart::state<OperationEnabled, DriveActive_m>
-                {
-                 
-                };
-
-                struct QuickStopActive : boost::statechart::state<QuickStopActive, DriveActive_m>
-                {
-                 
-                };
-
-                struct Fault_m : boost::statechart::state<Fault_m, m_StateMachine, FaultReactionActive>
-                {
-
-                };
-
-                struct FaultReactionActive : boost::statechart::state<FaultReactionActive, Fault_m>
-                {
-                 
-                };
-                
-                struct Fault : boost::statechart::state<Fault, Fault_m>
-                {
-                 
-                };
                 
             };
+
+            bool statusCheck(const uint16_t& current_status, const State& target_state);
+
             enum class State : uint16_t
             {
                 NotReadyToSwitchOn = 0x00,
@@ -144,6 +103,80 @@ namespace ethercat_interface
                 FaultResponseActive = 0x0F,
                 Fault = 0x008
             };
+
+            inline uint16_t get(const State& state)
+            {
+                return static_cast<std::underlying_type<State>::type>(state);
+            }
+
+
+            enum class Command : uint16_t
+            {
+                Shutdown = 0x06, // Changes the device status from "Switch On disabled" to "Ready to switch on". 
+                SwitchOn = 0x07, // Deactivates the switch on inhibit., 
+                EnableOperation = 0x000f, // Enables the operation and actives quick stop again. 
+                QuickStop = 0x02, // Activates Quick Stop.
+                DisableOperation = 0x01f, // Disables the operation
+                DisableVoltage = 0x01, // Inhibits the output stages of the controller.
+                ResetFault = 0x80 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
+            };
+
+            inline uint16_t get(const Command& command)
+            {
+                return static_cast<std::underlying_type<Command>::type>(command);
+            }
+
+            class StatusHelper
+            {
+                public:
+                /**
+                 * @brief Pair first: StatusType Enum, second: Vector of integers containing the unimportant bit's indexes.
+                 * 
+                 */
+                typedef std::vector<int> UnimportantBitIndexes;
+                static UnimportantBitIndexes getNotImportantBits(State type)
+                {
+                    switch (type)
+                    {
+                    case State::NotReadyToSwitchOn:
+                        return NotReadyToSwitchOn;
+                        break;
+                    case State::SwitchOnDisabled:
+                        return SwitchOnDisabled;
+                        break;
+                    case State::ReadyToSwitchOn:
+                        return ReadyToSwitchOn;
+                        break;
+                    case State::SwitchedOn:
+                        return SwitchedOn;
+                        break;
+                    case State::OperationEnabled:
+                        return OperationEnabled;
+                        break;
+                    case State::QuickStopActive:
+                        return QuickStopActive;
+                        break;
+                    case State::FaultResponseActive:
+                        return FaultResponseActive;
+                        break;
+                    case State::Fault:
+                        return Fault;
+                        break;
+                    default:
+                        break;
+                    }
+                }
+                static UnimportantBitIndexes NotReadyToSwitchOn;
+                static UnimportantBitIndexes SwitchOnDisabled;
+                static UnimportantBitIndexes ReadyToSwitchOn;
+                static UnimportantBitIndexes SwitchedOn;
+                static UnimportantBitIndexes OperationEnabled;
+                static UnimportantBitIndexes QuickStopActive;
+                static UnimportantBitIndexes FaultResponseActive;
+                static UnimportantBitIndexes Fault;
+            
+            };
+            
         }
     }
 }
