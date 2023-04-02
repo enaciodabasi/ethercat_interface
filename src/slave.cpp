@@ -54,7 +54,7 @@ namespace ethercat_interface
 
             m_SlaveStatus = std::make_shared<uint16_t>();
 
-            m_StateMachine = new state_machine::CIA402::StateMachine(m_SlaveStatus);
+            m_StateMachine = new ethercat_interface::state_machine::CIA402::StateMachine(m_SlaveStatus);
             m_StateMachine->setWriteCallback(std::bind(
                     &Slave::writeToSlave<uint16_t>,
                     this,

@@ -9,13 +9,14 @@
  * 
  */
 
+#ifndef STATE_MACHINE_HPP
+#define STATE_MACHINE_HPP
+
 #include <iostream>
 #include <memory>
 #include <functional>
 #include <unordered_map>
 #include <optional>
-
-#include "slave.hpp"
 
 namespace ethercat_interface
 {   
@@ -24,8 +25,39 @@ namespace ethercat_interface
         
         namespace CIA402
         {
-            enum class State : uint16_t;
-            enum class ControlCommand : uint16_t;
+            enum class State : uint16_t
+            {
+                NotReadyToSwitchOn = 0x00,
+                SwitchOnDisabled = 0x40,
+                ReadyToSwitchOn = 0x21,
+                SwitchedOn = 0x23,
+                OperationEnabled = 0x27,
+                QuickStopActive = 0x07,
+                FaultResponseActive = 0x0F,
+                Fault = 0x008
+            };
+
+            inline uint16_t get(const State& state)
+            {
+                return static_cast<std::underlying_type<State>::type>(state);
+            }
+
+
+            enum class Command : uint16_t
+            {
+                Shutdown = 0x06, // Changes the device status from "Switch On disabled" to "Ready to switch on". 
+                SwitchOn = 0x07, // Deactivates the switch on inhibit., 
+                EnableOperation = 0x000f, // Enables the operation and actives quick stop again. 
+                QuickStop = 0x02, // Activates Quick Stop.
+                DisableOperation = 0x01f, // Disables the operation
+                DisableVoltage = 0x01, // Inhibits the output stages of the controller.
+                ResetFault = 0x80 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
+            };
+
+            inline uint16_t get(const Command& command)
+            {
+                return static_cast<std::underlying_type<Command>::type>(command);
+            }
             
             class StateMachine
             {
@@ -103,39 +135,7 @@ namespace ethercat_interface
 
             bool statusCheck(const uint16_t& current_status, const State& target_state);
 
-            enum class State : uint16_t
-            {
-                NotReadyToSwitchOn = 0x00,
-                SwitchOnDisabled = 0x40,
-                ReadyToSwitchOn = 0x21,
-                SwitchedOn = 0x23,
-                OperationEnabled = 0x27,
-                QuickStopActive = 0x07,
-                FaultResponseActive = 0x0F,
-                Fault = 0x008
-            };
-
-            inline uint16_t get(const State& state)
-            {
-                return static_cast<std::underlying_type<State>::type>(state);
-            }
-
-
-            enum class Command : uint16_t
-            {
-                Shutdown = 0x06, // Changes the device status from "Switch On disabled" to "Ready to switch on". 
-                SwitchOn = 0x07, // Deactivates the switch on inhibit., 
-                EnableOperation = 0x000f, // Enables the operation and actives quick stop again. 
-                QuickStop = 0x02, // Activates Quick Stop.
-                DisableOperation = 0x01f, // Disables the operation
-                DisableVoltage = 0x01, // Inhibits the output stages of the controller.
-                ResetFault = 0x80 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
-            };
-
-            inline uint16_t get(const Command& command)
-            {
-                return static_cast<std::underlying_type<Command>::type>(command);
-            }
+            
 
             class StatusHelper
             {
@@ -191,3 +191,5 @@ namespace ethercat_interface
         }
     }
 }
+
+#endif // STATE_MACHINE_HPP
