@@ -343,7 +343,7 @@ namespace ethercat_interface
 
             
         }
-
+        
         template<typename T>
         void Slave::writeToSlave(
             const std::string& value_to_write_name,

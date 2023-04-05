@@ -9,12 +9,14 @@
  * 
  */
 
+#ifndef STATE_MACHINE_HPP
+#define STATE_MACHINE_HPP
+
 #include <iostream>
 #include <memory>
 #include <functional>
 #include <unordered_map>
-
-#include "slave.hpp"
+#include <optional>
 
 namespace ethercat_interface
 {   
@@ -23,75 +25,6 @@ namespace ethercat_interface
         
         namespace CIA402
         {
-            enum class State : uint16_t;
-            enum class ControlCommand : uint16_t;
-            
-            class StateMachine
-            {
-                public:
-                
-                StateMachine();
-                StateMachine(std::shared_ptr<uint16_t>& slave_status_ptr);
-
-                ~StateMachine();
-
-                std::weak_ptr<uint16_t> m_SlaveStatusPtr; 
-
-                inline void setStatusPtr(std::shared_ptr<uint16_t>& slave_status_ptr)
-                {
-                    m_SlaveStatusPtr = slave_status_ptr;
-                }
-
-                void setWriteCallback(std::function<void(const std::string&, const uint16_t&, int)> function_ptr);
-                
-                bool switchState(const State& target_state);
-
-                private:
-
-                std::function<void(const std::string&, const uint16_t&, int)> writeControlCommand;
-                
-                State m_CurrentState = State::SwitchOnDisabled; 
-
-                typedef std::pair<State, Command> Transition;
-                typedef std::vector<Transition> NextStates;
-
-                const std::unordered_map<State, NextStates> m_TransitionTable = {
-                    {State::SwitchOnDisabled, 
-                        {
-                            {State::ReadyToSwitchOn, Command::Shutdown}
-                        }
-                    },
-                    {State::ReadyToSwitchOn, 
-                        {
-                            {State::SwitchedOn, Command::SwitchOn}, 
-                            {State::SwitchOnDisabled, Command::QuickStop}
-                        }
-                    },
-                    {State::SwitchedOn, 
-                        {
-                            {State::OperationEnabled, Command::EnableOperation}, 
-                            {State::SwitchOnDisabled, Command::QuickStop}
-                        }
-                    },
-                    {State::OperationEnabled, 
-                        {
-                            {State::ReadyToSwitchOn, Command::Shutdown},
-                            {State::QuickStopActive, Command::QuickStop}, 
-                            {State::SwitchedOn, Command::DisableOperation}
-                        }
-                    },
-                    {State::Fault, 
-                    {
-                        {State::SwitchOnDisabled, Command::ResetFault}
-                    }
-                    }
-                };
-                
-                
-            };
-
-            bool statusCheck(const uint16_t& current_status, const State& target_state);
-
             enum class State : uint16_t
             {
                 NotReadyToSwitchOn = 0x00,
@@ -125,6 +58,84 @@ namespace ethercat_interface
             {
                 return static_cast<std::underlying_type<Command>::type>(command);
             }
+            
+            class StateMachine
+            {
+                public:
+                
+                StateMachine();
+                StateMachine(std::shared_ptr<uint16_t>& slave_status_ptr);
+
+                ~StateMachine();
+
+                std::weak_ptr<uint16_t> m_SlaveStatusPtr; 
+
+                inline void setStatusPtr(std::shared_ptr<uint16_t>& slave_status_ptr)
+                {
+                    m_SlaveStatusPtr = slave_status_ptr;
+                }
+
+                void setWriteCallback(std::function<void(const std::string&, const uint16_t&, int)> function_ptr);
+                
+                bool switchState(const State& target_state);
+
+                private:
+
+                std::function<void(const std::string&, const uint16_t&, int)> writeControlCommand;
+                
+                State m_CurrentState = State::SwitchOnDisabled; 
+
+                const std::vector<State> m_States = {
+                    State::NotReadyToSwitchOn,
+                    State::SwitchOnDisabled,
+                    State::ReadyToSwitchOn,
+                    State::SwitchedOn,
+                    State::OperationEnabled,
+                    State::QuickStopActive,
+                    State::FaultResponseActive,
+                    State::Fault
+                };
+
+                typedef std::unordered_map<State, Command> Transitions;
+                typedef std::unordered_map<State, Transitions> TransitionTable;
+                
+                const TransitionTable m_TransitionTable = {
+                     {State::SwitchOnDisabled, 
+                        {
+                            {State::ReadyToSwitchOn, Command::Shutdown}
+                        }
+                    },
+                    {State::ReadyToSwitchOn, 
+                        {
+                            {State::SwitchedOn, Command::SwitchOn}, 
+                            {State::SwitchOnDisabled, Command::QuickStop}
+                        }
+                    },
+                    {State::SwitchedOn, 
+                        {
+                            {State::OperationEnabled, Command::EnableOperation}, 
+                            {State::SwitchOnDisabled, Command::QuickStop}
+                        }
+                    },
+                    {State::OperationEnabled, 
+                        {
+                            {State::ReadyToSwitchOn, Command::Shutdown},
+                            {State::QuickStopActive, Command::QuickStop}, 
+                            {State::SwitchedOn, Command::DisableOperation}
+                        }
+                    },
+                    {State::Fault, 
+                    {
+                        {State::SwitchOnDisabled, Command::ResetFault}
+                    }
+                    }
+                };
+                
+            };
+
+            bool statusCheck(const uint16_t& current_status, const State& target_state);
+
+            
 
             class StatusHelper
             {
@@ -180,3 +191,5 @@ namespace ethercat_interface
         }
     }
 }
+
+#endif // STATE_MACHINE_HPP
