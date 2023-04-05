@@ -14,10 +14,12 @@
 
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <variant>
 #include <optional>
 #include <map>
+
 #include <time.h>
 #include <stdint.h>
 #include <sys/time.h>
@@ -107,6 +109,8 @@ namespace ethercat_interface
 
         std::vector<uint8_t> toHexadecimal(const std::vector<uint>& to_fix);
 
+        std::vector<uint8_t> fixSubindexes(const std::vector<uint>& to_fix);
+
         struct SlaveSyncInfo
         {
             SlaveSyncInfo();
@@ -184,11 +188,6 @@ namespace ethercat_interface
             }
         };
 
-        SlaveInfo parse_config_file(
-            const std::string& file_name,
-            const std::string& slave_name
-        );
-
         struct DC_Info
         {
             DC_Info();
@@ -202,6 +201,15 @@ namespace ethercat_interface
         DC_Info getDcInfo(
             const std::string& file_name,
             const std::string& slave_name
+        );
+
+        SlaveInfo parse_config_file(
+            const std::string& file_name,
+            const std::string& slave_name
+        );
+
+        std::optional<std::vector<SlaveInfo>> parse_config_file(
+            std::string_view file_name
         );
 
         // Contains functions and other helpers for debugging the EtherCAT Interface.

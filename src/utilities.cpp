@@ -148,9 +148,7 @@ namespace ethercat_interface
         
             // This is bad practice.
             for(std::size_t i = 0; i < to_fix.size(); i++)
-            {
-                std::cout << to_fix[i] << std::endl;
-                
+            {                
                 switch (to_fix[i])
                 {
                 case 0:
@@ -259,6 +257,20 @@ namespace ethercat_interface
             return hexas;
         }
 
+        std::vector<uint8_t> fitSubindexes(const std::vector<uint>& to_fix)
+        {
+
+            std::vector<uint8_t> output;
+            for (auto i : to_fix) {
+                uint8_t hex = 0x00;
+                if (i <= 0xFF) {
+                    hex = static_cast<uint8_t>(i);
+                }
+                output.push_back(hex);
+            }
+            return output;
+        }
+
         SlaveInfo parse_config_file(
             const std::string& file_name,
             const std::string& slave_name
@@ -275,11 +287,6 @@ namespace ethercat_interface
 
                 info.slaveName = slave_name;
                 const std::string typeStr = slave_config["type"].as<std::string>();
-                info.vendorID = slave_config["vendor_id"].as<int>();
-                info.productCode = slave_config["product_id"].as<int>();
-                info.position = slave_config["slave_position"].as<uint>();
-                info.alias = slave_config["slave_alias"].as<uint>();
-
                 if(typeStr == "coupler" || typeStr == "Coupler")
                 {
                     info.slaveType = SlaveType::Coupler;
@@ -289,6 +296,11 @@ namespace ethercat_interface
                 {
                     info.slaveType = SlaveType::Driver;
                 }
+
+                info.vendorID = slave_config["vendor_id"].as<int>();
+                info.productCode = slave_config["product_id"].as<int>();
+                info.position = slave_config["slave_position"].as<uint>();
+                info.alias = slave_config["slave_alias"].as<uint>();
                 
                 info.pdoEntryInfo.indexes = slave_config["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
                 info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
@@ -320,6 +332,85 @@ namespace ethercat_interface
             }
 
             return info;
+        }
+
+        std::optional<std::vector<SlaveInfo>> parse_config_file(std::string_view file_name)
+        {   
+            std::vector<SlaveInfo> slaveConfigs;
+            try{
+
+                auto config_docs = YAML::LoadAllFromFile(static_cast<std::string>(file_name));
+                if(config_docs.empty())
+                {
+                    return std::nullopt;
+                }
+
+                for(const auto& doc : config_docs)
+                {
+                    SlaveInfo conf;
+                    // Get slave configuration information from the YAML document
+                    conf.slaveName = doc["slave_name"].as<std::string>();
+                    const std::string typeStr = doc["slave_type"].as<std::string>();
+                    conf.vendorID = doc["vendor_id"].as<int>();
+                    conf.productCode = doc["product_id"].as<int>();
+                    conf.position = doc["slave_position"].as<uint>();
+                    conf.alias = doc["slave_alias"].as<uint>();
+
+                    if(typeStr == "coupler" || typeStr == "Coupler")
+                    {
+                        conf.slaveType = SlaveType::Coupler;
+                        slaveConfigs.push_back(conf);
+                    }
+                    else if(typeStr == "driver" || typeStr == "Driver")
+                    {
+                        conf.slaveType = SlaveType::Driver;
+                    }
+                
+                    conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
+                    conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
+                    conf.pdoEntryInfo.bitLengths = doc["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
+                
+                    conf.ioMappingInfo.RxPDO_Address = doc["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
+                    conf.ioMappingInfo.TxPDO_Address = doc["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
+                    conf.ioMappingInfo.RxPDO_Size = doc["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
+                    conf.ioMappingInfo.TxPDO_Size = doc["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
+                    conf.ioMappingInfo.RxPDO_Indexes = doc["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
+                    conf.ioMappingInfo.TxPDO_Indexes = doc["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
+
+                    conf.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(doc["slave_sync_info"]["num_sync_managers"].as<int>());
+                    conf.slaveSyncInfo.syncManagerDirections = doc["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();
+                    conf.slaveSyncInfo.numPDOs = doc["slave_sync_info"]["number_of_pdos"].as<std::vector<uint>>();
+                    const std::vector<std::string> tempPdoDiffs = doc["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
+                    conf.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
+                    conf.slaveSyncInfo.watchdogModes = doc["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
+
+                    // If only one slave should be created from the current slave information
+                    // Add conf to the config vector and continue to loop over the remaining documents.
+                    if(doc["num_of_slaves"].as<uint>() == 1)
+                    {
+                        slaveConfigs.push_back(conf);
+                        continue;
+                    }
+
+                    uint numOfSlaves = doc["num_of_slaves"].as<uint>();
+                    
+                    for(uint i = 0; i < numOfSlaves; i++)
+                    {
+                        SlaveInfo tempConf = conf;
+                        tempConf.slaveName = conf.slaveName + "_" + std::to_string(i);
+                        tempConf.position += i;
+
+                        slaveConfigs.push_back(tempConf); 
+                    }    
+                
+                }
+            }
+            catch(const YAML::BadFile& ex)
+            {
+                std::cout << ex.what();
+            }
+
+            return slaveConfigs;
         }
 
         DC_Info getDcInfo(
