@@ -4,6 +4,37 @@ namespace ethercat_interface
 {
     namespace utilities
     {
+        namespace parser
+        {
+            
+            std::optional<ControllerInfo> parse_controller_config(std::string_view config_file_path)
+            {
+                ControllerInfo controllerInfo;
+
+                if(auto docs = YAML::LoadFile(static_cast<std::string>(config_file_path))["controller_config"])
+                {
+                    std::vector<std::string> domain_names = docs["domain_names"].as<std::vector<std::string>>();
+
+                    if(domain_names.empty())
+                    {
+                        return std::nullopt;
+                    }
+
+                    controllerInfo.domainNames = domain_names;
+                    controllerInfo.numOfDomains = (uint)domain_names.size();
+                    
+                }
+
+                return controllerInfo;
+                
+            }
+
+            std::optional<StartupInfo> parse_startup_configs()
+            {   
+                
+            }
+
+        }
 
         PdoEntryInfo::PdoEntryInfo()
         {
@@ -340,6 +371,8 @@ namespace ethercat_interface
             try{
 
                 auto config_docs = YAML::LoadAllFromFile(static_cast<std::string>(file_name));
+                //std::cout << config_docs[1]["slave_name"].as<std::string>() << std::endl;
+                
                 if(config_docs.empty())
                 {
                     return std::nullopt;
@@ -360,10 +393,15 @@ namespace ethercat_interface
                     {
                         conf.slaveType = SlaveType::Coupler;
                         slaveConfigs.push_back(conf);
+                        continue;
                     }
                     else if(typeStr == "driver" || typeStr == "Driver")
                     {
                         conf.slaveType = SlaveType::Driver;
+                    }
+                    else if(typeStr == "io" || typeStr == "IO" || typeStr == "Io")
+                    {
+                        conf.slaveType = SlaveType::IO;
                     }
                 
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();

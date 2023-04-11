@@ -31,8 +31,27 @@
 
 namespace ethercat_interface
 {
+    struct ControllerInfo
+    {
+
+        std::vector<std::string> domainNames;
+        uint numOfDomains;
+    };
+
+    struct StartupInfo
+    {
+
+    };
+    
     namespace utilities
     {   
+        
+        namespace parser
+        {   
+            std::optional<ControllerInfo> parse_controller_config(std::string_view config_file_path);
+
+            std::optional<StartupInfo> parse_startup_configs(); 
+        }
         struct PdoEntryInfo
         {
             PdoEntryInfo();
@@ -156,7 +175,8 @@ namespace ethercat_interface
         enum class SlaveType
         {
             Coupler,
-            Driver
+            Driver,
+            IO
         };
 
         struct SlaveInfo
