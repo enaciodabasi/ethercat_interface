@@ -37,7 +37,7 @@ namespace ethercat_interface
                 std::shared_ptr<logger::Logger> logger
             );
 
-            virtual ~Master();
+            ~Master();
 
             void updateMasterState();
 

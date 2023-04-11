@@ -22,7 +22,11 @@ namespace ethercat_interface
 
                     controllerInfo.domainNames = domain_names;
                     controllerInfo.numOfDomains = (uint)domain_names.size();
-                    
+
+                }
+                else
+                {
+                    return std::nullopt;
                 }
 
                 return controllerInfo;

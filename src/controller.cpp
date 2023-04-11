@@ -20,9 +20,54 @@ namespace ethercat_interface
 
         }
 
+        Controller::Controller(const std::string& config_file_path)
+            : m_PathToConfigFile{config_file_path}
+        {
+            
+        }
+
         bool Controller::setup()
         {
+            auto configsOpt = loadSlaveConfig(m_PathToConfigFile);
+            if(configsOpt == std::nullopt)
+            {
+                return false;
+            }
 
+            m_Master = std::make_unique<master::Master>(
+                0,
+                std::make_shared<logger::Logger>(""),
+                logger::FILE
+            );
+
+            
+
+            const auto configs = configsOpt.value();
+            for(auto slave_config : configs)
+            {
+                
+            }
+                
+            if(!on_startup())
+            {
+                return false;
+            }
+
+            // Call the start-up function for the slave config via SDO's in PRE-OP State.
+            // Return the result. 
+            return true;
+        }
+
+        bool Controller::on_startup()
+        {
+
+        }
+
+        std::optional<std::vector<utilities::SlaveInfo>> Controller::loadSlaveConfig(
+            std::string_view config_file_path
+        )
+        {
+            return utilities::parse_config_file(config_file_path);
         }
 
         bool Controller::updateThreadInfo()
