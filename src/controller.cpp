@@ -63,7 +63,7 @@ namespace ethercat_interface
 
         }
 
-        std::optional<std::vector<utilities::SlaveInfo>> Controller::loadSlaveConfig(
+        std::optional<std::vector<SlaveInfo>> Controller::loadSlaveConfig(
             std::string_view config_file_path
         )
         {

@@ -31,6 +31,95 @@
 
 namespace ethercat_interface
 {
+
+    struct SlaveSyncInfo
+        {
+            SlaveSyncInfo();
+
+            std::size_t numSyncManagers;
+
+            std::vector<int> syncManagerDirections;
+
+            std::vector<uint> numPDOs;
+
+            //std::vector<std::string> pdoIndexDiff;
+            std::vector<std::optional<int>> pdoIndexDiff;
+
+            std::vector<int> watchdogModes;
+
+            void toString()
+            {      
+                std::cout << "Number of sync managers: " << numSyncManagers << std::endl;
+
+                std::cout << "Direction of each sync manager: " << std::endl;
+                for(auto i : syncManagerDirections)
+                {
+                    std::cout << i << std::endl; 
+                }
+                std::cout << "Number of PDOs: " << std::endl;
+                for(auto i : numPDOs)
+                {   
+                    std::cout << i << std::endl; 
+                }
+                std::cout << "PDO Entry Bit Lengths: " << std::endl;
+                //for(auto i : pdoIndexDiff)
+                //{   
+                //    std::cout << i << std::endl; 
+                //}
+                std::cout << "Watchdog mode for each sync manager:" << std::endl;
+                for(auto i : watchdogModes)
+                {
+                    std::cout << i << std::endl;
+                }
+            }
+        };
+
+        enum class SlaveType
+        {
+            Coupler,
+            Driver,
+            IO
+        };
+
+        struct SlaveInfo
+        {
+            SlaveInfo();
+
+            std::string slaveName;
+            SlaveType slaveType;
+            int vendorID;
+            int productCode;
+            int position;
+            int alias;
+            
+            PdoEntryInfo pdoEntryInfo;
+            IoMappingInfo ioMappingInfo;
+            SlaveSyncInfo slaveSyncInfo;
+
+            void toString()
+            {
+                std::cout << "Slave Name: " << slaveName << std::endl;
+                std::cout << "Vendor ID: " << vendorID << std::endl;
+                std::cout << "Product Code: " << productCode << std::endl;
+                std::cout << "Slave Position: " << position << std::endl;
+                std::cout << "Slave Alias: " << alias << std::endl;
+                
+                pdoEntryInfo.toString();
+                ioMappingInfo.toString();
+                slaveSyncInfo.toString();
+            }
+        };
+
+        struct DC_Info
+        {
+            DC_Info();
+            uint16_t assign_activate;
+            uint32_t sync0_cycle;
+            int32_t sync0_shift;
+            uint32_t sync1_cycle;
+            int32_t sync1_shift;
+        };
+
     struct ControllerInfo
     {
 
@@ -130,93 +219,7 @@ namespace ethercat_interface
 
         std::vector<uint8_t> fixSubindexes(const std::vector<uint>& to_fix);
 
-        struct SlaveSyncInfo
-        {
-            SlaveSyncInfo();
-
-            std::size_t numSyncManagers;
-
-            std::vector<int> syncManagerDirections;
-
-            std::vector<uint> numPDOs;
-
-            //std::vector<std::string> pdoIndexDiff;
-            std::vector<std::optional<int>> pdoIndexDiff;
-
-            std::vector<int> watchdogModes;
-
-            void toString()
-            {      
-                std::cout << "Number of sync managers: " << numSyncManagers << std::endl;
-
-                std::cout << "Direction of each sync manager: " << std::endl;
-                for(auto i : syncManagerDirections)
-                {
-                    std::cout << i << std::endl; 
-                }
-                std::cout << "Number of PDOs: " << std::endl;
-                for(auto i : numPDOs)
-                {   
-                    std::cout << i << std::endl; 
-                }
-                std::cout << "PDO Entry Bit Lengths: " << std::endl;
-                //for(auto i : pdoIndexDiff)
-                //{   
-                //    std::cout << i << std::endl; 
-                //}
-                std::cout << "Watchdog mode for each sync manager:" << std::endl;
-                for(auto i : watchdogModes)
-                {
-                    std::cout << i << std::endl;
-                }
-            }
-        };
-
-        enum class SlaveType
-        {
-            Coupler,
-            Driver,
-            IO
-        };
-
-        struct SlaveInfo
-        {
-            SlaveInfo();
-
-            std::string slaveName;
-            SlaveType slaveType;
-            int vendorID;
-            int productCode;
-            int position;
-            int alias;
-            
-            PdoEntryInfo pdoEntryInfo;
-            IoMappingInfo ioMappingInfo;
-            SlaveSyncInfo slaveSyncInfo;
-
-            void toString()
-            {
-                std::cout << "Slave Name: " << slaveName << std::endl;
-                std::cout << "Vendor ID: " << vendorID << std::endl;
-                std::cout << "Product Code: " << productCode << std::endl;
-                std::cout << "Slave Position: " << position << std::endl;
-                std::cout << "Slave Alias: " << alias << std::endl;
-                
-                pdoEntryInfo.toString();
-                ioMappingInfo.toString();
-                slaveSyncInfo.toString();
-            }
-        };
-
-        struct DC_Info
-        {
-            DC_Info();
-            uint16_t assign_activate;
-            uint32_t sync0_cycle;
-            int32_t sync0_shift;
-            uint32_t sync1_cycle;
-            int32_t sync1_shift;
-        };
+        
 
         DC_Info getDcInfo(
             const std::string& file_name,

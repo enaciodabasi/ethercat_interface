@@ -94,7 +94,7 @@ namespace ethercat_interface
             for(const auto& s : m_RegisteredSlaves)
             {
                 
-                if(s.second->getSlaveType() == utilities::SlaveType::Coupler)
+                if(s.second->getSlaveType() == SlaveType::Coupler)
                 {   
                     m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
                     continue;

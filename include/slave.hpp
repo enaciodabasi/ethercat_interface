@@ -135,6 +135,11 @@ namespace ethercat_interface
                 bool enable_dc = false
             );
 
+            Slave(
+                const SlaveInfo& slave_info,
+                Offset* offset = nullptr
+            );
+
             ~Slave();
 
             virtual void configure_slave();
