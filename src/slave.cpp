@@ -19,15 +19,10 @@ namespace ethercat_interface
             const std::string& slave_name,
             const std::string& config_file_path,
             Offset* offset,
-            std::shared_ptr<Logger> logger,
             bool enable_dc
         )   : m_SlaveName(slave_name), ENABLE_DC(enable_dc)
         {   
-            if(logger != nullptr)
-            {
-                m_Logger = logger;
-                LOGGING_ENABLED = true;
-            }
+
 
             if(offset != nullptr)
             {

@@ -41,11 +41,16 @@ namespace ethercat_interface
         public:
         
             Domain(
-                const std::string& domain_name,
-                std::shared_ptr<logger::Logger> logger = nullptr
+                const std::string& domain_name
             );
         
             ~Domain();
+
+            inline void setLogger(std::shared_ptr<logger::Logger> shared_logger)
+            {
+                m_Logger = shared_logger;
+                ENABLE_LOGGING = true;
+            }
 
             bool enableSlaves();
 

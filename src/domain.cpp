@@ -18,16 +18,10 @@ namespace ethercat_interface
     namespace domain
     {
         Domain::Domain(
-            const std::string& domain_name,
-            std::shared_ptr<Logger> logger
+            const std::string& domain_name
         )   : m_DomainName(domain_name)
         {
 
-            if(logger != nullptr)
-            {
-                m_Logger = logger;
-                ENABLE_LOGGING = true;
-            }
             m_EthercatDomainState = {};
 
             configureSlaves(); // Configure each slave
@@ -109,6 +103,8 @@ namespace ethercat_interface
                 //inf.toString();
                 s.second->configure_slave();
                 tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
+
+                s.second->setLogger(m_Logger);
             }
             
             m_NumOfPdoEntryRegistries = tempPdoNum;

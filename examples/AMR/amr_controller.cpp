@@ -46,7 +46,6 @@ AMR_Controller::AMR_Controller()
         "EK1100_0",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         nullptr,
-        m_Logger,
         false
     );
     
@@ -54,14 +53,12 @@ AMR_Controller::AMR_Controller()
         "EL7221_9014_0",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         new EL7221_9014_Offset(),
-        m_Logger,
         true
     );
     el7221_9014_1 = new slave::Slave(
         "EL7221_9014_1",
         "/home/naci/Projects/igh_master/examples/AMR/amr_config.yaml",
         new EL7221_9014_Offset(),
-        m_Logger,
         true
     );
     m = new master::Master(
@@ -70,8 +67,7 @@ AMR_Controller::AMR_Controller()
     );
 
     dom = new domain::Domain(
-        "dc_domain",
-        m_Logger
+        "dc_domain"
     );
     m->registerDomain(dom);
 

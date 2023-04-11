@@ -32,8 +32,10 @@ namespace ethercat_interface
         Master::Master(unsigned int master_index, std::shared_ptr<Logger> logger)
             : m_MasterIndex(master_index)
         {
-            
-            m_Logger = logger;
+            if(m_Logger)
+            {
+                m_Logger = logger;
+            }
 
             m_EthercatMaster = ecrt_request_master(m_MasterIndex);
             if(!m_EthercatMaster)
@@ -203,6 +205,7 @@ namespace ethercat_interface
         {
             for(const auto& d : m_RegisteredDomains)
             {
+                d.second->setLogger(m_Logger);
                 d.second->createDomain(m_EthercatMaster);
                 d.second->configureSlaves();
             }

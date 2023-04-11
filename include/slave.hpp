@@ -132,7 +132,6 @@ namespace ethercat_interface
                 const std::string& slave_name,
                 const std::string& config_file_path,
                 Offset* offset = nullptr,
-                std::shared_ptr<logger::Logger> logger = nullptr,
                 bool enable_dc = false
             );
 
@@ -175,6 +174,11 @@ namespace ethercat_interface
             inline void setOffsetPtr(Offset* offset)
             {
                 m_SlaveOffsets = offset;
+            }
+
+            inline void setLogger(std::shared_ptr<logger::Logger> shared_logger)
+            {
+                m_Logger = shared_logger;
             }
 
             /* void updateSlaveState(); */
