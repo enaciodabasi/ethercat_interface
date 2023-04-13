@@ -222,5 +222,17 @@ namespace ethercat_interface
                 }
             }
         }
+
+        bool Master::addSlaveToDomain(const SlaveInfo& slave_config)
+        {
+            auto found = m_RegisteredDomains.find(slave_config.domainName);
+            if(found == m_RegisteredDomains.end())
+            {
+                return false; // Can't find domain with the given name in the slave configuration.
+            }
+
+            found->second->registerSlave(new slave::Slave(slave_config));
+
+        }
     }
 }

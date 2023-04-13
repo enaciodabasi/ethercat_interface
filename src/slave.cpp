@@ -59,6 +59,27 @@ namespace ethercat_interface
                 ));
         }
 
+        Slave::Slave(
+            const SlaveInfo& slave_info,
+            Offset* offset = nullptr
+        )   : m_SlaveInfo{slave_info}
+        {
+            if(offset)
+            {
+                m_SlaveOffsets = offset;
+            }
+
+            if(m_SlaveInfo.slaveType != SlaveType::Coupler)
+            {
+                m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+
+                m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+
+                m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
+            }
+
+        }
+
         Slave::~Slave()
         {   
             delete m_SlaveOffsets;

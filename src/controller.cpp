@@ -26,32 +26,45 @@ namespace ethercat_interface
             
         }
 
-        bool Controller::setup()
+        bool Controller::setup(std::vector<Offset>& slave_offsets)
         {
-            auto configsOpt = loadSlaveConfig(m_PathToConfigFile);
-            if(configsOpt == std::nullopt)
+            auto slaveConfigsOpt = loadSlaveConfig(m_PathToConfigFile);
+            auto controllerConfigOpt = parser::parse_controller_config(m_PathToConfigFile);
+            if(slaveConfigsOpt == std::nullopt || controllerConfigOpt == std::nullopt)  
             {
                 return false;
             }
+            const ControllerInfo controllerConfig = controllerConfigOpt.value();
 
             m_Master = std::make_unique<master::Master>(
                 0,
-                std::make_shared<logger::Logger>(""),
+                std::make_shared<logger::Logger>(controllerConfig.logDirPath),
                 logger::FILE
             );
 
-            
+            for(uint i = 0; i < controllerConfig.numOfDomains; i++)
+            {
+                m_Master->registerDomain(
+                    new domain::Domain(
+                        controllerConfig.domainNames[i]
+                    )
+                );
+            }
 
-            const auto configs = configsOpt.value();
-            for(auto slave_config : configs)
+            const std::vector<SlaveInfo> slaveconfigs = slaveConfigsOpt.value();
+            for(auto slave_config : slaveconfigs)
             {
                 
             }
-                
+
             if(!on_startup())
             {
                 return false;
             }
+
+            
+                
+            
 
             // Call the start-up function for the slave config via SDO's in PRE-OP State.
             // Return the result. 

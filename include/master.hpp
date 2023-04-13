@@ -115,6 +115,8 @@ namespace ethercat_interface
             // Calls the setupSlaves function each registered domain.
             void setupDomains();
 
+            bool addSlaveToDomain(const SlaveInfo& slave_config);
+
         };
 
         template<typename T>

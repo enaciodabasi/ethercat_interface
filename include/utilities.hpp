@@ -81,35 +81,6 @@ namespace ethercat_interface
             IO
         };
 
-        struct SlaveInfo
-        {
-            SlaveInfo();
-
-            std::string slaveName;
-            SlaveType slaveType;
-            int vendorID;
-            int productCode;
-            int position;
-            int alias;
-            
-            PdoEntryInfo pdoEntryInfo;
-            IoMappingInfo ioMappingInfo;
-            SlaveSyncInfo slaveSyncInfo;
-
-            void toString()
-            {
-                std::cout << "Slave Name: " << slaveName << std::endl;
-                std::cout << "Vendor ID: " << vendorID << std::endl;
-                std::cout << "Product Code: " << productCode << std::endl;
-                std::cout << "Slave Position: " << position << std::endl;
-                std::cout << "Slave Alias: " << alias << std::endl;
-                
-                pdoEntryInfo.toString();
-                ioMappingInfo.toString();
-                slaveSyncInfo.toString();
-            }
-        };
-
         struct DC_Info
         {
             DC_Info();
@@ -120,67 +91,15 @@ namespace ethercat_interface
             int32_t sync1_shift;
         };
 
-    struct ControllerInfo
-    {
-
-        std::vector<std::string> domainNames;
-        uint numOfDomains;
-    };
-
-    struct StartupInfo
-    {
-
-    };
-    
-    namespace utilities
-    {   
-        
-        namespace parser
-        {   
-            std::optional<ControllerInfo> parse_controller_config(std::string_view config_file_path);
-
-            std::optional<StartupInfo> parse_startup_configs(); 
-        }
-        struct PdoEntryInfo
-        {
-            PdoEntryInfo();
-            
-            std::vector<uint16_t> indexes;
-            std::vector<uint8_t> subindexes;
-            std::vector<uint16_t> bitLengths;
-
-            void toString()
-            {
-                std::cout << "PDO Entry Indexes:" << std::endl;
-                for(auto i : indexes)
-                {
-                    std::cout << i << std::endl; 
-                }
-                std::cout << "PDO Entry Subindexes:" << std::endl;
-                for(auto i : subindexes)
-                {   
-                    std::cout << i << std::endl; 
-                }
-                std::cout << "PDO Entry Bit Lengths:" << std::endl;
-                for(auto i : bitLengths)
-                {   
-                    std::cout << i << std::endl; 
-                }
-            }
-        };
-
         struct IoMappingInfo
         {
             IoMappingInfo();
-
             uint16_t RxPDO_Address;
             uint16_t TxPDO_Address;
             unsigned int RxPDO_Size;
             unsigned int TxPDO_Size;
-
             std::vector<uint16_t> RxPDO_Indexes;
             std::vector<uint16_t> TxPDO_Indexes;
-
             void toString()
             {
                 std::cout << "RxPDO Indexes:";
@@ -195,6 +114,85 @@ namespace ethercat_interface
                 }
             }
         };
+
+    struct PdoEntryInfo
+    {
+        PdoEntryInfo();
+        
+        std::vector<uint16_t> indexes;
+        std::vector<uint8_t> subindexes;
+        std::vector<uint16_t> bitLengths;
+        void toString()
+        {
+            std::cout << "PDO Entry Indexes:" << std::endl;
+            for(auto i : indexes)
+            {
+                std::cout << i << std::endl; 
+            }
+            std::cout << "PDO Entry Subindexes:" << std::endl;
+            for(auto i : subindexes)
+            {   
+                std::cout << i << std::endl; 
+            }
+            std::cout << "PDO Entry Bit Lengths:" << std::endl;
+            for(auto i : bitLengths)
+            {   
+                std::cout << i << std::endl; 
+            }
+        }
+    };
+
+    struct ControllerInfo
+    {
+
+        std::vector<std::string> domainNames;
+        uint numOfDomains;
+        std::string logDirPath;
+    };
+
+    struct StartupInfo
+    {
+
+    };
+
+    struct SlaveInfo
+    {
+        SlaveInfo();
+        std::string slaveName;
+        SlaveType slaveType;
+        int vendorID;
+        int productCode;
+        int position;
+        int alias;
+        
+        std::string domainName;
+
+        PdoEntryInfo pdoEntryInfo;
+        IoMappingInfo ioMappingInfo;
+        SlaveSyncInfo slaveSyncInfo;
+        void toString()
+        {
+            std::cout << "Slave Name: " << slaveName << std::endl;
+            std::cout << "Vendor ID: " << vendorID << std::endl;
+            std::cout << "Product Code: " << productCode << std::endl;
+            std::cout << "Slave Position: " << position << std::endl;
+            std::cout << "Slave Alias: " << alias << std::endl;
+            
+            pdoEntryInfo.toString();
+            ioMappingInfo.toString();
+            slaveSyncInfo.toString();
+        }
+    };
+    
+    namespace utilities
+    {   
+        
+        namespace parser
+        {   
+            std::optional<ControllerInfo> parse_controller_config(std::string_view config_file_path);
+
+            std::optional<StartupInfo> parse_startup_configs(); 
+        }
 
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls);
         

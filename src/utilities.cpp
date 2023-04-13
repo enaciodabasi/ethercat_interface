@@ -3,7 +3,7 @@
 namespace ethercat_interface
 {
     namespace utilities
-    {
+    {   
         namespace parser
         {
             
@@ -19,9 +19,11 @@ namespace ethercat_interface
                     {
                         return std::nullopt;
                     }
+                    const std::string logDirPath = docs["log_directory_path"].as<std::string>();
 
                     controllerInfo.domainNames = domain_names;
                     controllerInfo.numOfDomains = (uint)domain_names.size();
+                    controllerInfo.logDirPath = logDirPath;
 
                 }
                 else
@@ -38,54 +40,6 @@ namespace ethercat_interface
                 
             }
 
-        }
-
-        PdoEntryInfo::PdoEntryInfo()
-        {
-            indexes = std::vector<uint16_t>();
-            subindexes = std::vector<uint8_t>();
-            bitLengths = std::vector<uint16_t>();
-        }
-
-        IoMappingInfo::IoMappingInfo()
-        {
-            RxPDO_Address = 0;
-            TxPDO_Address = 0;
-            RxPDO_Size = 0;
-            TxPDO_Size = 0;
-            RxPDO_Indexes = std::vector<uint16_t>();
-            TxPDO_Indexes = std::vector<uint16_t>();
-        }
-
-        SlaveSyncInfo::SlaveSyncInfo()
-        {
-            numSyncManagers = 0;
-            syncManagerDirections = std::vector<int>();
-            numPDOs = std::vector<uint>();
-            pdoIndexDiff = std::vector<std::optional<int>>();
-            watchdogModes = std::vector<int>();
-        }
-        
-        SlaveInfo::SlaveInfo()
-        {
-            slaveName = std::string();
-            vendorID = 0;
-            productCode = 0;
-            position = 0;
-            alias = 0;
-
-            pdoEntryInfo = PdoEntryInfo();
-            ioMappingInfo = IoMappingInfo();
-            slaveSyncInfo = SlaveSyncInfo();
-        }
-
-        DC_Info::DC_Info()
-        {
-            assign_activate = 0;
-            sync0_cycle = 0;
-            sync0_shift = 0;
-            sync1_cycle = 0;
-            sync1_shift = 0;
         }
 
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
@@ -384,6 +338,12 @@ namespace ethercat_interface
 
                 for(const auto& doc : config_docs)
                 {
+                    if(doc["controller_config"])
+                    {
+                        std::cout << "controller config found skipping" << std::endl;
+                        continue;
+                    }
+
                     SlaveInfo conf;
                     // Get slave configuration information from the YAML document
                     conf.slaveName = doc["slave_name"].as<std::string>();
@@ -407,7 +367,9 @@ namespace ethercat_interface
                     {
                         conf.slaveType = SlaveType::IO;
                     }
-                
+
+                    conf.domainName = doc["domain_name"].as<std::string>();
+
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
                     conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
                     conf.pdoEntryInfo.bitLengths = doc["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
@@ -554,5 +516,49 @@ namespace ethercat_interface
                 return diff;
             }
         }
+    }
+
+    PdoEntryInfo::PdoEntryInfo()
+    {
+        indexes = std::vector<uint16_t>();
+        subindexes = std::vector<uint8_t>();
+        bitLengths = std::vector<uint16_t>();
+    }
+    IoMappingInfo::IoMappingInfo()
+    {
+        RxPDO_Address = 0;
+        TxPDO_Address = 0;
+        RxPDO_Size = 0;
+        TxPDO_Size = 0;
+        RxPDO_Indexes = std::vector<uint16_t>();
+        TxPDO_Indexes = std::vector<uint16_t>();
+    }
+    SlaveSyncInfo::SlaveSyncInfo()
+    {
+        numSyncManagers = 0;
+        syncManagerDirections = std::vector<int>();
+        numPDOs = std::vector<uint>();
+        pdoIndexDiff = std::vector<std::optional<int>>();
+        watchdogModes = std::vector<int>();
+    }
+    
+    SlaveInfo::SlaveInfo()
+    {
+        slaveName = std::string();
+        vendorID = 0;
+        productCode = 0;
+        position = 0;
+        alias = 0;
+        pdoEntryInfo = PdoEntryInfo();
+        ioMappingInfo = IoMappingInfo();
+        slaveSyncInfo = SlaveSyncInfo();
+    }
+    DC_Info::DC_Info()
+    {
+        assign_activate = 0;
+        sync0_cycle = 0;
+        sync0_shift = 0;
+        sync1_cycle = 0;
+        sync1_shift = 0;
     }
 }
