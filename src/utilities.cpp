@@ -368,6 +368,8 @@ namespace ethercat_interface
                         conf.slaveType = SlaveType::IO;
                     }
 
+                    conf.pdoNames = doc["pdo_names"].as<std::vector<std::string>>();
+
                     conf.domainName = doc["domain_name"].as<std::string>();
 
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
@@ -387,6 +389,22 @@ namespace ethercat_interface
                     const std::vector<std::string> tempPdoDiffs = doc["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
                     conf.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
                     conf.slaveSyncInfo.watchdogModes = doc["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
+                    
+                    if(const auto dcConfig = doc["dc_info"])
+                    {
+                        DC_Info tempDcInfo;
+                        tempDcInfo.assign_activate = dcConfig["assign_activate"].as<uint16_t>();
+                        tempDcInfo.sync0_cycle = dcConfig["sync0_cycle"].as<uint32_t>();
+                        tempDcInfo.sync0_shift = dcConfig["sync0_shift"].as<int32_t>();
+                        tempDcInfo.sync1_cycle = dcConfig["sync1_cycle"].as<uint32_t>();
+                        tempDcInfo.sync1_shift = dcConfig["sync1_shift"].as<int32_t>();
+
+                        conf.dcInfo.emplace<DC_Info>(tempDcInfo);
+                    }
+                    else
+                    {
+                        conf.dcInfo = false;
+                    }
 
                     // If only one slave should be created from the current slave information
                     // Add conf to the config vector and continue to loop over the remaining documents.

@@ -170,6 +170,8 @@ namespace ethercat_interface
         PdoEntryInfo pdoEntryInfo;
         IoMappingInfo ioMappingInfo;
         SlaveSyncInfo slaveSyncInfo;
+        
+        std::variant<bool, DC_Info> dcInfo;
 
         std::vector<std::string> pdoNames;
         
