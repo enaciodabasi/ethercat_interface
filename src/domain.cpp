@@ -176,23 +176,24 @@ namespace ethercat_interface
 
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
-                    std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
+                    /* std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
                         (uint16_t)info.position << " " <<
                         (uint32_t)info.vendorID << " " << 
                         (uint32_t)info.productCode << " " << 
                         info.pdoEntryInfo.indexes[j] << " " <<
                         (uint16_t)info.pdoEntryInfo.subindexes[j] << " " << s.second->getOffset()->m_OffsetNameIndexes.at(j) << std::endl;
-                
-
-                    *(temp + i) = {
-                        (uint16_t)info.alias,
-                        (uint16_t)info.position,
-                        (uint32_t)info.vendorID,
-                        (uint32_t)info.productCode,
-                        info.pdoEntryInfo.indexes[j],
-                        info.pdoEntryInfo.subindexes[j],
-                        s.second->getOffset()->getData(s.second->getOffset()->m_OffsetNameIndexes[j])
-                    };
+                 */
+                    const std::string currDataName = s.second->getOffset()->getDataName(j);
+                    if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
+                        *(temp + i) = {
+                            (uint16_t)info.alias,
+                            (uint16_t)info.position,
+                            (uint32_t)info.vendorID,
+                            (uint32_t)info.productCode,
+                            info.pdoEntryInfo.indexes[j],
+                            info.pdoEntryInfo.subindexes[j],
+                            s.second->getOffset()->getDataOffset(currDataName).value()
+                        };
                     
                     i+= 1;
                 }

@@ -1,13 +1,10 @@
+/**
+ * 
+ */
+
 #include "slave.hpp"
+
 #include <optional>
-
-
-#define VendorID 0x000000fb
-#define ProductCode 0x65520000
-
-#define SMBSlavePos 0,0
-#define SMB VendorID,ProductCode
-
 
 namespace ethercat_interface
 {   
@@ -59,14 +56,12 @@ namespace ethercat_interface
                 ));
         }
 
-        Slave::Slave(
-            const SlaveInfo& slave_info,
-            Offset* offset
-        )   : m_SlaveInfo{slave_info}
+        Slave::Slave(const SlaveInfo& slave_info)
+            : m_SlaveInfo{slave_info}
         {
-            if(offset)
+            if(!m_SlaveInfo.pdoNames.empty())
             {
-                m_SlaveOffsets = offset;
+                m_DataOffset = std::make_unique<offset::DataOffset>(m_SlaveInfo.pdoNames);
             }
 
             if(m_SlaveInfo.slaveType != SlaveType::Coupler)
@@ -82,7 +77,7 @@ namespace ethercat_interface
 
         Slave::~Slave()
         {   
-            delete m_SlaveOffsets;
+            //delete m_SlaveOffsets;
             delete m_SlavePdoEntries;
             delete m_SlavePDOs;
             delete m_SlaveSyncs;
@@ -322,7 +317,7 @@ namespace ethercat_interface
             uint32_t slave_product_code,
             std::vector<uint16_t> indexes,
             std::vector<uint8_t> subindexes,
-            Offset* offset,
+            offset::DataOffset* offset,
             unsigned int* bit_position
         )
         {   
@@ -335,18 +330,21 @@ namespace ethercat_interface
                 {
                     domain_registries[i] = {};
                     break; 
-                }                
-                unsigned int* op = new unsigned int();
-                op = offset->getData(offset->m_OffsetNameIndexes.at(i));
-                domain_registries[i] = {
-                    slave_alias,
-                    slave_position,
-                    slave_vendor_id,
-                    slave_product_code,
-                    indexes.at(i),
-                    subindexes.at(i),
-                    offset->getData(offset->m_OffsetNameIndexes.at(i))
-                };
+                }        
+                const std::string currentDataName = offset->getDataName((uint)i);        
+                //unsigned int* op = new unsigned int();
+                //op = offset->getData(offset->m_OffsetNameIndexes.at(i));
+                if(offset->getDataOffset(currentDataName) != std::nullopt)
+                    domain_registries[i] = {
+                        slave_alias,
+                        slave_position,
+                        slave_vendor_id,
+                        slave_product_code,
+                        indexes.at(i),
+                        subindexes.at(i),
+                        //offset->getData(offset->m_OffsetNameIndexes.at(i))
+                        offset->getDataOffset(currentDataName).value()
+                    };
             }
 
             return domain_registries;

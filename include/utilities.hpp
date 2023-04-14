@@ -170,6 +170,9 @@ namespace ethercat_interface
         PdoEntryInfo pdoEntryInfo;
         IoMappingInfo ioMappingInfo;
         SlaveSyncInfo slaveSyncInfo;
+
+        std::vector<std::string> pdoNames;
+        
         void toString()
         {
             std::cout << "Slave Name: " << slaveName << std::endl;

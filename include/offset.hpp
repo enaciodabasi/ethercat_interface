@@ -8,28 +8,35 @@
 namespace ethercat_interface
 {
 
-    class DataOffset
+    namespace offset
     {
-        typedef std::pair<std::string, uint> Data;
+        class DataOffset
+        {
+            typedef std::pair<std::string, uint> Data;
 
-        public:
+            public:
 
-        DataOffset();
+            DataOffset();
 
-        DataOffset(const std::vector<std::string>& pdo_names);
-        
-        ~DataOffset();
+            DataOffset(const std::vector<std::string>& pdo_names);
 
-        std::optional<unsigned int*> getDataOffset(const std::string& offset_name);
-        
-        private:
+            ~DataOffset();
 
-        std::unordered_map<std::string, uint*> m_DataOffsetAdressMap;
+            std::optional<unsigned int*> getDataOffset(const std::string& offset_name);
 
-        std::vector<Data> m_DataOffsets;
+            inline std::string getDataName(const uint data_index)
+            {
+                return m_DataOffsets[data_index].first;
+            }
 
-    };
+            private:
 
+            std::unordered_map<std::string, uint*> m_DataOffsetAdressMap;
+
+            std::vector<Data> m_DataOffsets;
+
+        };
+    }
         /**
          * @brief Base class to derive from when creating offsets for the Slave PDOs.
          * 
