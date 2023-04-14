@@ -3,9 +3,33 @@
 
 #include <vector>
 #include <unordered_map>
+#include <optional>
 
 namespace ethercat_interface
 {
+
+    class DataOffset
+    {
+        typedef std::pair<std::string, uint> Data;
+
+        public:
+
+        DataOffset();
+
+        DataOffset(const std::vector<std::string>& pdo_names);
+        
+        ~DataOffset();
+
+        std::optional<unsigned int*> getDataOffset(const std::string& offset_name);
+        
+        private:
+
+        std::unordered_map<std::string, uint*> m_DataOffsetAdressMap;
+
+        std::vector<Data> m_DataOffsets;
+
+    };
+
         /**
          * @brief Base class to derive from when creating offsets for the Slave PDOs.
          * 

@@ -17,6 +17,8 @@ set(SOURCES
     src/dc_sync.c
     src/logger.cpp
     src/state_machine.cpp
+    src/controller.cpp
+    src/offset.cpp
 )
 
 set(
@@ -58,6 +60,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/state.hpp
     include/dc_sync.h
     include/state_machine.hpp
+    include/controller.hpp
 )
 
 set_target_properties(${PROJECT_NAME}

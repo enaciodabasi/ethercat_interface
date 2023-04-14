@@ -61,7 +61,7 @@ namespace ethercat_interface
 
         Slave::Slave(
             const SlaveInfo& slave_info,
-            Offset* offset = nullptr
+            Offset* offset
         )   : m_SlaveInfo{slave_info}
         {
             if(offset)
