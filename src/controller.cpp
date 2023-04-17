@@ -38,8 +38,7 @@ namespace ethercat_interface
 
             m_Master = std::make_unique<master::Master>(
                 0,
-                std::make_shared<logger::Logger>(controllerConfig.logDirPath),
-                logger::FILE
+                std::make_shared<logger::Logger>(controllerConfig.logDirPath, logger::FILE)
             );
 
             for(uint i = 0; i < controllerConfig.numOfDomains; i++)
@@ -51,20 +50,30 @@ namespace ethercat_interface
                 );
             }
 
-            const std::vector<SlaveInfo> slaveconfigs = slaveConfigsOpt.value();
-            for(auto slave_config : slaveconfigs)
-            {
-                
-            }
+            const std::vector<SlaveInfo> slaveConfigs = slaveConfigsOpt.value();
+            if(!slaveConfigs.empty())
+                for(auto slave_config : slaveConfigs)
+                {
+                    m_Master->addSlaveToDomain(slave_config);
+                }
+
+            m_Master->configureDomains();
+
+            // Write to SDOs via COE
+
+            
+
+            // PREOP TO OP 
+
+            m_Master->setupDomains();
+
+
 
             if(!on_startup())
             {
                 return false;
             }
-
-            
-                
-            
+    
 
             // Call the start-up function for the slave config via SDO's in PRE-OP State.
             // Return the result. 
