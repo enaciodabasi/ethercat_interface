@@ -254,7 +254,7 @@ namespace ethercat_interface
 
             bool LOGGING_ENABLED = false;
 
-            bool ENABLE_DC = false;
+            bool ENABLE_DC = true;
 
             DC_Info m_DcInfo;
 
