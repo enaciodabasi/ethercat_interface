@@ -150,6 +150,8 @@ namespace ethercat_interface
         std::string logDirPath;
     };
 
+    typedef std::pair<uint16_t, uint8_t> SDO_Info;
+
     struct StartupInfo
     {
 
