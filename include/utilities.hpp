@@ -173,6 +173,12 @@ namespace ethercat_interface
     
     typedef std::variant<uint8_t, uint16_t, uint32_t, uint64_t> StartupData;
 
+    enum SdoConfigType
+    {
+        READ,
+        WRITE
+    };
+
     //template<typename T>
     struct StartupInfo
     {
@@ -180,6 +186,8 @@ namespace ethercat_interface
         StartupData data;
         std::string slaveName;
         SDO_Info sdoInfo;
+
+        SdoConfigType configType = SdoConfigType::WRITE;
 
         void deduceDataType(
             const std::string& data_type_str,

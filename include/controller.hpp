@@ -16,6 +16,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <optional>
+#include <any>
 
 #include <pthread.h>
 
@@ -28,7 +29,15 @@
 namespace ethercat_interface
 {
     namespace controller
-    {   
+    {
+        /* namespace 
+        {
+            template<typename ... Ts>                                                 // (7) 
+            struct Overload : Ts ... { 
+                using Ts::operator() ...;
+            };
+            template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
+        }  */  
 
         /**
          * @brief Semi-abstract class to implement an EtherCAT control loop.
@@ -78,7 +87,7 @@ namespace ethercat_interface
              * @return true if no error is raised.
              * @return false if an error occurs.
              */
-            virtual bool on_startup();
+            virtual bool on_startup(std::vector<StartupInfo>& startup_configs, const std::vector<SlaveInfo>& slave_configs);
 
             /**
              * @brief Updates the threads policy and priority using std::thread::native_handle in pthread_setschedparam.

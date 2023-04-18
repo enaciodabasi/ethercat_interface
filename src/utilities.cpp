@@ -72,10 +72,12 @@ namespace ethercat_interface
                         if(const auto data_val = startup_config["data_value"])
                         {
                             tempSI.deduceDataType(dataTypeStr, data_val);
+                            tempSI.configType = SdoConfigType::WRITE;
                         }
                         else
                         {
                             tempSI.deduceDataType(dataTypeStr);
+                            tempSI.configType = SdoConfigType::READ;
                         }
 
                         startupInfo.emplace_back(std::move(tempSI));

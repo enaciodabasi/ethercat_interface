@@ -60,29 +60,163 @@ namespace ethercat_interface
             m_Master->configureDomains();
 
             // Write to SDOs via COE
+            auto startupConfig_o = utilities::parser::parse_startup_configs(m_PathToConfigFile);
+            bool doStartupRoutine = true;
 
+            if(startupConfig_o != std::nullopt){doStartupRoutine = false;}
+            if(!doStartupRoutine){return false;}
             
+            auto& startupConfigs = startupConfig_o.value();
+
+            if(!on_startup(startupConfigs, slaveConfigs))
+            {   
+                return false;
+            }
 
             // PREOP TO OP 
 
-            m_Master->setupDomains();
-
-
-
-            if(!on_startup())
-            {
-                return false;
-            }
-    
+            m_Master->setupDomains();    
 
             // Call the start-up function for the slave config via SDO's in PRE-OP State.
             // Return the result. 
             return true;
         }
 
-        bool Controller::on_startup()
-        {
+        bool Controller::on_startup(std::vector<StartupInfo>& startup_configs, const std::vector<SlaveInfo>& slave_configs)
+        {   
+            if(startup_configs.empty()) // Check just to be sure.
+            {
+                return true;
+            }
 
+            for(auto& startup_config : startup_configs) // Iterate over all startup configurations
+            {
+                const std::string slaveNameTemp = startup_config.slaveName;
+
+                std::optional<int> slavePosition_o = [&slave_configs, &slaveNameTemp]() -> std::optional<int>{
+
+                    for(const auto sc : slave_configs)
+                    {
+                        if(sc.slaveName == slaveNameTemp)
+                        {
+                            return sc.position;
+                        }
+                        else
+                            continue;
+                    }
+
+                    return std::nullopt;
+                    
+                }();  
+
+                if(slavePosition_o == std::nullopt)
+                {
+                    return false;
+                }
+
+                int slavePosition = slavePosition_o.value();
+
+                if(std::holds_alternative<uint8_t>(startup_config.data))
+                {
+                    
+                    uint8_t valToWrite = std::get<uint8_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success =  m_Master->sdo_write<uint8_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<uint8_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+                    }
+                }
+                else if(std::holds_alternative<uint16_t>(startup_config.data))
+                {
+
+                    uint16_t valToWrite = std::get<uint16_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<uint16_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<uint16_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+                    }
+                }
+                else if(std::holds_alternative<uint32_t>(startup_config.data))
+                {
+                    uint32_t valToWrite = std::get<uint32_t>(startup_config.data);
+                    
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<uint32_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<uint32_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+                    }
+                }
+                else if(std::holds_alternative<uint64_t>(startup_config.data))
+                {
+                    
+                    uint64_t valToWrite = std::get<uint64_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<uint64_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<uint64_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+                    }
+                }
+            }
+
+            return true;
         }
 
         std::optional<std::vector<SlaveInfo>> Controller::loadSlaveConfig(
@@ -101,6 +235,7 @@ namespace ethercat_interface
 
             return true;
         }
+
     } // End of namespace controller
 
 } // End of namespace ethercat_interface

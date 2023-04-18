@@ -92,7 +92,7 @@ namespace ethercat_interface
             );
 
             template<typename T>
-            auto sdo_read(
+            std::optional<T> sdo_read(
                 const uint16_t& slave_position,
                 const SDO_Info& sdo_info
             );
@@ -232,7 +232,7 @@ namespace ethercat_interface
         }
 
         template<typename T>
-        auto Master::sdo_read(
+        std::optional<T> Master::sdo_read(
             const uint16_t& slave_position,
             const SDO_Info& sdo_info
         )
@@ -257,7 +257,7 @@ namespace ethercat_interface
 
             if(res < 0 || sizeof(result_size) != target_data_size)
             {
-                return false;
+                return std::nullopt;
             }
 
             
