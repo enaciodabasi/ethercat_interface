@@ -1,9 +1,12 @@
 #include "../include/utilities.hpp"
 
+#include <algorithm>
+
 namespace ethercat_interface
 {
     namespace utilities
     {   
+
         namespace parser
         {
             
@@ -35,9 +38,55 @@ namespace ethercat_interface
                 
             }
 
-            std::optional<StartupInfo> parse_startup_configs()
+            std::optional<std::vector<StartupInfo>> parse_startup_configs(std::string_view config_file_path)
             {   
-                
+                std::vector<StartupInfo> startupInfo;
+
+                if(auto startup_config_doc = [&config_file_path](){
+                    const auto allDocs = YAML::LoadAllFromFile(static_cast<std::string>(config_file_path));
+                    YAML::Node startupNode;
+                    for(const auto& doc : allDocs)
+                    {
+                        if(const auto tempNode = doc["startup_config"])
+                        {   
+                            startupNode = tempNode;
+                        }
+                        else
+                            continue;
+                    }
+
+                    return startupNode;
+                }())
+                {
+                    
+                    for(const auto& startup_config : startup_config_doc)
+                    {
+                        StartupInfo tempSI;
+                        
+                        tempSI.slaveName = startup_config["slave_name"].as<std::string>();
+                        tempSI.sdoInfo.first = (uint16_t)startup_config["sdo_index"].as<uint16_t>();
+                        tempSI.sdoInfo.second = (uint8_t)startup_config["sdo_subindex"].as<uint16_t>();
+
+                        const std::string dataTypeStr = startup_config["data_type"].as<std::string>();
+                        
+                        if(const auto data_val = startup_config["data_value"])
+                        {
+                            tempSI.deduceDataType(dataTypeStr, data_val);
+                        }
+                        else
+                        {
+                            tempSI.deduceDataType(dataTypeStr);
+                        }
+
+                        startupInfo.emplace_back(std::move(tempSI));
+                    }
+                }
+                else
+                {
+                    return std::nullopt;
+                }
+
+                return startupInfo;
             }
 
         }
@@ -579,4 +628,85 @@ namespace ethercat_interface
         sync1_cycle = 0;
         sync1_shift = 0;
     }
+
+    void StartupInfo::deduceDataType(const std::string& data_type_str)
+        {
+            auto res = std::find_if(
+                 EC_TYPE_STRING_PAIRS.begin(),
+                 EC_TYPE_STRING_PAIRS.end(),
+                 [&data_type_str](const std::pair<std::string, EC_Type>& p)
+                 {
+                     return (p.first == data_type_str);
+                 }
+            );
+
+            if(res == EC_TYPE_STRING_PAIRS.end())
+            {
+                 return;
+            }
+
+            const EC_Type currType = res->second;
+
+            // If the SDO is to be read
+            // Change the variant type to the data_type in the configuration file.
+    
+            switch (currType)
+            {
+            case EC_Type::UINT8:
+                data = uint8_t();
+                break;
+            case EC_Type::UINT16:
+                data = uint16_t();
+                break;
+            case EC_Type::UINT32:
+                data = uint32_t();
+                break;
+            case EC_Type::UINT64:
+                data = uint64_t();
+                break;
+            default:
+                return;
+            }
+        }
+
+        void StartupInfo::deduceDataType(
+            const std::string& data_type_str,
+            const YAML::Node& data_node
+        )
+        {
+            auto res = std::find_if(
+                 EC_TYPE_STRING_PAIRS.begin(),
+                 EC_TYPE_STRING_PAIRS.end(),
+                 [&data_type_str](const std::pair<std::string, EC_Type>& p)
+                 {
+                     return (p.first == data_type_str);
+                 }
+            );
+
+            if(res == EC_TYPE_STRING_PAIRS.end())
+            {
+                 return;
+            }
+            
+            const EC_Type currType = res->second;
+
+            switch (currType)
+            {
+            case EC_Type::UINT8:
+                this->data = (uint8_t)data_node.as<uint16_t>();
+                break;
+            case EC_Type::UINT16:
+                this->data = data_node.as<uint16_t>();
+                break;
+            case EC_Type::UINT32:
+                this->data = data_node.as<uint32_t>();
+                break;
+            case EC_Type::UINT64:
+                this->data = data_node.as<uint64_t>();
+                break;
+            default:
+                return;
+            }
+
+        }
 }

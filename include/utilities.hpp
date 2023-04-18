@@ -144,16 +144,49 @@ namespace ethercat_interface
 
     struct ControllerInfo
     {
-
         std::vector<std::string> domainNames;
         uint numOfDomains;
         std::string logDirPath;
     };
 
     typedef std::pair<uint16_t, uint8_t> SDO_Info;
+    
+    namespace
+    {
+        enum EC_Type
+        {
+            UINT8,
+            UINT16,
+            UINT32,
+            UINT64,
+            UNDEFINED
+        };
 
+        std::vector<std::pair<std::string, EC_Type>> EC_TYPE_STRING_PAIRS = {
+            {"uint8", EC_Type::UINT8},
+            {"uint16", EC_Type::UINT16},
+            {"uint32", EC_Type::UINT32},
+            {"uint64", EC_Type::UINT64}
+        }; 
+    }
+    
+    
+    typedef std::variant<uint8_t, uint16_t, uint32_t, uint64_t> StartupData;
+
+    //template<typename T>
     struct StartupInfo
     {
+
+        StartupData data;
+        std::string slaveName;
+        SDO_Info sdoInfo;
+
+        void deduceDataType(
+            const std::string& data_type_str,
+            const YAML::Node& data_node
+        );    
+
+        void deduceDataType(const std::string& data_type_str);
 
     };
 
@@ -198,7 +231,7 @@ namespace ethercat_interface
         {   
             std::optional<ControllerInfo> parse_controller_config(std::string_view config_file_path);
 
-            std::optional<StartupInfo> parse_startup_configs(); 
+            std::optional<std::vector<StartupInfo>> parse_startup_configs(std::string_view config_file_path); 
         }
 
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls);
