@@ -9,7 +9,7 @@
  * 
  */
 
-#include "../include/data.hpp"
+#include "ethercat_interface/data.hpp"
 
 namespace ethercat_interface
 {

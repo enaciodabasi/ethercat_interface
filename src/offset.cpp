@@ -9,7 +9,7 @@
  * 
  */
 
-#include "../include/offset.hpp"
+#include "ethercat_interface/offset.hpp"
 
 namespace ethercat_interface
 {

@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  * 
  */
-#include "master.hpp"
+#include "ethercat_interface/master.hpp"
 
 namespace ethercat_interface
 {

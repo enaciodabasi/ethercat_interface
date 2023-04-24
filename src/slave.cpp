@@ -2,7 +2,7 @@
  * 
  */
 
-#include "slave.hpp"
+#include "ethercat_interface/slave.hpp"
 
 #include <optional>
 

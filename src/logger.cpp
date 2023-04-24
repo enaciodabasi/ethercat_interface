@@ -9,7 +9,7 @@
  * 
  */
 
-#include "../include/logger.hpp"
+#include "ethercat_interface/logger.hpp"
 
 namespace ethercat_interface
 {

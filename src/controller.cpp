@@ -9,8 +9,7 @@
  * 
  */
 
-#include "controller.hpp"
-
+#include "ethercat_interface/controller.hpp"
 namespace ethercat_interface
 {
     namespace controller

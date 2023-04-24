@@ -1,4 +1,5 @@
-#include "state.hpp"
+
+#include "ethercat_interface/state.hpp"
 #include <algorithm>
 namespace ethercat_interface
 {

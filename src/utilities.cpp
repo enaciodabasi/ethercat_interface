@@ -1,4 +1,4 @@
-#include "../include/utilities.hpp"
+#include "ethercat_interface/utilities.hpp"
 
 #include <algorithm>
 

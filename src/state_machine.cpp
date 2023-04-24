@@ -9,7 +9,7 @@
  * 
  */
 
-#include "state_machine.hpp"
+#include "ethercat_interface/state_machine.hpp"
 
 namespace ethercat_interface
 {
