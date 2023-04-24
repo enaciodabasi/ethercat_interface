@@ -25,7 +25,7 @@ namespace ethercat_interface
             
         }
 
-        bool Controller::setup(std::vector<Offset>& slave_offsets)
+        bool Controller::setup()
         {
             auto slaveConfigsOpt = loadSlaveConfig(m_PathToConfigFile);
             auto controllerConfigOpt = parser::parse_controller_config(m_PathToConfigFile);
@@ -253,6 +253,15 @@ namespace ethercat_interface
         )
         {
             return utilities::parse_config_file(config_file_path);
+        }
+
+        void Controller::startTask()
+        {
+            m_CyclicTaskThread = std::thread(
+                &Controller::cyclicTask,
+                this
+            );
+            updateThreadInfo();
         }
 
         bool Controller::updateThreadInfo()

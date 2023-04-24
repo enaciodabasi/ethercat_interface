@@ -72,7 +72,9 @@ namespace ethercat_interface
 
                 m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
             }
-            
+
+            m_DataOffset = std::make_unique<offset::DataOffset>(m_SlaveInfo.pdoNames);
+
             if(std::holds_alternative<bool>(m_SlaveInfo.dcInfo))
             {
                 ENABLE_DC = std::get<bool>(m_SlaveInfo.dcInfo);

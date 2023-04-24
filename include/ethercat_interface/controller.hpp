@@ -82,7 +82,9 @@ namespace ethercat_interface
              * @return true if no error is raised during setup. 
              * @return false if an error has been raised during setup.
              */
-            virtual bool setup(std::vector<Offset>& slave_offsets);
+            virtual bool setup();
+
+            void startTask();
 
             protected:
             /**
@@ -92,6 +94,8 @@ namespace ethercat_interface
              * @return false if an error occurs.
              */
             virtual bool on_startup(std::vector<StartupInfo>& startup_configs, const std::vector<SlaveInfo>& slave_configs);
+
+            
 
             /**
              * @brief Updates the threads policy and priority using std::thread::native_handle in pthread_setschedparam.
