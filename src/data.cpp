@@ -9,7 +9,7 @@
  * 
  */
 
-#include "../include/data_defs.hpp"
+#include "../include/data.hpp"
 
 namespace ethercat_interface
 {

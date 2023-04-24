@@ -25,6 +25,7 @@
 #include "slave.hpp"
 #include "utilities.hpp"
 #include "offset.hpp"
+#include "data.hpp"
 
 namespace ethercat_interface
 {
@@ -63,6 +64,8 @@ namespace ethercat_interface
             Controller(const std::string& config_file_path);        
 
             ~Controller();
+
+            virtual void cyclicTask() = 0;
             
             /**
              * @brief Loads the slave config information.
@@ -81,6 +84,7 @@ namespace ethercat_interface
              */
             virtual bool setup(std::vector<Offset>& slave_offsets);
 
+            protected:
             /**
              * @brief Configures the slaves during their PRE-OP state.
              * 
@@ -117,6 +121,8 @@ namespace ethercat_interface
             std::unique_ptr<master::Master> m_Master;
 
             std::thread m_CyclicTaskThread;
+        
+            std::vector<StartupInfo> m_StartupInfos;
 
             struct
             {

@@ -73,13 +73,15 @@ namespace ethercat_interface
                 return false;
             }
 
+            m_StartupInfos = startupConfigs;
+
             // PREOP TO OP 
 
             m_Master->setupDomains();    
 
-            // Call the start-up function for the slave config via SDO's in PRE-OP State.
+            // Activate ECRT Master.
             // Return the result. 
-            return true;
+            return m_Master->activateMaster();
         }
 
         bool Controller::on_startup(std::vector<StartupInfo>& startup_configs, const std::vector<SlaveInfo>& slave_configs)
@@ -139,6 +141,13 @@ namespace ethercat_interface
                             slavePosition,
                             startup_config.sdoInfo
                         );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
                     }
                 }
                 else if(std::holds_alternative<uint16_t>(startup_config.data))
@@ -164,6 +173,13 @@ namespace ethercat_interface
                             slavePosition,
                             startup_config.sdoInfo
                         );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
                     }
                 }
                 else if(std::holds_alternative<uint32_t>(startup_config.data))
@@ -188,6 +204,13 @@ namespace ethercat_interface
                             slavePosition,
                             startup_config.sdoInfo
                         );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
                     }
                 }
                 else if(std::holds_alternative<uint64_t>(startup_config.data))
@@ -212,6 +235,13 @@ namespace ethercat_interface
                             slavePosition,
                             startup_config.sdoInfo
                         );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
                     }
                 }
             }
