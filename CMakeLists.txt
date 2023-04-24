@@ -19,6 +19,7 @@ set(SOURCES
     src/state_machine.cpp
     src/controller.cpp
     src/offset.cpp
+    src/data.cpp
 )
 
 set(

@@ -159,6 +159,13 @@ namespace ethercat_interface
             UINT16,
             UINT32,
             UINT64,
+            INT8,
+            INT16,
+            INT32,
+            INT64,
+            FLOAT,
+            DOUBLE,
+            BIT,
             UNDEFINED
         };
 
@@ -166,7 +173,14 @@ namespace ethercat_interface
             {"uint8", EC_Type::UINT8},
             {"uint16", EC_Type::UINT16},
             {"uint32", EC_Type::UINT32},
-            {"uint64", EC_Type::UINT64}
+            {"uint64", EC_Type::UINT64},
+            {"int8", EC_Type::INT8},
+            {"int16", EC_Type::INT16},
+            {"int32", EC_Type::INT32},
+            {"int64", EC_Type::INT64},
+            {"float", EC_Type::FLOAT},
+            {"double", EC_Type::DOUBLE},
+            {"bit", EC_Type::BIT}
         }; 
     }
     
