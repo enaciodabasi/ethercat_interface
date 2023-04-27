@@ -6,8 +6,24 @@
 #include <stdint.h>
 #include <sys/time.h>
 
+#define DistributedClockHelper DistributedClockHelper_t
 
 #define NANOSEC_PER_SEC (1000000000L)
+
+
+struct DistributedClockHelper_t
+{
+    struct timespec cycleTime;
+    struct timespec wakeupTime;
+    struct timespec currentTime;
+
+    long periodNanoSec;
+    
+    clockid_t clock;
+
+    int referenceClockCounter;
+
+};
 
 long int period_nanosec(int frequency);
 
