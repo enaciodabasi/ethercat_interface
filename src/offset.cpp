@@ -21,7 +21,7 @@ namespace ethercat_interface
         {
             for(const std::string& pdo : pdo_names)
             {
-                m_DataOffsets.emplace_back(std::make_pair(pdo, uint()));
+                m_DataOffsets.emplace_back(std::make_pair(pdo, 0));
             }
     
             for(std::size_t i = 0; i < m_DataOffsets.size(); i++)

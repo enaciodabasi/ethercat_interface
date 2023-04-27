@@ -170,12 +170,12 @@ namespace ethercat_interface
 
             offset::DataOffset* getOffset()
             {
-                return m_DataOffset.get();
+                return m_DataOffset;
             }
 
-            inline void setOffsetPtr(offset::DataOffset offset)
+            inline void setOffsetPtr(offset::DataOffset* offset)
             {
-                m_DataOffset = std::make_unique<offset::DataOffset>(offset);
+                m_DataOffset = offset;
             }
 
             inline void setLogger(std::shared_ptr<logger::Logger> shared_logger)
@@ -246,8 +246,10 @@ namespace ethercat_interface
 
             Offset* m_SlaveOffsets; 
 
-            std::unique_ptr<offset::DataOffset> m_DataOffset;
+            //std::unique_ptr<offset::DataOffset> m_DataOffset;
             
+            offset::DataOffset* m_DataOffset;
+
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
             std::shared_ptr<logger::Logger> m_Logger;
