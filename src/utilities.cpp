@@ -37,10 +37,12 @@ namespace ethercat_interface
                         return std::nullopt;
                     }
                     const std::string logDirPath = controller_config_doc["log_directory_path"].as<std::string>();
+                    const uint16_t cyclePeriod = controller_config_doc["cycle_period"].as<uint16_t>();
 
                     controllerInfo.domainNames = domain_names;
                     controllerInfo.numOfDomains = (uint)domain_names.size();
                     controllerInfo.logDirPath = logDirPath;
+                    controllerInfo.cyclePeriod = cyclePeriod;
                 }
                 std::cout << "Passed controller config\n";
                 return controllerInfo;
@@ -412,7 +414,8 @@ namespace ethercat_interface
                     conf.productCode = doc["product_id"].as<int>();
                     conf.position = doc["slave_position"].as<uint>();
                     conf.alias = doc["slave_alias"].as<uint>();
-
+                    conf.domainName = doc["domain_name"].as<std::string>();
+                    
                     if(typeStr == "coupler" || typeStr == "Coupler")
                     {
                         conf.slaveType = SlaveType::Coupler;
@@ -430,7 +433,7 @@ namespace ethercat_interface
 
                     conf.pdoNames = doc["pdo_names"].as<std::vector<std::string>>();
 
-                    conf.domainName = doc["domain_name"].as<std::string>();
+                    
 
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
                     conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
@@ -480,8 +483,8 @@ namespace ethercat_interface
                     {
                         SlaveInfo tempConf = conf;
                         tempConf.slaveName = conf.slaveName + "_" + std::to_string(i);
+                        
                         tempConf.position += i;
-
                         slaveConfigs.push_back(tempConf); 
                     }    
                 

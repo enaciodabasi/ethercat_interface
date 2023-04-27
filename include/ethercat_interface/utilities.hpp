@@ -147,6 +147,7 @@ namespace ethercat_interface
         std::vector<std::string> domainNames;
         uint numOfDomains;
         std::string logDirPath;
+        uint16_t cyclePeriod;
     };
 
     typedef std::pair<uint16_t, uint8_t> SDO_Info;
