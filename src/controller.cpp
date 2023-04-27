@@ -58,9 +58,11 @@ namespace ethercat_interface
             }
 
             const std::vector<SlaveInfo> slaveConfigs = slaveConfigsOpt.value();
+            std::cout << slaveConfigs.size() << std::endl;
             if(!slaveConfigs.empty())
                 for(auto slave_config : slaveConfigs)
                 {
+                    //slave_config.toString();
                     m_Master->addSlaveToDomain(slave_config);
                 }
 
@@ -70,7 +72,7 @@ namespace ethercat_interface
             auto startupConfig_o = utilities::parser::parse_startup_configs(m_PathToConfigFile);
             bool doStartupRoutine = true;
 
-            if(startupConfig_o != std::nullopt){doStartupRoutine = false;}
+            if(startupConfig_o == std::nullopt){doStartupRoutine = false;}
             if(doStartupRoutine)
             {
                 auto& startupConfigs = startupConfig_o.value();
@@ -81,11 +83,18 @@ namespace ethercat_interface
                 }
 
                 m_StartupInfos = startupConfigs;
+
             }
 
             // PREOP TO OP 
 
             m_Master->setupDomains();    
+
+            m_DcHelper.periodNanoSec = period_nanosec(controllerConfig.cyclePeriod);
+            m_DcHelper.cycleTime = {0, m_DcHelper.periodNanoSec};
+            m_DcHelper.referenceClockCounter = 0;
+            
+            clock_gettime(m_DcHelper.clock, &m_DcHelper.wakeupTime);
 
             // Activate ECRT Master.
             // Return the result. 
@@ -281,6 +290,11 @@ namespace ethercat_interface
             }
 
             return true;
+        }
+
+        void Controller::setTaskWakeUpTime()
+        {
+            m_DcHelper.wakeupTime = addTimespec(m_DcHelper.wakeupTime, m_DcHelper.cycleTime);
         }
 
     } // End of namespace controller

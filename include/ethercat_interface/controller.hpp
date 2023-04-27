@@ -27,6 +27,13 @@
 #include "offset.hpp"
 #include "data.hpp"
 
+#include <signal.h>
+
+extern "C"
+{
+    #include "dc_sync.h"
+}
+
 namespace ethercat_interface
 {
     namespace controller
@@ -90,6 +97,10 @@ namespace ethercat_interface
 
             std::thread m_CyclicTaskThread;
 
+            bool m_IsThreadRunning;
+
+            DistributedClockHelper m_DcHelper;            
+
             /**
              * @brief Configures the slaves during their PRE-OP state.
              * 
@@ -132,6 +143,8 @@ namespace ethercat_interface
                     m_CyclicTaskThread.join();
                 }
             }
+
+            void setTaskWakeUpTime();
 
             private:
 
