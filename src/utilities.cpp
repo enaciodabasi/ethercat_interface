@@ -14,26 +14,35 @@ namespace ethercat_interface
             {
                 ControllerInfo controllerInfo;
 
-                if(auto docs = YAML::LoadFile(static_cast<std::string>(config_file_path))["controller_config"])
+                if(auto controller_config_doc = [&config_file_path](){
+                    const auto allDocs = YAML::LoadAllFromFile(static_cast<std::string>(config_file_path));
+                    YAML::Node configNode;
+                    for(const auto& doc: allDocs)
+                    {
+                        if(const auto tempNode = doc["controller_config"])
+                        {
+                            configNode = tempNode;
+                        }
+                        else
+                            continue;
+                    }
+
+                    return configNode;
+                }())
                 {
-                    std::vector<std::string> domain_names = docs["domain_names"].as<std::vector<std::string>>();
+                     std::vector<std::string> domain_names = controller_config_doc["domain_names"].as<std::vector<std::string>>();
 
                     if(domain_names.empty())
                     {
                         return std::nullopt;
                     }
-                    const std::string logDirPath = docs["log_directory_path"].as<std::string>();
+                    const std::string logDirPath = controller_config_doc["log_directory_path"].as<std::string>();
 
                     controllerInfo.domainNames = domain_names;
                     controllerInfo.numOfDomains = (uint)domain_names.size();
                     controllerInfo.logDirPath = logDirPath;
-
                 }
-                else
-                {
-                    return std::nullopt;
-                }
-
+                std::cout << "Passed controller config\n";
                 return controllerInfo;
                 
             }
@@ -87,7 +96,7 @@ namespace ethercat_interface
                 {
                     return std::nullopt;
                 }
-
+                
                 return startupInfo;
             }
 
@@ -389,9 +398,9 @@ namespace ethercat_interface
 
                 for(const auto& doc : config_docs)
                 {
-                    if(doc["controller_config"])
+                    if(doc["controller_config"] || doc["startup_config"])
                     {
-                        std::cout << "controller config found skipping" << std::endl;
+                        std::cout << "controller or startup config found skipping" << std::endl;
                         continue;
                     }
 

@@ -32,7 +32,7 @@ namespace ethercat_interface
         Master::Master(unsigned int master_index, std::shared_ptr<Logger> logger)
             : m_MasterIndex(master_index)
         {
-            if(m_Logger)
+            if(logger)
             {
                 m_Logger = logger;
             }
@@ -206,8 +206,11 @@ namespace ethercat_interface
             for(const auto& d : m_RegisteredDomains)
             {
                 d.second->setLogger(m_Logger);
+                std::cout << "Set logger\n";
                 d.second->createDomain(m_EthercatMaster);
+                std::cout << "Created domain via master\n";
                 d.second->configureSlaves();
+                std::cout << "Configured slaves of the domain\n";
             }
         }
 

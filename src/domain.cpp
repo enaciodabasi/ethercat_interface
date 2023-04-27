@@ -24,7 +24,7 @@ namespace ethercat_interface
 
             m_EthercatDomainState = {};
 
-            configureSlaves(); // Configure each slave
+            //configureSlaves(); // Configure each slave
             
         }
 
@@ -90,13 +90,13 @@ namespace ethercat_interface
         {
             
             std::size_t tempPdoNum = 0;
-            m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
+            //m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
             for(const auto& s : m_RegisteredSlaves)
             {
-                
+                s.second->setLogger(m_Logger);
                 if(s.second->getSlaveType() == SlaveType::Coupler)
                 {   
-                    m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
+                    //m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
                     continue;
                 }
                 //auto inf = s.second->getSlaveInfo();
@@ -104,7 +104,7 @@ namespace ethercat_interface
                 s.second->configure_slave();
                 tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
 
-                s.second->setLogger(m_Logger);
+                
             }
             
             m_NumOfPdoEntryRegistries = tempPdoNum;
