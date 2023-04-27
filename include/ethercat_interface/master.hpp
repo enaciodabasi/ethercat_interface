@@ -18,6 +18,11 @@
 #include "domain.hpp"
 #include "logger.hpp"
 
+extern "C"
+{
+    #include "dc_sync.h"
+}
+
 #include "ecrt.h"
 
 namespace ethercat_interface
@@ -103,7 +108,7 @@ namespace ethercat_interface
 
             void setMasterTime(const uint64_t& app_time);
 
-            void syncMasterClock(const uint64_t& sync_time, bool sync_ref_clock);
+            void syncMasterClock(const uint64_t& sync_time, DistributedClockHelper& dc_helper);
 
             bool enableSlaves();
 

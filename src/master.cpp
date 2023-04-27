@@ -99,10 +99,17 @@ namespace ethercat_interface
             ecrt_master_application_time(m_EthercatMaster, app_time);
         }
 
-        void Master::syncMasterClock(const uint64_t &sync_time, bool sync_ref_clock)
+        void Master::syncMasterClock(const uint64_t &sync_time, DistributedClockHelper& dc_helper)
         {
-            if(sync_ref_clock)
-                ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);
+            if(dc_helper.referenceClockCounter)
+            {   
+                dc_helper.referenceClockCounter -= 1;
+                ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);   
+            }
+            else
+            {
+                dc_helper.referenceClockCounter = 1;
+            }
 
             ecrt_master_sync_slave_clocks(m_EthercatMaster);
         }
@@ -220,8 +227,9 @@ namespace ethercat_interface
             {
                 d.second->setupSlaves(m_EthercatMaster, &m_SlaveConfig);
                 if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries) != 0)
-                {
-                    m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
+                {   
+                    std::cout << "Failed during PDO entry reg check" << std::endl;
+                    //m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
                 }
             }
         }
@@ -234,8 +242,10 @@ namespace ethercat_interface
                 return false; // Can't find domain with the given name in the slave configuration.
             }
 
+            std::cout << slave_config.slaveName << std::endl;
             found->second->registerSlave(new slave::Slave(slave_config));
 
+            return true;
         }
     }
 }
