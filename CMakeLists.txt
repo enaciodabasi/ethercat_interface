@@ -13,10 +13,13 @@ set(SOURCES
     src/state.cpp
     src/domain.cpp
     src/master.cpp
-    include/dc_sync.h
+    include/ethercat_interface/dc_sync.h
     src/dc_sync.c
     src/logger.cpp
     src/state_machine.cpp
+    src/controller.cpp
+    src/offset.cpp
+    src/data.cpp
 )
 
 set(
@@ -52,12 +55,13 @@ target_link_libraries(
 #set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
-    include/slave.hpp
-    include/offset.hpp
-    include/utilities.hpp
-    include/state.hpp
-    include/dc_sync.h
-    include/state_machine.hpp
+    include/ethercat_interface/slave.hpp
+    include/ethercat_interface/offset.hpp
+    include/ethercat_interface/utilities.hpp
+    include/ethercat_interface/state.hpp
+    include/ethercat_interface/dc_sync.h
+    include/ethercat_interface/state_machine.hpp
+    include/ethercat_interface/controller.hpp
 )
 
 set_target_properties(${PROJECT_NAME}

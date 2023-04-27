@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2023
  * 
  */
-#include "master.hpp"
+#include "ethercat_interface/master.hpp"
 
 namespace ethercat_interface
 {
@@ -32,7 +32,7 @@ namespace ethercat_interface
         Master::Master(unsigned int master_index, std::shared_ptr<Logger> logger)
             : m_MasterIndex(master_index)
         {
-            if(m_Logger)
+            if(logger)
             {
                 m_Logger = logger;
             }
@@ -99,10 +99,17 @@ namespace ethercat_interface
             ecrt_master_application_time(m_EthercatMaster, app_time);
         }
 
-        void Master::syncMasterClock(const uint64_t &sync_time, bool sync_ref_clock)
+        void Master::syncMasterClock(const uint64_t &sync_time, DistributedClockHelper& dc_helper)
         {
-            if(sync_ref_clock)
-                ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);
+            if(dc_helper.referenceClockCounter)
+            {   
+                dc_helper.referenceClockCounter -= 1;
+                ecrt_master_sync_reference_clock_to(m_EthercatMaster, sync_time);   
+            }
+            else
+            {
+                dc_helper.referenceClockCounter = 1;
+            }
 
             ecrt_master_sync_slave_clocks(m_EthercatMaster);
         }
@@ -206,8 +213,11 @@ namespace ethercat_interface
             for(const auto& d : m_RegisteredDomains)
             {
                 d.second->setLogger(m_Logger);
+                std::cout << "Set logger\n";
                 d.second->createDomain(m_EthercatMaster);
+                std::cout << "Created domain via master\n";
                 d.second->configureSlaves();
+                std::cout << "Configured slaves of the domain\n";
             }
         }
 
@@ -217,10 +227,25 @@ namespace ethercat_interface
             {
                 d.second->setupSlaves(m_EthercatMaster, &m_SlaveConfig);
                 if(ecrt_domain_reg_pdo_entry_list(d.second->m_EthercatDomain, d.second->m_DomainPdoEntryRegistries) != 0)
-                {
-                    m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
+                {   
+                    std::cout << "Failed during PDO entry reg check" << std::endl;
+                    //m_Logger->log(FATAL, std::string("Master " + m_MasterIndex), "Failed during PDO entry registries check.");
                 }
             }
+        }
+
+        bool Master::addSlaveToDomain(const SlaveInfo& slave_config)
+        {
+            auto found = m_RegisteredDomains.find(slave_config.domainName);
+            if(found == m_RegisteredDomains.end())
+            {
+                return false; // Can't find domain with the given name in the slave configuration.
+            }
+
+            std::cout << slave_config.slaveName << std::endl;
+            found->second->registerSlave(new slave::Slave(slave_config));
+
+            return true;
         }
     }
 }

@@ -1,13 +1,10 @@
-#include "slave.hpp"
+/**
+ * 
+ */
+
+#include "ethercat_interface/slave.hpp"
+
 #include <optional>
-
-
-#define VendorID 0x000000fb
-#define ProductCode 0x65520000
-
-#define SMBSlavePos 0,0
-#define SMB VendorID,ProductCode
-
 
 namespace ethercat_interface
 {   
@@ -59,9 +56,45 @@ namespace ethercat_interface
                 ));
         }
 
+        Slave::Slave(const SlaveInfo& slave_info)
+            : m_SlaveInfo{slave_info}
+        {
+            
+            m_SlaveName = m_SlaveInfo.slaveName;
+
+            if(m_SlaveInfo.slaveType != SlaveType::Coupler)
+            {
+                if(!m_SlaveInfo.pdoNames.empty())
+                {
+                    m_DataOffset = new offset::DataOffset(m_SlaveInfo.pdoNames);
+                }
+
+                m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
+
+                m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
+
+                m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
+
+                m_DataOffset = new offset::DataOffset(m_SlaveInfo.pdoNames);
+                if(std::holds_alternative<bool>(m_SlaveInfo.dcInfo))
+                {
+                    ENABLE_DC = std::get<bool>(m_SlaveInfo.dcInfo);
+                }
+
+                if(ENABLE_DC && std::holds_alternative<DC_Info>(m_SlaveInfo.dcInfo))
+                {
+                    m_DcInfo = std::get<DC_Info>(m_SlaveInfo.dcInfo);
+                }
+            }
+
+            //m_DataOffset = std::make_unique<offset::DataOffset>(m_SlaveInfo.pdoNames);
+            
+        
+        }
+
         Slave::~Slave()
         {   
-            delete m_SlaveOffsets;
+            //delete m_SlaveOffsets;
             delete m_SlavePdoEntries;
             delete m_SlavePDOs;
             delete m_SlaveSyncs;
@@ -94,8 +127,8 @@ namespace ethercat_interface
                 ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
             );
 
-            m_Logger->log(INFO, m_SlaveName, "Loaded slave configuration.");
-        }
+/*             m_Logger->log(INFO, m_SlaveName, "Loaded slave configuration.");
+ */        }
 
         void Slave::setupSlave(ec_master_t *masterPtr, ec_domain_t* domainPtr, ec_slave_config_t** slave_config_ptr)
         {
@@ -115,18 +148,19 @@ namespace ethercat_interface
         
             if(!slave_config_ptr)
             {
-                m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
-            }
+/*                 m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
+ */         }
 
             if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
             {
-                m_Logger->log(ERROR, m_SlaveName, "Can't specify PDO configuration for the slave.");
-            }
+                    
+/*                 m_Logger->log(ERROR, m_SlaveName, "Can't specify PDO configuration for the slave.");
+ */            }
             else
             {
-                
-                m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
-            }
+                   std::cout << "Failed during slave config pdos\n"; 
+/*                 m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
+ */            }
 
             if(ENABLE_DC)
             {
@@ -140,14 +174,14 @@ namespace ethercat_interface
                 );  
             }
 
-            m_Logger->log(INFO, m_SlaveName, "Successfully set up the slave.");
-        }
+/*             m_Logger->log(INFO, m_SlaveName, "Successfully set up the slave.");
+ */        }
 
 
         bool Slave::enableOperation()
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
-
+            std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
                 Ready to switch on -> Switched on: Switch on command.
@@ -301,7 +335,7 @@ namespace ethercat_interface
             uint32_t slave_product_code,
             std::vector<uint16_t> indexes,
             std::vector<uint8_t> subindexes,
-            Offset* offset,
+            offset::DataOffset* offset,
             unsigned int* bit_position
         )
         {   
@@ -314,18 +348,22 @@ namespace ethercat_interface
                 {
                     domain_registries[i] = {};
                     break; 
-                }                
-                unsigned int* op = new unsigned int();
-                op = offset->getData(offset->m_OffsetNameIndexes.at(i));
-                domain_registries[i] = {
-                    slave_alias,
-                    slave_position,
-                    slave_vendor_id,
-                    slave_product_code,
-                    indexes.at(i),
-                    subindexes.at(i),
-                    offset->getData(offset->m_OffsetNameIndexes.at(i))
-                };
+                }        
+                const std::string currentDataName = offset->getDataName((uint)i);   
+                std::cout << currentDataName << std::endl;     
+                //unsigned int* op = new unsigned int();
+                //op = offset->getData(offset->m_OffsetNameIndexes.at(i));
+                if(offset->getDataOffset(currentDataName) != std::nullopt)
+                    domain_registries[i] = {
+                        slave_alias,
+                        slave_position,
+                        slave_vendor_id,
+                        slave_product_code,
+                        indexes.at(i),
+                        subindexes.at(i),
+                        //offset->getData(offset->m_OffsetNameIndexes.at(i))
+                        offset->getDataOffset(currentDataName).value()
+                    };
             }
 
             return domain_registries;

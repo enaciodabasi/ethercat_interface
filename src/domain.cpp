@@ -9,7 +9,7 @@
  * 
  */
 
-#include "domain.hpp"
+#include "ethercat_interface/domain.hpp"
 
 namespace ethercat_interface
 {
@@ -24,7 +24,7 @@ namespace ethercat_interface
 
             m_EthercatDomainState = {};
 
-            configureSlaves(); // Configure each slave
+            //configureSlaves(); // Configure each slave
             
         }
 
@@ -90,13 +90,14 @@ namespace ethercat_interface
         {
             
             std::size_t tempPdoNum = 0;
-            m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
+            //m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
             for(const auto& s : m_RegisteredSlaves)
-            {
-                
-                if(s.second->getSlaveType() == utilities::SlaveType::Coupler)
+            { 
+                  
+                s.second->setLogger(m_Logger);
+                if(s.second->getSlaveType() == SlaveType::Coupler)
                 {   
-                    m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
+                    //m_Logger->log(INFO, m_DomainName, s.second->getSlaveName() + " Slave's type: Coupler, skipping.");
                     continue;
                 }
                 //auto inf = s.second->getSlaveInfo();
@@ -104,7 +105,7 @@ namespace ethercat_interface
                 s.second->configure_slave();
                 tempPdoNum += s.second->getSlaveInfo().pdoEntryInfo.indexes.size();
 
-                s.second->setLogger(m_Logger);
+                
             }
             
             m_NumOfPdoEntryRegistries = tempPdoNum;
@@ -116,23 +117,24 @@ namespace ethercat_interface
 
         void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t** slave_config_ptr)
         {   
-            m_Logger->log(INFO, m_DomainName, "Setting up slaves of the domain.");
-            for(const auto& s : m_RegisteredSlaves)
+/*             m_Logger->log(INFO, m_DomainName, "Setting up slaves of the domain.");
+ */         for(const auto& s : m_RegisteredSlaves)
             {
                 s.second->setupSlave(master_ptr, m_EthercatDomain, slave_config_ptr);
             }
 
             if(m_NumOfPdoEntryRegistries != 0)
             {   
-                m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
-                // + 1 is for adding the empty entry registry at the end of the array.
+                    std::cout << m_NumOfPdoEntryRegistries << std::endl;
+/*                 m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
+ */                // + 1 is for adding the empty entry registry at the end of the array.
                 m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
                 this->createDomainPdoEntryRegistries(); 
             }
             else
             {
-                m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
-                
+/*                 m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
+ */                
             }
         }
 
@@ -176,23 +178,23 @@ namespace ethercat_interface
 
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
-                    std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
+                    /* std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
                         (uint16_t)info.position << " " <<
                         (uint32_t)info.vendorID << " " << 
                         (uint32_t)info.productCode << " " << 
-                        info.pdoEntryInfo.indexes[j] << " " <<
-                        (uint16_t)info.pdoEntryInfo.subindexes[j] << " " << s.second->getOffset()->m_OffsetNameIndexes.at(j) << std::endl;
+                        info.pdoEntryInfo.indexes[j] << std::endl; */
                 
-
-                    *(temp + i) = {
-                        (uint16_t)info.alias,
-                        (uint16_t)info.position,
-                        (uint32_t)info.vendorID,
-                        (uint32_t)info.productCode,
-                        info.pdoEntryInfo.indexes[j],
-                        info.pdoEntryInfo.subindexes[j],
-                        s.second->getOffset()->getData(s.second->getOffset()->m_OffsetNameIndexes[j])
-                    };
+                    const std::string currDataName = s.second->getOffset()->getDataName(j);
+                    if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
+                        *(temp + i) = {
+                            (uint16_t)info.alias,
+                            (uint16_t)info.position,
+                            (uint32_t)info.vendorID,
+                            (uint32_t)info.productCode,
+                            info.pdoEntryInfo.indexes[j],
+                            info.pdoEntryInfo.subindexes[j],
+                            s.second->getOffset()->getDataOffset(currDataName).value()
+                        };
                     
                     i+= 1;
                 }

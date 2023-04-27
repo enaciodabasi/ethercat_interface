@@ -135,6 +135,8 @@ namespace ethercat_interface
                 bool enable_dc = false
             );
 
+            Slave(const SlaveInfo& slave_info);
+
             ~Slave();
 
             virtual void configure_slave();
@@ -166,14 +168,14 @@ namespace ethercat_interface
                 return m_SlaveInfo.slaveType;
             }
 
-            Offset* getOffset()
+            offset::DataOffset* getOffset()
             {
-                return m_SlaveOffsets;
+                return m_DataOffset;
             }
 
-            inline void setOffsetPtr(Offset* offset)
+            inline void setOffsetPtr(offset::DataOffset* offset)
             {
-                m_SlaveOffsets = offset;
+                m_DataOffset = offset;
             }
 
             inline void setLogger(std::shared_ptr<logger::Logger> shared_logger)
@@ -193,7 +195,7 @@ namespace ethercat_interface
              * @return From the EtherCAT Master retrived value of type T. 
              */
             template<typename T>
-            auto readFromSlave(
+            T readFromSlave(
                 const std::string& value_to_read_name, 
                 int bit_position = NULL
             );
@@ -243,14 +245,18 @@ namespace ethercat_interface
             SlaveInfo m_SlaveInfo;
 
             Offset* m_SlaveOffsets; 
+
+            //std::unique_ptr<offset::DataOffset> m_DataOffset;
             
+            offset::DataOffset* m_DataOffset;
+
             uint8_t* m_DomainProcessDataPtr = nullptr;
 
             std::shared_ptr<logger::Logger> m_Logger;
 
             bool LOGGING_ENABLED = false;
 
-            bool ENABLE_DC = false;
+            bool ENABLE_DC = true;
 
             DC_Info m_DcInfo;
 
@@ -263,11 +269,16 @@ namespace ethercat_interface
         };
 
         template<typename T>
-        auto Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
+        T Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
         {
 
-            auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
-
+            //auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
+            if(m_DataOffset->getDataOffset(value_to_read_name) == std::nullopt)
+            {
+                return T();
+            }        
+        
+            auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(value_to_read_name).value();
             /*
                 Control statement for determining which type of value is used with the template function.
                 Uses the appropriate macro function from the ecrt.h to read according to the template argument.
@@ -356,8 +367,13 @@ namespace ethercat_interface
         )
         {
 
-            auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name);
-
+            //auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_write_name);
+            if(m_DataOffset->getDataOffset(value_to_write_name) == std::nullopt)
+            {
+                return;
+            }        
+        
+            auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(value_to_write_name).value();
             /*
                 Control statement for determining which type of value is used with the template function.
                 Uses the appropriate macro function from the ecrt.h to write according to the template argument.

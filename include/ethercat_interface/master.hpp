@@ -18,6 +18,11 @@
 #include "domain.hpp"
 #include "logger.hpp"
 
+extern "C"
+{
+    #include "dc_sync.h"
+}
+
 #include "ecrt.h"
 
 namespace ethercat_interface
@@ -74,13 +79,36 @@ namespace ethercat_interface
                 int bit_position = NULL
             );
 
+            /**
+             * @brief 
+             * 
+             * @tparam T 
+             * @param slave_position 
+             * @param sdo_info 
+             * @param value_to_write 
+             * @return true 
+             * @return false 
+             */
+            template<typename T>
+            bool sdo_write(
+                const uint16_t& slave_position,
+                const SDO_Info& sdo_info,
+                const T value_to_write
+            );
+
+            template<typename T>
+            std::optional<T> sdo_read(
+                const uint16_t& slave_position,
+                const SDO_Info& sdo_info
+            );
+
             void receive(const std::string& domain_name);
 
             void send(const std::string& domain_name);
 
             void setMasterTime(const uint64_t& app_time);
 
-            void syncMasterClock(const uint64_t& sync_time, bool sync_ref_clock);
+            void syncMasterClock(const uint64_t& sync_time, DistributedClockHelper& dc_helper);
 
             bool enableSlaves();
 
@@ -114,6 +142,8 @@ namespace ethercat_interface
 
             // Calls the setupSlaves function each registered domain.
             void setupDomains();
+
+            bool addSlaveToDomain(const SlaveInfo& slave_config);
 
         };
 
@@ -180,9 +210,67 @@ namespace ethercat_interface
                 bit_position
             );
         }
-    }
 
-    
+        template<typename T>
+        bool Master::sdo_write(
+            const uint16_t& slave_position,
+            const SDO_Info& sdo_info,
+            const T value_to_write
+        )
+        {
+            uint32_t abort_code;
+
+            uint8_t* data_address = (uint8_t*)&value_to_write;
+            size_t data_size = sizeof(T) / sizeof(uint8_t);
+
+            int res = ecrt_master_sdo_download(
+                this->m_EthercatMaster,
+                slave_position,
+                sdo_info.first, // SDO Index
+                sdo_info.second,  // SDO Subindex
+                data_address,
+                data_size,
+                &abort_code
+            );
+            
+            return (res < 0) ? false : true;
+        }
+
+        template<typename T>
+        std::optional<T> Master::sdo_read(
+            const uint16_t& slave_position,
+            const SDO_Info& sdo_info
+        )
+        {
+            uint32_t abort_code;
+
+            T target_data;
+
+            size_t target_data_size = sizeof(T);
+            size_t result_size;
+
+            int res = ecrt_master_sdo_upload(
+                this->m_EthercatMaster,
+                slave_position,
+                sdo_info.first,
+                sdo_info.second,
+                (uint8_t*)(&target_data),
+                target_data_size,
+                &result_size,
+                &abort_code
+            );
+
+            if(res < 0 || sizeof(result_size) != target_data_size)
+            {
+                return std::nullopt;
+            }
+
+            
+            return (T)target_data;
+
+        }
+
+    }   
 }
 
 #endif // MASTER_HPP

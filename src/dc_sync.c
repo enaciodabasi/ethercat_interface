@@ -1,4 +1,4 @@
-#include "dc_sync.h"
+#include "ethercat_interface/dc_sync.h"
 
 
 #include <bits/types/clockid_t.h>

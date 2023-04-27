@@ -1,9 +1,12 @@
-#include "../include/utilities.hpp"
+#include "ethercat_interface/utilities.hpp"
+
+#include <algorithm>
 
 namespace ethercat_interface
 {
     namespace utilities
-    {
+    {   
+
         namespace parser
         {
             
@@ -11,81 +14,94 @@ namespace ethercat_interface
             {
                 ControllerInfo controllerInfo;
 
-                if(auto docs = YAML::LoadFile(static_cast<std::string>(config_file_path))["controller_config"])
+                if(auto controller_config_doc = [&config_file_path](){
+                    const auto allDocs = YAML::LoadAllFromFile(static_cast<std::string>(config_file_path));
+                    YAML::Node configNode;
+                    for(const auto& doc: allDocs)
+                    {
+                        if(const auto tempNode = doc["controller_config"])
+                        {
+                            configNode = tempNode;
+                        }
+                        else
+                            continue;
+                    }
+
+                    return configNode;
+                }())
                 {
-                    std::vector<std::string> domain_names = docs["domain_names"].as<std::vector<std::string>>();
+                     std::vector<std::string> domain_names = controller_config_doc["domain_names"].as<std::vector<std::string>>();
 
                     if(domain_names.empty())
                     {
                         return std::nullopt;
                     }
+                    const std::string logDirPath = controller_config_doc["log_directory_path"].as<std::string>();
+                    const uint16_t cyclePeriod = controller_config_doc["cycle_period"].as<uint16_t>();
 
                     controllerInfo.domainNames = domain_names;
                     controllerInfo.numOfDomains = (uint)domain_names.size();
+                    controllerInfo.logDirPath = logDirPath;
+                    controllerInfo.cyclePeriod = cyclePeriod;
+                }
+                std::cout << "Passed controller config\n";
+                return controllerInfo;
+                
+            }
 
+            std::optional<std::vector<StartupInfo>> parse_startup_configs(std::string_view config_file_path)
+            {   
+                std::vector<StartupInfo> startupInfo;
+
+                if(auto startup_config_doc = [&config_file_path](){
+                    const auto allDocs = YAML::LoadAllFromFile(static_cast<std::string>(config_file_path));
+                    YAML::Node startupNode;
+                    for(const auto& doc : allDocs)
+                    {
+                        if(const auto tempNode = doc["startup_config"])
+                        {   
+                            startupNode = tempNode;
+                        }
+                        else
+                            continue;
+                    }
+
+                    return startupNode;
+                }())
+                {
+                    
+                    for(const auto& startup_config : startup_config_doc)
+                    {
+                        StartupInfo tempSI;
+                        
+                        tempSI.slaveName = startup_config["slave_name"].as<std::string>();
+                        tempSI.sdoInfo.first = (uint16_t)startup_config["sdo_index"].as<uint16_t>();
+                        tempSI.sdoInfo.second = (uint8_t)startup_config["sdo_subindex"].as<uint16_t>();
+
+                        const std::string dataTypeStr = startup_config["data_type"].as<std::string>();
+                        
+                        if(const auto data_val = startup_config["data_value"])
+                        {
+                            tempSI.deduceDataType(dataTypeStr, data_val);
+                            tempSI.configType = SdoConfigType::WRITE;
+                        }
+                        else
+                        {
+                            tempSI.deduceDataType(dataTypeStr);
+                            tempSI.configType = SdoConfigType::READ;
+                        }
+
+                        startupInfo.emplace_back(std::move(tempSI));
+                    }
                 }
                 else
                 {
                     return std::nullopt;
                 }
-
-                return controllerInfo;
                 
+                return startupInfo;
             }
 
-            std::optional<StartupInfo> parse_startup_configs()
-            {   
-                
-            }
-
-        }
-
-        PdoEntryInfo::PdoEntryInfo()
-        {
-            indexes = std::vector<uint16_t>();
-            subindexes = std::vector<uint8_t>();
-            bitLengths = std::vector<uint16_t>();
-        }
-
-        IoMappingInfo::IoMappingInfo()
-        {
-            RxPDO_Address = 0;
-            TxPDO_Address = 0;
-            RxPDO_Size = 0;
-            TxPDO_Size = 0;
-            RxPDO_Indexes = std::vector<uint16_t>();
-            TxPDO_Indexes = std::vector<uint16_t>();
-        }
-
-        SlaveSyncInfo::SlaveSyncInfo()
-        {
-            numSyncManagers = 0;
-            syncManagerDirections = std::vector<int>();
-            numPDOs = std::vector<uint>();
-            pdoIndexDiff = std::vector<std::optional<int>>();
-            watchdogModes = std::vector<int>();
-        }
-        
-        SlaveInfo::SlaveInfo()
-        {
-            slaveName = std::string();
-            vendorID = 0;
-            productCode = 0;
-            position = 0;
-            alias = 0;
-
-            pdoEntryInfo = PdoEntryInfo();
-            ioMappingInfo = IoMappingInfo();
-            slaveSyncInfo = SlaveSyncInfo();
-        }
-
-        DC_Info::DC_Info()
-        {
-            assign_activate = 0;
-            sync0_cycle = 0;
-            sync0_shift = 0;
-            sync1_cycle = 0;
-            sync1_shift = 0;
         }
 
         std::vector<std::optional<int>> detect_null_diffs(const std::vector<std::string>& diffs_with_nulls)
@@ -384,6 +400,12 @@ namespace ethercat_interface
 
                 for(const auto& doc : config_docs)
                 {
+                    if(doc["controller_config"] || doc["startup_config"])
+                    {
+                        std::cout << "controller or startup config found skipping" << std::endl;
+                        continue;
+                    }
+
                     SlaveInfo conf;
                     // Get slave configuration information from the YAML document
                     conf.slaveName = doc["slave_name"].as<std::string>();
@@ -392,7 +414,8 @@ namespace ethercat_interface
                     conf.productCode = doc["product_id"].as<int>();
                     conf.position = doc["slave_position"].as<uint>();
                     conf.alias = doc["slave_alias"].as<uint>();
-
+                    conf.domainName = doc["domain_name"].as<std::string>();
+                    
                     if(typeStr == "coupler" || typeStr == "Coupler")
                     {
                         conf.slaveType = SlaveType::Coupler;
@@ -407,7 +430,11 @@ namespace ethercat_interface
                     {
                         conf.slaveType = SlaveType::IO;
                     }
-                
+
+                    conf.pdoNames = doc["pdo_names"].as<std::vector<std::string>>();
+
+                    
+
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
                     conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
                     conf.pdoEntryInfo.bitLengths = doc["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
@@ -425,6 +452,22 @@ namespace ethercat_interface
                     const std::vector<std::string> tempPdoDiffs = doc["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
                     conf.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
                     conf.slaveSyncInfo.watchdogModes = doc["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
+                    
+                    if(const auto dcConfig = doc["dc_info"])
+                    {
+                        DC_Info tempDcInfo;
+                        tempDcInfo.assign_activate = dcConfig["assign_activate"].as<uint16_t>();
+                        tempDcInfo.sync0_cycle = dcConfig["sync0_cycle"].as<uint32_t>();
+                        tempDcInfo.sync0_shift = dcConfig["sync0_shift"].as<int32_t>();
+                        tempDcInfo.sync1_cycle = dcConfig["sync1_cycle"].as<uint32_t>();
+                        tempDcInfo.sync1_shift = dcConfig["sync1_shift"].as<int32_t>();
+
+                        conf.dcInfo.emplace<DC_Info>(tempDcInfo);
+                    }
+                    else
+                    {
+                        conf.dcInfo = false;
+                    }
 
                     // If only one slave should be created from the current slave information
                     // Add conf to the config vector and continue to loop over the remaining documents.
@@ -440,8 +483,8 @@ namespace ethercat_interface
                     {
                         SlaveInfo tempConf = conf;
                         tempConf.slaveName = conf.slaveName + "_" + std::to_string(i);
+                        
                         tempConf.position += i;
-
                         slaveConfigs.push_back(tempConf); 
                     }    
                 
@@ -555,4 +598,129 @@ namespace ethercat_interface
             }
         }
     }
+
+    PdoEntryInfo::PdoEntryInfo()
+    {
+        indexes = std::vector<uint16_t>();
+        subindexes = std::vector<uint8_t>();
+        bitLengths = std::vector<uint16_t>();
+    }
+    IoMappingInfo::IoMappingInfo()
+    {
+        RxPDO_Address = 0;
+        TxPDO_Address = 0;
+        RxPDO_Size = 0;
+        TxPDO_Size = 0;
+        RxPDO_Indexes = std::vector<uint16_t>();
+        TxPDO_Indexes = std::vector<uint16_t>();
+    }
+    SlaveSyncInfo::SlaveSyncInfo()
+    {
+        numSyncManagers = 0;
+        syncManagerDirections = std::vector<int>();
+        numPDOs = std::vector<uint>();
+        pdoIndexDiff = std::vector<std::optional<int>>();
+        watchdogModes = std::vector<int>();
+    }
+    
+    SlaveInfo::SlaveInfo()
+    {
+        slaveName = std::string();
+        vendorID = 0;
+        productCode = 0;
+        position = 0;
+        alias = 0;
+        pdoEntryInfo = PdoEntryInfo();
+        ioMappingInfo = IoMappingInfo();
+        slaveSyncInfo = SlaveSyncInfo();
+    }
+    DC_Info::DC_Info()
+    {
+        assign_activate = 0;
+        sync0_cycle = 0;
+        sync0_shift = 0;
+        sync1_cycle = 0;
+        sync1_shift = 0;
+    }
+
+    void StartupInfo::deduceDataType(const std::string& data_type_str)
+        {
+            auto res = std::find_if(
+                 EC_TYPE_STRING_PAIRS.begin(),
+                 EC_TYPE_STRING_PAIRS.end(),
+                 [&data_type_str](const std::pair<std::string, EC_Type>& p)
+                 {
+                     return (p.first == data_type_str);
+                 }
+            );
+
+            if(res == EC_TYPE_STRING_PAIRS.end())
+            {
+                 return;
+            }
+
+            const EC_Type currType = res->second;
+
+            // If the SDO is to be read
+            // Change the variant type to the data_type in the configuration file.
+    
+            switch (currType)
+            {
+            case EC_Type::UINT8:
+                data = uint8_t();
+                break;
+            case EC_Type::UINT16:
+                data = uint16_t();
+                break;
+            case EC_Type::UINT32:
+                data = uint32_t();
+                break;
+            case EC_Type::UINT64:
+                data = uint64_t();
+                break;
+            default:
+                return;
+            }
+        }
+
+        void StartupInfo::deduceDataType(
+            const std::string& data_type_str,
+            const YAML::Node& data_node
+        )
+        {
+            auto res = std::find_if(
+                 EC_TYPE_STRING_PAIRS.begin(),
+                 EC_TYPE_STRING_PAIRS.end(),
+                 [&data_type_str](const std::pair<std::string, EC_Type>& p)
+                 {
+                     return (p.first == data_type_str);
+                 }
+            );
+
+            if(res == EC_TYPE_STRING_PAIRS.end())
+            {
+                 return;
+            }
+            
+            const EC_Type currType = res->second;
+
+            switch (currType)
+            {
+            case EC_Type::UINT8:
+                this->data = (uint8_t)data_node.as<uint16_t>();
+                break;
+            case EC_Type::UINT16:
+                this->data = data_node.as<uint16_t>();
+                break;
+            case EC_Type::UINT32:
+                this->data = data_node.as<uint32_t>();
+                break;
+            case EC_Type::UINT64:
+                this->data = data_node.as<uint64_t>();
+                break;
+            default:
+                return;
+            }
+
+        }
 }
