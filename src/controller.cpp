@@ -25,6 +25,14 @@ namespace ethercat_interface
             
         }
 
+        Controller::~Controller()
+        {
+            if(m_CyclicTaskThread.joinable())
+            {
+                m_CyclicTaskThread.join();
+            }
+        }
+
         bool Controller::setup()
         {
             auto slaveConfigsOpt = loadSlaveConfig(m_PathToConfigFile);
@@ -63,16 +71,17 @@ namespace ethercat_interface
             bool doStartupRoutine = true;
 
             if(startupConfig_o != std::nullopt){doStartupRoutine = false;}
-            if(!doStartupRoutine){return false;}
-            
-            auto& startupConfigs = startupConfig_o.value();
+            if(doStartupRoutine)
+            {
+                auto& startupConfigs = startupConfig_o.value();
 
-            if(!on_startup(startupConfigs, slaveConfigs))
-            {   
-                return false;
+                if(!on_startup(startupConfigs, slaveConfigs))
+                {   
+                    return false;
+                }
+
+                m_StartupInfos = startupConfigs;
             }
-
-            m_StartupInfos = startupConfigs;
 
             // PREOP TO OP 
 

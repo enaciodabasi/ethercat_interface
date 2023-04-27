@@ -63,7 +63,7 @@ namespace ethercat_interface
              */
             Controller(const std::string& config_file_path);        
 
-            ~Controller();
+            virtual ~Controller();
 
             virtual void cyclicTask() = 0;
             
@@ -84,9 +84,12 @@ namespace ethercat_interface
              */
             virtual bool setup();
 
-            void startTask();
-
             protected:
+
+            std::unique_ptr<master::Master> m_Master;
+
+            std::thread m_CyclicTaskThread;
+
             /**
              * @brief Configures the slaves during their PRE-OP state.
              * 
@@ -95,7 +98,11 @@ namespace ethercat_interface
              */
             virtual bool on_startup(std::vector<StartupInfo>& startup_configs, const std::vector<SlaveInfo>& slave_configs);
 
-            
+            /**
+             * @brief Override this function to start your overriden cyclicTask method.
+             * 
+             */
+            virtual void startTask();
 
             /**
              * @brief Updates the threads policy and priority using std::thread::native_handle in pthread_setschedparam.
@@ -118,13 +125,17 @@ namespace ethercat_interface
                 m_ThreadInfo.schedParam.sched_priority = m_ThreadInfo.threadPriority;
             }
 
+            inline bool joinThread()
+            {
+                if(m_CyclicTaskThread.joinable())
+                {
+                    m_CyclicTaskThread.join();
+                }
+            }
+
             private:
 
             std::string m_PathToConfigFile;
-
-            std::unique_ptr<master::Master> m_Master;
-
-            std::thread m_CyclicTaskThread;
         
             std::vector<StartupInfo> m_StartupInfos;
 
