@@ -3,16 +3,23 @@ startup_config:
 
  -
   slave_name: "EL7221_9015_0"
-  sdo_index: 0x2008
-  sdo_subindex: 0x00
+  sdo_index: 0x2002
+  sdo_subindex: 0x55
   data_type: uint8
   data_value: 0x05
  -
   slave_name: "EL7221_9015_1"
-  sdo_index: 0x2008
-  sdo_subindex: 0x00
+  sdo_index: 0x2002
+  sdo_subindex: 0x55
   data_type: uint8
   data_value: 0x05
+
+ -
+  slave_name: "EL7221_9015_1"
+  sdo_index: 0x2002
+  sdo_subindex: 0x55
+  data_type: uint8
+
 
 ...
 ---
@@ -21,7 +28,25 @@ controller_config:
  domain_names:
   - domain_1
  log_directory_path: "/home/naci/Projects/igh_master/logs/"
+ cycle_period: 500
 
+...
+---
+slave_name: "EK1100_0"
+ 
+slave_type: "coupler"
+
+domain_name: domain_1
+
+num_of_slaves: 1
+
+vendor_id: 0x00000002
+
+product_id: 0x044c2c52
+
+slave_position: 0
+
+slave_alias: 0
 ...
 ---
 
@@ -52,6 +77,7 @@ pdo_names:
  - "current_position"
  - "current_velocity"
  - "current_torque"
+ - "info_data"
  - "op_mode_display"
 
 pdo_entry_info:
@@ -63,6 +89,7 @@ pdo_entry_info:
   - 0x6064
   - 0x606c
   - 0x6070
+  - 0x2008
   - 0x6061
  subindexes:
   - 0
@@ -72,6 +99,7 @@ pdo_entry_info:
   - 0
   - 0
   - 0
+  - 1
   - 0
   
  bit_lengths:
@@ -82,12 +110,13 @@ pdo_entry_info:
   - 32
   - 32
   - 16
+  - 16
   - 8
   
  rxpdo_address: 0x1600
  rxpdo_size: 3
  txpdo_address: 0x1a00
- txpdo_size: 5
+ txpdo_size: 6
  rxpdo_indexes:
   - 0x1600
   - 0x1601
@@ -97,6 +126,7 @@ pdo_entry_info:
   - 0x1a01
   - 0x1a02
   - 0x1a03
+  - 0x1a0b
   - 0x1a0e
 
 slave_sync_info:
@@ -112,7 +142,7 @@ slave_sync_info:
   - 0
   - 0
   - 3
-  - 5
+  - 6
 
  pdo_index_diff:
   - "NULL"
@@ -127,11 +157,11 @@ slave_sync_info:
   - 2
 
 dc_info:
- assign_activate: 0x070 
- sync0_cycle: 200000 
- sync0_shift: 3000 
- sync1_cycle: 200000 
- sync1_shift: 1000
+ assign_activate: 0x0700 
+ sync0_cycle: 2000000 
+ sync0_shift: 0 
+ sync1_cycle: 2000000 
+ sync1_shift: 0
 
 generator_info:
   - "ctrl_word"
@@ -141,21 +171,7 @@ generator_info:
   - "current_position"
   - "current_velocity"
   - "current_torque"
+  - "info_data"
   - "op_mode_display"
 
-...
----
-slave_name: "EK1100_0"
- 
-slave_type: "coupler"
-
-num_of_slaves: 1
-
-vendor_id: 0x00000002
-
-product_id: 0x044c2c52
-
-slave_position: 0
-
-slave_alias: 0
 ...
