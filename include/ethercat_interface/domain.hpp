@@ -92,6 +92,7 @@ namespace ethercat_interface
             inline void registerSlave(slave::Slave* slave)
             {
                 m_RegisteredSlaves[slave->getSlaveName()] = slave;
+                std::cout << slave->getSlaveName() << std::endl;
             }
 
             inline void registerSlaves(std::vector<slave::Slave*> slaves)
@@ -99,6 +100,7 @@ namespace ethercat_interface
                 for(std::size_t i = 0; i < slaves.size(); i++)
                 {
                     m_RegisteredSlaves[slaves[i]->getSlaveName()] = slaves[i];
+
                 }
             }
 

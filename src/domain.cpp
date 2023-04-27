@@ -92,7 +92,8 @@ namespace ethercat_interface
             std::size_t tempPdoNum = 0;
             //m_Logger->log(INFO, m_DomainName, "Configuring slaves of the domain.");
             for(const auto& s : m_RegisteredSlaves)
-            {
+            { 
+                  
                 s.second->setLogger(m_Logger);
                 if(s.second->getSlaveType() == SlaveType::Coupler)
                 {   
@@ -116,23 +117,24 @@ namespace ethercat_interface
 
         void Domain::setupSlaves(ec_master_t* master_ptr, ec_slave_config_t** slave_config_ptr)
         {   
-            m_Logger->log(INFO, m_DomainName, "Setting up slaves of the domain.");
-            for(const auto& s : m_RegisteredSlaves)
+/*             m_Logger->log(INFO, m_DomainName, "Setting up slaves of the domain.");
+ */         for(const auto& s : m_RegisteredSlaves)
             {
                 s.second->setupSlave(master_ptr, m_EthercatDomain, slave_config_ptr);
             }
 
             if(m_NumOfPdoEntryRegistries != 0)
             {   
-                m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
-                // + 1 is for adding the empty entry registry at the end of the array.
+                    std::cout << m_NumOfPdoEntryRegistries << std::endl;
+/*                 m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
+ */                // + 1 is for adding the empty entry registry at the end of the array.
                 m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
                 this->createDomainPdoEntryRegistries(); 
             }
             else
             {
-                m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
-                
+/*                 m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
+ */                
             }
         }
 
@@ -180,9 +182,8 @@ namespace ethercat_interface
                         (uint16_t)info.position << " " <<
                         (uint32_t)info.vendorID << " " << 
                         (uint32_t)info.productCode << " " << 
-                        info.pdoEntryInfo.indexes[j] << " " <<
-                        (uint16_t)info.pdoEntryInfo.subindexes[j] << " " << s.second->getOffset()->m_OffsetNameIndexes.at(j) << std::endl;
-                 */
+                        info.pdoEntryInfo.indexes[j] << std::endl; */
+                
                     const std::string currDataName = s.second->getOffset()->getDataName(j);
                     if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
                         *(temp + i) = {
