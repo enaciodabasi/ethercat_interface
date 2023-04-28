@@ -39,7 +39,9 @@ void ControllerExample::cyclicTask()
             ********************************
         */  
 
-       bool slavesEnabled = m_Master->enableSlaves();
+        bool slavesEnabled = m_Master->enableSlaves();
+
+
         this->m_Master->write<int8_t>(
                 "domain_1",
                 "EL7221_9015_0",
@@ -53,21 +55,19 @@ void ControllerExample::cyclicTask()
             0x09
         );
 
-        auto infodata1 = this->m_Master->read<uint8_t>(
-            "domain_1",
-            "EL7221_9015_1",
-            "info_data"
-        );
-
-        if(infodata1 != std::nullopt)
+        
+        if(slavesEnabled)
         {
-            std::cout << "info data: " << (uint16_t)infodata1.value() << std::endl;
-        }
+                auto leftWheelPosOpt = m_Master->read<int32_t>("domain_1", "EL7221_9015_0", "current_position");
+                auto rightWheelPosOpt = m_Master->read<int32_t>("domain_1", "EL7221_9015_1", "current_position");
 
-       if(slavesEnabled)
-       {
-             
-       }
+                if(leftWheelPosOpt != std::nullopt || rightWheelPosOpt != std::nullopt)
+                {
+                    std::string posOutMsg = "Left Wheel Position: " + std::to_string(leftWheelPosOpt.value()) + " Right Wheel Position: " + std::to_string(rightWheelPosOpt.value());
+                    std::cout << posOutMsg << std::endl;
+                }
+
+        }
 
 
        /*
