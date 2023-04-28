@@ -12,50 +12,6 @@ namespace ethercat_interface
     namespace slave
     {
 
-        Slave::Slave(
-            const std::string& slave_name,
-            const std::string& config_file_path,
-            Offset* offset,
-            bool enable_dc
-        )   : m_SlaveName(slave_name), ENABLE_DC(enable_dc)
-        {   
-
-
-            if(offset != nullptr)
-            {
-                m_SlaveOffsets = offset;
-            }
-
-            if(enable_dc)
-            {
-                m_DcInfo = utilities::getDcInfo(
-                    config_file_path,
-                    slave_name
-                );
-            }
-
-            m_SlaveInfo = utilities::parse_config_file(config_file_path, slave_name);
-            if(m_SlaveInfo.slaveType != SlaveType::Coupler)
-            {
-                m_SlaveSyncs = new ec_sync_info_t[m_SlaveInfo.slaveSyncInfo.numSyncManagers + 1];
-
-                m_SlavePdoEntries = new ec_pdo_entry_info_t[m_SlaveInfo.pdoEntryInfo.indexes.size()];
-
-                m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
-            }
-
-            m_SlaveStatus = std::make_shared<uint16_t>();
-
-            m_StateMachine = new ethercat_interface::state_machine::CIA402::StateMachine(m_SlaveStatus);
-            m_StateMachine->setWriteCallback(std::bind(
-                    &Slave::writeToSlave<uint16_t>,
-                    this,
-                    std::placeholders::_1,
-                    std::placeholders::_2,
-                    std::placeholders::_3
-                ));
-        }
-
         Slave::Slave(const SlaveInfo& slave_info)
             : m_SlaveInfo{slave_info}
         {
@@ -180,8 +136,15 @@ namespace ethercat_interface
 
         bool Slave::enableOperation()
         {
-            m_Status = this->readFromSlave<uint16_t>("status_word");
-            std::cout << "Status Word: " << m_Status << std::endl;
+            
+            auto statusOpt = this->readFromSlave<uint16_t>("status_word");
+            if(statusOpt == std::nullopt)
+            {
+                return false;
+            }
+
+            m_Status = statusOpt.value();
+            //std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
                 Ready to switch on -> Switched on: Switch on command.

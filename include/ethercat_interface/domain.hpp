@@ -78,7 +78,7 @@ namespace ethercat_interface
             );
 
             template<typename T>
-            auto read(
+            std::optional<T> read(
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
                 int bit_position = NULL
@@ -192,7 +192,7 @@ namespace ethercat_interface
         }
 
         template<typename T>
-        auto Domain::read(
+        std::optional<T> Domain::read(
             const std::string& slave_name,
             const std::string& value_to_read_name,
             int bit_position

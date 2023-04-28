@@ -18,6 +18,7 @@
 #include <memory>
 #include <variant>
 #include <map>
+#include <optional>
 
 #include "ecrt.h"
 
@@ -128,13 +129,6 @@ namespace ethercat_interface
         {
             public:
 
-            Slave(
-                const std::string& slave_name,
-                const std::string& config_file_path,
-                Offset* offset = nullptr,
-                bool enable_dc = false
-            );
-
             Slave(const SlaveInfo& slave_info);
 
             ~Slave();
@@ -195,7 +189,7 @@ namespace ethercat_interface
              * @return From the EtherCAT Master retrived value of type T. 
              */
             template<typename T>
-            T readFromSlave(
+            std::optional<T> readFromSlave(
                 const std::string& value_to_read_name, 
                 int bit_position = NULL
             );
@@ -269,7 +263,7 @@ namespace ethercat_interface
         };
 
         template<typename T>
-        T Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
+        std::optional<T> Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
         {
 
             //auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
@@ -351,11 +345,8 @@ namespace ethercat_interface
                     bit_position
                 );
             }
-            else
-            {
-                std::cout << "Incorrect type\n";
-            }
 
+            return std::nullopt;
             
         }
         

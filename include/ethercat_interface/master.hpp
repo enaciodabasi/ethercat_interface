@@ -72,7 +72,7 @@ namespace ethercat_interface
             );
 
             template<typename T>
-            T read(
+            std::optional<T> read(
                 const std::string& domain_name,
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
@@ -183,7 +183,7 @@ namespace ethercat_interface
         }
 
         template<typename T>
-        T Master::read(
+        std::optional<T> Master::read(
             const std::string& domain_name,
             const std::string& slave_name,
             const std::string& value_to_read_name,
