@@ -1,0 +1,29 @@
+---
+startup_config:
+
+...
+
+---
+controller_config:
+...
+
+---
+
+slave_name: epos4_0
+slave_type: "driver"
+num_of_slaves: 1
+domain_name: domain_1
+slave_alias: 0
+slave_position: 0
+pdo_names:
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+ -
+
+...
