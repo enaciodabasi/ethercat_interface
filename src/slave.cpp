@@ -181,7 +181,7 @@ namespace ethercat_interface
         bool Slave::enableOperation()
         {
             m_Status = this->readFromSlave<uint16_t>("status_word");
-            std::cout << "Status Word: " << m_Status << std::endl;
+            //std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
                 Ready to switch on -> Switched on: Switch on command.

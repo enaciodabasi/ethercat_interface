@@ -53,6 +53,12 @@ void ControllerExample::cyclicTask()
             0x09
         );
 
+        auto infodata = this->m_Master->read<uint8_t>(
+            "domain_1",
+            "EL7221_9015_1",
+            "info_data"
+        );
+
        if(slavesEnabled)
             std::cout << "aaaaaaaaaaaaaaaaaa\n";
 
