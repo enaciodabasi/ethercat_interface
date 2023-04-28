@@ -14,13 +14,6 @@ startup_config:
   data_type: uint8
   data_value: 0x05
 
- -
-  slave_name: "EL7221_9015_1"
-  sdo_index: 0x2002
-  sdo_subindex: 0x55
-  data_type: uint8
-
-
 ...
 ---
 
