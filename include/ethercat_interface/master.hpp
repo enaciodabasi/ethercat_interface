@@ -68,7 +68,7 @@ namespace ethercat_interface
                 const std::string& slave_name,
                 const std::string& value_to_write_name,
                 const T& value_to_write,
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
 
             template<typename T>
@@ -76,7 +76,7 @@ namespace ethercat_interface
                 const std::string& domain_name,
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
 
             /**
@@ -153,7 +153,7 @@ namespace ethercat_interface
             const std::string& slave_name,
             const std::string& value_to_write_name,
             const T& value_to_write,
-            int bit_position
+            std::optional<int> bit_position
         )
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
@@ -162,23 +162,22 @@ namespace ethercat_interface
                 return;
             }
 
-            if(bit_position == NULL)
+/*             if(bit_position == NULL)
             {
                 m_RegisteredDomains.at(domain_name)->write<T>(
                     slave_name,
                     value_to_write_name,
                     value_to_write
                 );
-            }
-            else
-            {
-                m_RegisteredDomains.at(domain_name)->write<T>(
-                    slave_name,
-                    value_to_write_name,
-                    value_to_write,
-                    bit_position
-                );
-            }
+            } */
+
+            m_RegisteredDomains.at(domain_name)->write<T>(
+                slave_name,
+                value_to_write_name,
+                value_to_write,
+                bit_position
+            );
+
 
         }
 
@@ -187,7 +186,7 @@ namespace ethercat_interface
             const std::string& domain_name,
             const std::string& slave_name,
             const std::string& value_to_read_name,
-            int bit_position
+            std::optional<int> bit_position
         )
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
@@ -196,13 +195,13 @@ namespace ethercat_interface
                 
             }
 
-            if(bit_position == NULL)
+/*             if(bit_position == NULL)
             {
                 return m_RegisteredDomains.at(domain_name)->read<T>(
                     slave_name,
                     value_to_read_name
                 );
-            }
+            } */
 
             return m_RegisteredDomains.at(domain_name)->read<T>(
                 slave_name,

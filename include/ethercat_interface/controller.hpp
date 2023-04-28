@@ -141,7 +141,10 @@ namespace ethercat_interface
                 if(m_CyclicTaskThread.joinable())
                 {
                     m_CyclicTaskThread.join();
+                    return true;
                 }
+                return false;
+
             }
 
             void setTaskWakeUpTime();

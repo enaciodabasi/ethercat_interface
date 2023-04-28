@@ -74,14 +74,14 @@ namespace ethercat_interface
                 const std::string& slave_name,
                 const std::string& value_to_write_name,
                 const T& value_to_write,
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
 
             template<typename T>
             std::optional<T> read(
                 const std::string& slave_name,
                 const std::string& value_to_read_name,
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
 
             /**
@@ -163,7 +163,7 @@ namespace ethercat_interface
             const std::string& slave_name,
                 const std::string& value_to_write_name,
                 const T& value_to_write,
-                int bit_position
+                std::optional<int> bit_position
         )
         {
             // TODO: check if the slave with the name slave_name exists and throw exception.
@@ -174,7 +174,7 @@ namespace ethercat_interface
                 // throw exception
                 return;
             }
-
+/* 
             if(bit_position == NULL)
             {
                 m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
@@ -182,7 +182,7 @@ namespace ethercat_interface
                     value_to_write
                 );
             }
-            else
+            else */
                 m_RegisteredSlaves.at(slave_name)->writeToSlave<T>(
                     value_to_write_name,
                     value_to_write,
@@ -195,7 +195,8 @@ namespace ethercat_interface
         std::optional<T> Domain::read(
             const std::string& slave_name,
             const std::string& value_to_read_name,
-            int bit_position
+            std::optional<int> bit_position
+
         )
         {
             /* if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
@@ -203,10 +204,10 @@ namespace ethercat_interface
 
                return -1;
             } */
-            if(bit_position == NULL)
+/*             if(bit_position == NULL)
             {
                 return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(value_to_read_name);
-            }
+            } */
             
             return m_RegisteredSlaves.at(slave_name)->readFromSlave<T>(
                 value_to_read_name,

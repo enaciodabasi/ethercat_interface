@@ -191,7 +191,7 @@ namespace ethercat_interface
             template<typename T>
             std::optional<T> readFromSlave(
                 const std::string& value_to_read_name, 
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
             
             /**
@@ -207,7 +207,7 @@ namespace ethercat_interface
             void writeToSlave(
                 const std::string& value_to_write_name,
                 const T& new_val, 
-                int bit_position = NULL
+                std::optional<int> bit_position = std::nullopt
             );
 
             inline void setDomainProcessDataPtr(uint8_t* domain_data_ptr)
@@ -263,7 +263,7 @@ namespace ethercat_interface
         };
 
         template<typename T>
-        std::optional<T> Slave::readFromSlave(const std::string& value_to_read_name, int bit_position)
+        std::optional<T> Slave::readFromSlave(const std::string& value_to_read_name, std::optional<int> bit_position)
         {
 
             //auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
@@ -340,9 +340,13 @@ namespace ethercat_interface
             }
             else if constexpr (std::is_same_v<bool, T>)
             {
+                if(bit_position == std::nullopt)
+                {
+                    return std::nullopt;
+                }
                 return EC_READ_BIT(
                     data,
-                    bit_position
+                    bit_position.value()
                 );
             }
 
@@ -354,7 +358,7 @@ namespace ethercat_interface
         void Slave::writeToSlave(
             const std::string& value_to_write_name,
             const T& new_val,
-            int bit_position
+            std::optional<int> bit_position
         )
         {
 
@@ -440,12 +444,11 @@ namespace ethercat_interface
                 );
             }
             else if constexpr (std::is_same_v<bool, T>)
-            {
-                EC_WRITE_BIT(
-                    data,
-                    bit_position,
-                    new_val
-                );
+            {   
+                if(bit_position != std::nullopt)
+                {
+                    EC_WRITE_BIT(data, bit_position.value(), new_val);
+                }
             }
             else
             {

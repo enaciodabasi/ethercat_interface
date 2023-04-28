@@ -103,7 +103,7 @@ namespace ethercat_interface
             }
         
             if(!slave_config_ptr)
-            {
+            { 
 /*                 m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
  */         }
 
@@ -114,7 +114,7 @@ namespace ethercat_interface
  */            }
             else
             {
-                   std::cout << "Failed during slave config pdos\n"; 
+                   
 /*                 m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
  */            }
 
@@ -144,6 +144,7 @@ namespace ethercat_interface
             }
 
             m_Status = statusOpt.value();
+            std::cout << m_Status << std::endl;
             //std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
