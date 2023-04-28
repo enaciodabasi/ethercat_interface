@@ -30,6 +30,49 @@ namespace ethercat_interface
                 writeControlCommand = function_ptr;
             }
 
+            std::optional<Command> StateMachine::findPathToState(const State& target_state)
+            {
+                uint16_t currentStatus;
+                if(auto statPtr = m_SlaveStatusPtr.lock())
+                {
+                    currentStatus = *statPtr;
+                }
+
+                std::optional<State> stateOpt = std::nullopt;
+
+                for(const auto& state : m_StatesVector)
+                {
+                    if(statusCheck(currentStatus, state))
+                    {
+                        stateOpt = state;
+                        break;
+                    }
+                    else{continue;}
+                }
+
+                if(stateOpt == std::nullopt)
+                {
+                    return std::nullopt;
+                }
+
+                auto resultTransition = m_TransitionTable.find(stateOpt.value());
+                if(resultTransition != m_TransitionTable.end())
+                {
+                    const Transitions possibleTransitions = resultTransition->second;
+                    auto resultCommand = possibleTransitions.find(target_state);
+
+                    if(resultCommand != possibleTransitions.end())
+                    {
+                        const Command commandToTarget = resultCommand->second;
+
+                        return commandToTarget;
+                    }
+                }
+
+
+                return std::nullopt;
+            }
+
             bool StateMachine::switchState(const State& target_state)
             {
                 bool isSwitchSuccessful = false;
@@ -41,19 +84,19 @@ namespace ethercat_interface
                 }
                 
                 // Get the current state of the slave by comparing the status word with the State's.
-                std::optional<State> optState;
-                for(const auto state : m_States)
+                std::optional<State> optState = std::nullopt;
+
+                for(const auto state : m_StatesVector)
                 {
                     if(statusCheck(currentStatus, state)) 
                     {
                         optState = state;
                         break;
                     }
-                    else
-                    {
-                        optState = std::nullopt;
-                    }
+
                 }
+
+
 
                 // If the current status word does not match with any of the predefined
                 // State's, return false.

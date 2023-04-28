@@ -22,6 +22,14 @@ namespace ethercat_interface
 {   
     namespace state_machine
     {
+
+        class StateMachineBase
+        {
+            public:
+
+            StateMachineBase();
+            virtual ~StateMachineBase();
+        };
         
         namespace CIA402
         {
@@ -59,7 +67,7 @@ namespace ethercat_interface
                 return static_cast<std::underlying_type<Command>::type>(command);
             }
             
-            class StateMachine
+            class StateMachine : public StateMachineBase
             {
                 public:
                 
@@ -79,13 +87,15 @@ namespace ethercat_interface
                 
                 bool switchState(const State& target_state);
 
+                std::optional<Command> findPathToState(const State& target_state);
+
                 private:
 
                 std::function<void(const std::string&, const uint16_t&, int)> writeControlCommand;
                 
                 State m_CurrentState = State::SwitchOnDisabled; 
 
-                const std::vector<State> m_States = {
+                const std::vector<State> m_StatesVector = {
                     State::NotReadyToSwitchOn,
                     State::SwitchOnDisabled,
                     State::ReadyToSwitchOn,
