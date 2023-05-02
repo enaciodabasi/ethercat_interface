@@ -154,7 +154,7 @@ namespace ethercat_interface
 
             std::shared_ptr<logger::Logger> m_Logger;
 
-            ec_pdo_entry_reg_t* createDomainPdoEntryRegistries();
+            void createDomainPdoEntryRegistries();
 
         };
 

@@ -34,7 +34,7 @@ namespace ethercat_interface
                 m_DataOffset = new offset::DataOffset(m_SlaveInfo.pdoNames);
                 if(std::holds_alternative<bool>(m_SlaveInfo.dcInfo))
                 {
-                    ENABLE_DC = std::get<bool>(m_SlaveInfo.dcInfo);
+                    ENABLE_DC = false;
                 }
 
                 if(ENABLE_DC && std::holds_alternative<DC_Info>(m_SlaveInfo.dcInfo))
@@ -67,11 +67,22 @@ namespace ethercat_interface
                 m_SlaveInfo.pdoEntryInfo.bitLengths)
             ;
 
-            m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
-                m_SlavePdoEntries,
-                m_SlaveInfo.ioMappingInfo.RxPDO_Indexes,
-                m_SlaveInfo.ioMappingInfo.TxPDO_Indexes
-            );
+            if(m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() == 1 && m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size() == 1)
+            {
+                m_SlavePDOs = createSlavePDOs(
+                    m_SlavePdoEntries,
+                    m_SlaveInfo.ioMappingInfo.RxPDO_Address,
+                    m_SlaveInfo.ioMappingInfo.RxPDO_Size,
+                    m_SlaveInfo.ioMappingInfo.TxPDO_Address,
+                    m_SlaveInfo.ioMappingInfo.TxPDO_Size
+                );
+            }
+            else
+                m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
+                    m_SlavePdoEntries,
+                    m_SlaveInfo.ioMappingInfo.RxPDO_Indexes,
+                    m_SlaveInfo.ioMappingInfo.TxPDO_Indexes
+                );
 
 
             m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
@@ -104,19 +115,19 @@ namespace ethercat_interface
         
             if(!slave_config_ptr)
             { 
-/*                 m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
+/*              m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
  */         }
 
             if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
             {
-                    
 /*                 m_Logger->log(ERROR, m_SlaveName, "Can't specify PDO configuration for the slave.");
- */            }
+ */            
+            }
             else
             {
-                   
-/*                 m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
- */            }
+                //std::cout << "Configured PDOs\n";       
+/*              m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
+ */         }
 
             if(ENABLE_DC)
             {
@@ -245,6 +256,7 @@ namespace ethercat_interface
             ec_pdo_info_t* pdos = new ec_pdo_info_t[2];
             pdos[0] = {RxPDO_start, RxPDO_size, entriesArray + 0};
             pdos[1] = {TxPDO_start, TxPDO_size, entriesArray + RxPDO_size};
+            std::cout << "Create slave PDOs: " << RxPDO_start << " " << RxPDO_size << " ," << TxPDO_start << " " << TxPDO_size << std::endl;
             return pdos;
         }                                                              
 
@@ -277,7 +289,7 @@ namespace ethercat_interface
         }
 
         // -----------------------------------
-        ec_pdo_info_t* createSlavePDOs(
+        /* ec_pdo_info_t* createSlavePDOs(
             std::vector<ec_pdo_entry_info_t>& entries_vector,
             uint16_t RxPDO_start,
             uint16_t TxPDO_start
@@ -289,7 +301,7 @@ namespace ethercat_interface
             {
                 *(slavePDOs + i) = {(uint16_t)(RxPDO_start + i), 1, &entries_vector[i]};
             }
-        }
+        } */
 
         // -----------------------------------
         ec_pdo_entry_reg_t* createDomainRegistries(

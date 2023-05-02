@@ -132,7 +132,7 @@ namespace ethercat_interface
                 this->createDomainPdoEntryRegistries(); 
             }
             else
-            {
+            {  
 /*                 m_Logger->log(FATAL, m_DomainName, "Can't register PDO entries.");
  */                
             }
@@ -163,7 +163,7 @@ namespace ethercat_interface
 
         }
 
-        ec_pdo_entry_reg_t* Domain::createDomainPdoEntryRegistries()
+        void Domain::createDomainPdoEntryRegistries()
         {   
             ec_pdo_entry_reg_t* temp = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
             int i = 0;
@@ -178,13 +178,14 @@ namespace ethercat_interface
 
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
-                    /* std::cout <<  std::hex <<(uint16_t)info.alias << " " <<
+                    const std::string currDataName = s.second->getOffset()->getDataName(j);
+                    /* std::cout << currDataName << std::hex <<(uint16_t)info.alias << " " <<
                         (uint16_t)info.position << " " <<
                         (uint32_t)info.vendorID << " " << 
                         (uint32_t)info.productCode << " " << 
-                        info.pdoEntryInfo.indexes[j] << std::endl; */
+                        info.pdoEntryInfo.indexes[j] << " " <<  (uint16_t)info.pdoEntryInfo.subindexes[j] << std::endl; */
                 
-                    const std::string currDataName = s.second->getOffset()->getDataName(j);
+                    
                     if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
                         *(temp + i) = {
                             (uint16_t)info.alias,
@@ -201,7 +202,7 @@ namespace ethercat_interface
                 
             }
             *(temp + m_NumOfPdoEntryRegistries -1) = {};
-
+            
             m_DomainPdoEntryRegistries = temp;
         }
     }

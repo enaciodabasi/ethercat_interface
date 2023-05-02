@@ -53,25 +53,29 @@ namespace ethercat_interface
             {   
                 std::vector<StartupInfo> startupInfo;
 
-                if(auto startup_config_doc = [&config_file_path](){
+                if(YAML::Node* startup_config_doc = [&config_file_path](){
                     const auto allDocs = YAML::LoadAllFromFile(static_cast<std::string>(config_file_path));
-                    YAML::Node startupNode;
+                    YAML::Node* startupNode = nullptr;
                     for(const auto& doc : allDocs)
                     {
                         if(const auto tempNode = doc["startup_config"])
                         {   
-                            startupNode = tempNode;
+                            startupNode = new YAML::Node(tempNode);
                         }
                         else
                             continue;
                     }
-
+                    
                     return startupNode;
                 }())
                 {
-                    
-                    for(const auto& startup_config : startup_config_doc)
+                    if(!startup_config_doc)
                     {
+                        return std::nullopt;
+                    }
+                    for(const auto& startup_config : *startup_config_doc)
+                    {   
+
                         StartupInfo tempSI;
                         
                         tempSI.slaveName = startup_config["slave_name"].as<std::string>();
@@ -93,6 +97,8 @@ namespace ethercat_interface
 
                         startupInfo.emplace_back(std::move(tempSI));
                     }
+
+                    delete startup_config_doc;
                 }
                 else
                 {
@@ -439,13 +445,16 @@ namespace ethercat_interface
                     conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
                     conf.pdoEntryInfo.bitLengths = doc["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
-                    conf.ioMappingInfo.RxPDO_Address = doc["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
-                    conf.ioMappingInfo.TxPDO_Address = doc["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
+                    //conf.ioMappingInfo.RxPDO_Address = doc["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
+                    //conf.ioMappingInfo.TxPDO_Address = doc["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
                     conf.ioMappingInfo.RxPDO_Size = doc["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
                     conf.ioMappingInfo.TxPDO_Size = doc["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
                     conf.ioMappingInfo.RxPDO_Indexes = doc["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
                     conf.ioMappingInfo.TxPDO_Indexes = doc["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
-
+                    conf.ioMappingInfo.RxPDO_Address = conf.ioMappingInfo.RxPDO_Indexes[0];
+                    conf.ioMappingInfo.TxPDO_Address = conf.ioMappingInfo.TxPDO_Indexes[0];
+                    //conf.ioMappingInfo.RxPDO_Size = conf.ioMappingInfo.RxPDO_Indexes.size();                        
+                    //conf.ioMappingInfo.TxPDO_Size = conf.ioMappingInfo.TxPDO_Indexes.size();
                     conf.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(doc["slave_sync_info"]["num_sync_managers"].as<int>());
                     conf.slaveSyncInfo.syncManagerDirections = doc["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();
                     conf.slaveSyncInfo.numPDOs = doc["slave_sync_info"]["number_of_pdos"].as<std::vector<uint>>();
