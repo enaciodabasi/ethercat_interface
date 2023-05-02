@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS -pthread)
 
 set(SOURCES
-    src/epos4_example.cpp
+    src/epos4.cpp
 )
 
 set(eci_headers /home/naci/Projects/igh_master/include)

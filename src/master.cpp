@@ -192,7 +192,7 @@ namespace ethercat_interface
             {
                 if(state.al_state != m_SlaveStates.al_state)
                 {
-                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Slave State: + state.al_state");
+                    m_Logger->log(INFO, std::string("Master " + m_MasterIndex), "Slave State: " + state.al_state);
                 }
                 if(state.online != m_SlaveStates.online)
                 {
@@ -213,11 +213,11 @@ namespace ethercat_interface
             for(const auto& d : m_RegisteredDomains)
             {
                 d.second->setLogger(m_Logger);
-                std::cout << "Set logger\n";
+
                 d.second->createDomain(m_EthercatMaster);
-                std::cout << "Created domain via master\n";
+                std::cout << "Created domain " << d.second->m_DomainName << std::endl;
                 d.second->configureSlaves();
-                std::cout << "Configured slaves of the domain\n";
+                std::cout << "Configured slaves of domain " << d.second->m_DomainName << std::endl;
             }
         }
 

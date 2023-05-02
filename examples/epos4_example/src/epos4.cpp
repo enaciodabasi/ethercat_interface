@@ -18,7 +18,7 @@ void EPOS4_Controller::cyclicTask()
 
         bool slavesEnabled = m_Master->enableSlaves();
 
-        m_Master->write<int8_t>("domain_1", "epos4", "op_mode", 0x09);
+        //m_Master->write<int8_t>("domain_1", "epos4", "op_mode", 0x09);
 
         
 

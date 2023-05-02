@@ -16,7 +16,7 @@ set(SOURCES
     include/ethercat_interface/dc_sync.h
     src/dc_sync.c
     src/logger.cpp
-    src/state_machine.cpp
+    #src/state_machine.cpp
     src/controller.cpp
     src/offset.cpp
     src/data.cpp
@@ -60,7 +60,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/ethercat_interface/utilities.hpp
     include/ethercat_interface/state.hpp
     include/ethercat_interface/dc_sync.h
-    include/ethercat_interface/state_machine.hpp
+    #include/ethercat_interface/state_machine.hpp
     include/ethercat_interface/controller.hpp
 )
 
