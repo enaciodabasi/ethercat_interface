@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "/home/naci/ethercat/include/**",
-                "/home/naci/Projects/igh_master/include/**"
+                "/home/naci/Projects/igh_master/include/**",
+                "/home/naci/Projects/igh_master/ethercat_config_gui/include/**"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

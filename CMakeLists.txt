@@ -85,3 +85,8 @@ add_executable(
 )
 target_link_libraries(offset_generator ${YAML_CPP_LIBRARIES})
 target_include_directories(offset_generator PUBLIC ${YAML_CPP_INCLUDE_DIRS})
+
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parsers
+    ${CMAKE_CURRENT_SOURCE_DIR}/xml_parsers/build
+)
