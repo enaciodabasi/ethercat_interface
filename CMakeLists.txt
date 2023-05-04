@@ -79,14 +79,19 @@ install(
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ethercat_interface
 )
 
-add_executable(
-    offset_generator
-    generator/offset_generator.cpp
-)
-target_link_libraries(offset_generator ${YAML_CPP_LIBRARIES})
-target_include_directories(offset_generator PUBLIC ${YAML_CPP_INCLUDE_DIRS})
+#add_executable(
+#    offset_generator
+#    generator/offset_generator.cpp
+#)
+#target_link_libraries(offset_generator ${YAML_CPP_LIBRARIES})
+#target_include_directories(offset_generator PUBLIC ${YAML_CPP_INCLUDE_DIRS})
 
 add_subdirectory(
     ${CMAKE_CURRENT_SOURCE_DIR}/xml_parsers
     ${CMAKE_CURRENT_SOURCE_DIR}/xml_parsers/build
 )
+
+add_subdirectory(
+    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui
+    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui/build
+    )
