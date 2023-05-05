@@ -18,9 +18,18 @@ namespace ethercat_config_gui
         : QWidget(parent)
     {
         m_LineDisplay = new EcLineDisplayWidget(this);
+        m_SlaveInfoWidget = new SlaveInfoWidget(this);
+
+        connect(
+            m_LineDisplay,
+            &EcLineDisplayWidget::networkRefreshed,
+            m_SlaveInfoWidget,
+            &SlaveInfoWidget::onNetworkRefreshed
+        );
 
         m_MainLayout = new QHBoxLayout();
         m_MainLayout->addWidget(m_LineDisplay);
+        m_MainLayout->addWidget(m_SlaveInfoWidget);
 
         this->setLayout(m_MainLayout);
     }

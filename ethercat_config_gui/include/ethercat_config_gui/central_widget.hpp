@@ -20,6 +20,7 @@
 #include <QProcess>
 
 #include "ethercat_config_gui/ec_line_display.hpp"
+#include "ethercat_config_gui/slave_info_widget.hpp"
 
 namespace ethercat_config_gui
 {
@@ -34,7 +35,7 @@ namespace ethercat_config_gui
         private:
 
         EcLineDisplayWidget* m_LineDisplay;
-
+        SlaveInfoWidget* m_SlaveInfoWidget;
 
         QHBoxLayout* m_MainLayout;
 

@@ -21,6 +21,8 @@ set(
     ${include_dir}/central_widget.hpp
     src/ec_line_display.cpp
     ${include_dir}/ec_line_display.hpp
+    src/slave_info_widget.cpp
+    ${include_dir}/slave_info_widget.hpp
     ${include_dir}/defs.hpp
 
 )
