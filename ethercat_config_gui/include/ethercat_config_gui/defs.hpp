@@ -9,6 +9,10 @@
  * 
  */
 
+
+#ifndef DEFS_HPP
+#define DEFS_HPP
+
 #include <QObject>
 #include <QString>
 
@@ -18,3 +22,5 @@ struct BasicSlaveInformation
     uint16_t slavePosition;
     uint16_t slaveAlias;
 }; Q_DECLARE_METATYPE(BasicSlaveInformation)  
+
+#endif // DEFS_HPP

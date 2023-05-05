@@ -27,6 +27,8 @@
 #include <thread>
 #include <optional>
 
+#include "ethercat_config_gui/defs.hpp"
+
 namespace ethercat_config_gui
 {
 
@@ -47,6 +49,8 @@ namespace ethercat_config_gui
 
         void refreshSlaveList();
 
+        void networkRefreshed(const QVector<BasicSlaveInformation>& basic_slave_info);
+
         private:
 
         QVBoxLayout* m_MainLayout;
@@ -56,6 +60,8 @@ namespace ethercat_config_gui
         QListWidget* m_SlaveListWidget;
 
         QStringList m_SlaveNameList;
+        
+        QVector<BasicSlaveInformation> m_BasicSlaveInfoContainer;
 
         void onScanNetworkBtnClicked();
         

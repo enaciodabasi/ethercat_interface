@@ -18,6 +18,7 @@ int main(int argc, char** argv)
 {   
 
     qRegisterMetaType<BasicSlaveInformation>();
+    qRegisterMetaType<QVector<BasicSlaveInformation>>();
 
     QApplication app(argc, argv);
 

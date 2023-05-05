@@ -1,6 +1,6 @@
 /**
  * @file ec_line_display.cpp
- * @author your name (you@domain.com)
+ * @author Eren Naci Odabasi (enaciodabasi@outlook.com)
  * @brief 
  * @version 0.1
  * @date 2023-05-04
@@ -80,6 +80,7 @@ void EcLineDisplayWidget::onRefreshSlaveList()
     for(QStringList::iterator it = m_SlaveNameList.begin(); it != m_SlaveNameList.end(); it++)
     {
         const QString slaveName = *it;
+        m_BasicSlaveInfoContainer.push_back({*it, 0, 0});
 
         m_SlaveListWidget->addItem(
             new QListWidgetItem(
@@ -87,6 +88,8 @@ void EcLineDisplayWidget::onRefreshSlaveList()
             )
         );
     }
+    
+    emit networkRefreshed(m_BasicSlaveInfoContainer);
 }
 
 std::optional<QString> scanEcNetwork()
