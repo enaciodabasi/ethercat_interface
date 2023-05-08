@@ -25,8 +25,11 @@ namespace parser
 
     
     struct Entry;   
+    struct Object;
 
     typedef std::vector<Entry> Entries;
+
+    typedef std::vector<Object> Objects;
 
     enum PdoType
     {
@@ -93,6 +96,27 @@ namespace parser
                 << std::endl;
         }
     };
+
+    struct Object
+    {
+    
+        std::string index;
+        std::string name;
+        std::string type;
+        std::string bitsize;
+        std::string accessFlag;
+
+        void toString()
+        {
+            std::cout 
+                << "Index: " << index
+                << "\nName: " << name
+                << "\nType: " << type
+                << "\nBit Size: " << bitsize
+                << "\nAccess: " << accessFlag
+                << std::endl;
+        }
+    };
     
 
     struct SlaveConfig
@@ -107,6 +131,8 @@ namespace parser
         std::vector<PdoInfo> txPDOs;
 
         std::vector<OpModeInfo> opModes;
+
+        Objects objects;
 
         void toString()
         {
@@ -126,6 +152,9 @@ namespace parser
             
             for(auto opmode : opModes)
                 opmode.toString();
+
+            for(auto object : objects)
+                object.toString();
         }
     };
 
@@ -140,7 +169,18 @@ namespace parser
         SlaveConfig* conf
     );
 
+    /**
+     * @brief Finds the operation mode configuration (Distributed Clock and Synchron Manager)
+     * 
+     * @param device_node Reference to the Device node in the XML file. 
+     * @param conf Pointer to the SlaveConfig struct to edit.
+     */
     void getOpModeInfo(
+        pugi::xml_node& device_node,
+        SlaveConfig* conf
+    );
+
+    void getObjects(
         pugi::xml_node& device_node,
         SlaveConfig* conf
     );

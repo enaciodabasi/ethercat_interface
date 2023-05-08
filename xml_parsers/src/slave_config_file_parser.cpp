@@ -75,7 +75,9 @@ namespace parser
         getPdoInfo(foundDeviceNode, conf);
 
         getOpModeInfo(foundDeviceNode, conf);
-        
+
+        getObjects(foundDeviceNode, conf);
+
         if(conf)
         {
             auto slaveConfig = *conf;
@@ -308,6 +310,32 @@ namespace parser
         
             conf->opModes.push_back(opModeInfo);
         }
+    }
+
+    void getObjects(
+        pugi::xml_node& device_node,
+        SlaveConfig* conf
+    )
+    {
+        const pugi::xml_node objectsNode = device_node.child("Profile").child("Dictionary").child("Objects");
+        
+        Objects tempObjects;
+
+        for(pugi::xml_node object = objectsNode.first_child(); object; object = object.next_sibling())
+        {   
+            Object obj;
+
+            obj.index = object.child("Index").child_value();
+            obj.name = object.child("Name").child_value();
+            obj.type = object.child("Type").child_value();
+            obj.bitsize = object.child("BitSize").child_value();
+            obj.accessFlag = object.child("Info").child("Access").child_value();
+
+            tempObjects.push_back(obj);
+        }
+
+        conf->objects = tempObjects;
+
     }
 
 }
