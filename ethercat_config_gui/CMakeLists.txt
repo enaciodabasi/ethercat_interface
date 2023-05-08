@@ -7,6 +7,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(xml_parsers_LIB /home/$ENV{USER}/Projects/igh_master/xml_parsers/build/libxml_parsers.a)
+
 find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
 find_package(Threads REQUIRED)
 
@@ -31,5 +33,5 @@ add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
 )
-target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Threads::Threads)
+target_link_libraries(${PROJECT_NAME} Qt5::Core Qt5::Widgets Threads::Threads ${xml_parsers_LIB})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
