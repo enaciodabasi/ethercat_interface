@@ -62,10 +62,7 @@ namespace ethercat_interface
             std::optional<T> get(const std::string& data_name);
 
             template<typename T>
-            const T get(const std::string& data_name);
-
-            template<typename T>
-            bool set(const std::string& data_name, T& new_val);
+            bool set(const std::string& data_name, const T new_val);
 
             private:
 
@@ -105,7 +102,7 @@ namespace ethercat_interface
         }
 
         template<typename T>
-        bool DataContainer::set(const std::string& data_name, T& new_val)
+        bool DataContainer::set(const std::string& data_name, const T new_val)
         {
             std::unique_lock<std::mutex>(m_MutexRW);
 
