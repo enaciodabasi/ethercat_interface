@@ -15,40 +15,72 @@ namespace ethercat_interface
 {
     namespace PDO
     {
-        template<class Ps>
-        Data<Ps>::Data()
+        
+        DataContainer::DataContainer(const std::string& owner_name)
+            : m_OwnerName(owner_name)
         {
-
+            
         }
 
-        template<class Ps>
-        Data<Ps>::~Data()
+        DataContainer::DataContainer(
+            const std::string& owner_name,
+            const std::vector<std::pair<std::string, ethercat_interface::EC_Type>>& pdo_info
+        )   : m_OwnerName(owner_name)
         {
-
-        }
-
-        template<class Ps>
-        std::shared_ptr<Ps> Data<Ps>::getData()
-        {
-            std::lock_guard<std::mutex> lg(m_MutexRW);
-            if(m_PdoDataQueue.empty()) // If there is no data in the queue, return an empty shared_ptr (== nullptr)
+            for(const auto& pdo : pdo_info)
             {
-                return std::shared_ptr<Ps>();
+                switch (pdo.second)
+                {
+                case EC_Type::UINT8:
+                    /* m_Data.push_back(new Data<uint8_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = uint8_t();
+                break;
+                case EC_Type::UINT16:
+                    /* m_Data.push_back(new Data<uint16_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = uint16_t();
+                break;
+                case EC_Type::UINT32:
+                    /* m_Data.push_back(new Data<uint32_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = uint32_t();
+                break;
+                case EC_Type::UINT64:
+                    /* m_Data.push_back(new Data<uint64_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = uint64_t();
+                break;
+                case EC_Type::INT8:
+                    /* m_Data.push_back(new Data<int8_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = int8_t();
+                break;
+                case EC_Type::INT16:
+                    /* m_Data.push_back(new Data<int16_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = int16_t();
+                break;
+                case EC_Type::INT32:
+                    /* m_Data.push_back(new Data<int32_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = int32_t();
+                break;
+                case EC_Type::INT64:
+                    /* m_Data.push_back(new Data<int64_t>(pdo.first)); */
+                    m_DataMap[pdo.first] = int64_t();
+                break;
+                case EC_Type::FLOAT:
+                    /* m_Data.push_back(new Data<float>(pdo.first)); */
+                    m_DataMap[pdo.first] = float();
+                break;
+                case EC_Type::DOUBLE:
+                    /* m_Data.push_back(new Data<double>(pdo.first)); */
+                    m_DataMap[pdo.first] = double();
+                break;
+                case EC_Type::BIT:
+                    /* m_Data.push_back(new Data<bool>(pdo.first)); */
+                    m_DataMap[pdo.first] = bool();
+                break;
+                default:
+                    break;
+                }
             }
-            std::shared_ptr<Ps> latestPdoData = m_PdoDataQueue.front();
 
-            m_PdoDataQueue.pop(); // Remove PDO data struct from the queue.
 
-            return latestPdoData;
-        }
-
-        template<class Ps>
-        bool Data<Ps>::writeData(Ps pdo_data_to_write)
-        {
-            std::shared_ptr<Ps> newData = std::make_shared<Ps>(std::move(pdo_data_to_write));
-
-            std::lock_guard<std::mutex> lg(m_MutexRW);
-            m_PdoDataQueue.push(newData);
         }
     }
 }
