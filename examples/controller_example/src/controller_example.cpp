@@ -56,6 +56,7 @@ void ControllerExample::cyclicTask()
         );
 
         
+        
         if(slavesEnabled)
         {
                 auto leftWheelPosOpt = m_Master->read<int32_t>("domain_1", "EL7221_9015_0", "current_position");

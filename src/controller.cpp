@@ -90,6 +90,25 @@ namespace ethercat_interface
 
             m_Master->setupDomains();    
 
+
+            for(const auto config : slaveConfigs)
+            {   
+                const std::string dataOwnerName = config.slaveName;
+
+                std::unique_ptr<PDO::DataContainer> tempPdo(new PDO::DataContainer(
+                        dataOwnerName,
+                        config.pdoInfo
+                    ));
+
+                m_SharedData.insert(std::make_pair(dataOwnerName, std::move(tempPdo)));
+
+                /* for(const auto pdoInfo : config.pdoInfo)
+                {
+                    
+                    
+                } */
+            }
+
             m_DcHelper.periodNanoSec = period_nanosec(controllerConfig.cyclePeriod);
             m_DcHelper.cycleTime = {0, m_DcHelper.periodNanoSec};
             m_DcHelper.referenceClockCounter = 0;
@@ -107,7 +126,7 @@ namespace ethercat_interface
             {
                 return true;
             }
-
+            
             for(auto& startup_config : startup_configs) // Iterate over all startup configurations
             {
                 const std::string slaveNameTemp = startup_config.slaveName;

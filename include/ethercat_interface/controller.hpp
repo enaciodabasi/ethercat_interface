@@ -91,11 +91,26 @@ namespace ethercat_interface
              */
             virtual bool setup();
 
+            template<typename T>
+            std::optional<T> getData(
+                const std::string& owner_name,
+                const std::string& data_name
+            );
+
+            template<typename T>
+            bool setData(
+                const std::string& owner_name,
+                const std::string& data_name,
+                const T& new_val
+            );
+
             protected:
 
             std::unique_ptr<master::Master> m_Master;
 
             std::thread m_CyclicTaskThread;
+
+            std::unordered_map<std::string, std::unique_ptr<PDO::DataContainer>> m_SharedData;
 
             bool m_IsThreadRunning;
 
@@ -146,7 +161,7 @@ namespace ethercat_interface
                 return false;
 
             }
-
+            
             void setTaskWakeUpTime();
 
             private:
@@ -163,6 +178,36 @@ namespace ethercat_interface
             } m_ThreadInfo;
         
         };
+
+        template<typename T>
+        std::optional<T> Controller::getData(
+            const std::string& owner_name,
+            const std::string& data_name
+        )
+        {
+            auto owner = m_SharedData.find(owner_name);
+            if(owner == m_SharedData.end())
+            {
+                return std::nullopt;
+            }
+            return owner->second->get<T>(data_name);
+        }
+
+        template<typename T>
+        bool Controller::setData(
+            const std::string& owner_name,
+            const std::string& data_name,
+            const T& new_val
+        )
+        {   
+            auto owner = m_SharedData.find(owner_name);
+            if(owner == m_SharedData.end())
+            {
+                return false;
+            }
+
+            return owner->second->set(data_name, new_val);
+        }
 
     } // End of namespace controller
 
