@@ -32,6 +32,22 @@
 namespace ethercat_interface
 {
 
+    enum EC_Type
+    {
+            UINT8,
+            UINT16,
+            UINT32,
+            UINT64,
+            INT8,
+            INT16,
+            INT32,
+            INT64,
+            FLOAT,
+            DOUBLE,
+            BIT,
+            UNDEFINED
+    };
+
     struct SlaveSyncInfo
         {
             SlaveSyncInfo();
@@ -152,23 +168,10 @@ namespace ethercat_interface
 
     typedef std::pair<uint16_t, uint8_t> SDO_Info;
     
+    
     namespace
     {
-        enum EC_Type
-        {
-            UINT8,
-            UINT16,
-            UINT32,
-            UINT64,
-            INT8,
-            INT16,
-            INT32,
-            INT64,
-            FLOAT,
-            DOUBLE,
-            BIT,
-            UNDEFINED
-        };
+        
 
         std::vector<std::pair<std::string, EC_Type>> EC_TYPE_STRING_PAIRS = {
             {"uint8", EC_Type::UINT8},
@@ -212,7 +215,7 @@ namespace ethercat_interface
         void deduceDataType(const std::string& data_type_str);
 
     };
-
+    typedef std::vector<std::pair<std::string, EC_Type>> PdoInfo;
     struct SlaveInfo
     {
         SlaveInfo();
@@ -232,6 +235,7 @@ namespace ethercat_interface
         std::variant<bool, DC_Info> dcInfo;
 
         std::vector<std::string> pdoNames;
+        PdoInfo pdoInfo;
         
         void toString()
         {

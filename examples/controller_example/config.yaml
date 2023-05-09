@@ -86,6 +86,17 @@ pdo_names:
  - "current_torque"
  - "info_data"
  - "op_mode_display"
+# Must be in the same order with pdo_names
+pdo_types: 
+ - uint16
+ - int32
+ - uint8
+ - 
+ -
+ -
+ -
+ -
+ -
 
 pdo_entry_info:
  indexes:

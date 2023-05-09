@@ -438,7 +438,61 @@ namespace ethercat_interface
                     }
 
                     conf.pdoNames = doc["pdo_names"].as<std::vector<std::string>>();
+                    
+                    std::optional<PdoInfo> pdoInfo = [&doc]() -> std::optional<PdoInfo>{
+                        PdoInfo tempPdoInfo;
 
+                        const auto pdoNames = doc["pdo_names"].as<std::vector<std::string>>();
+                        const auto pdoTypeStrs = doc["pdo_types"].as<std::vector<std::string>>();
+                        if(pdoNames.size() != pdoTypeStrs.size())
+                        {
+                            return std::nullopt;
+                        }
+
+                        const auto pdoTypes = [&pdoTypeStrs]() -> std::vector<EC_Type>{
+                            std::vector<EC_Type> tempPdoTypes;
+
+                            for(std::size_t i = 0; i < pdoTypeStrs.size(); i++)
+                            {
+                                const std::string currStr = pdoTypeStrs[i];
+
+                                auto type = std::find_if(
+                                EC_TYPE_STRING_PAIRS.begin(),
+                                EC_TYPE_STRING_PAIRS.end(),
+                                [&currStr](const std::pair<std::string, EC_Type>& p)
+                                    {
+                                        return p.first == currStr;
+                                    }
+                                );
+
+                                if(type == EC_TYPE_STRING_PAIRS.end())
+                                {
+                                    tempPdoTypes.emplace_back(EC_Type::UNDEFINED);
+                                    continue;
+                                }
+
+                                tempPdoTypes.emplace_back(type->second);
+                            }
+
+                            return tempPdoTypes;
+                        }();
+
+                        if(pdoTypes.empty())
+                        {
+                            return std::nullopt;
+                        }
+                        for(std::size_t i = 0; i < pdoNames.size(); i++)
+                        {
+                            tempPdoInfo.emplace_back(std::make_pair(pdoNames[i], pdoTypes[i]));
+                        }
+
+                        return tempPdoInfo; 
+                    }();
+
+                    if(pdoInfo != std::nullopt)
+                    {
+                        conf.pdoInfo = pdoInfo.value();
+                    }
                     
 
                     conf.pdoEntryInfo.indexes = doc["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
