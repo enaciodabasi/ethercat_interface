@@ -62,6 +62,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     include/ethercat_interface/dc_sync.h
     #include/ethercat_interface/state_machine.hpp
     include/ethercat_interface/controller.hpp
+    include/ethercat_interface/data.hpp
 )
 
 set_target_properties(${PROJECT_NAME}

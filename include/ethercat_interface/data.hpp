@@ -53,7 +53,7 @@ namespace ethercat_interface
                 const std::vector<std::pair<std::string, ethercat_interface::EC_Type>>& pdo_info
             );
 
-            ~DataContainer();
+            ~DataContainer(){};
 
             template<typename T>
             bool createData(const std::string& new_data_name);
