@@ -92,7 +92,7 @@ add_subdirectory(
     ${CMAKE_CURRENT_SOURCE_DIR}/xml_parsers/build
 )
 
-add_subdirectory(
-    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui
-    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui/build
-    )
+#add_subdirectory(
+#    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui
+#    ${CMAKE_CURRENT_SOURCE_DIR}/ethercat_config_gui/build
+#    )

@@ -154,8 +154,11 @@ namespace ethercat_interface
                 return false;
             }
 
-            m_Status = statusOpt.value();
-            std::cout << m_Status << std::endl;
+            auto status = statusOpt.value();
+            if(status != m_Status)
+                std::cout << m_Status << std::endl;
+
+            m_Status = status;
             //std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
