@@ -17,6 +17,8 @@
 #include <shared_mutex>
 #include <optional>
 #include <any>
+#include <chrono>
+#include <sstream>
 
 #include <pthread.h>
 
@@ -46,7 +48,28 @@ namespace ethercat_interface
             };
             template<class... Ts> Overload(Ts...) -> Overload<Ts...>;
         }  */  
+        
+        typedef std::vector<std::pair<std::string, std::vector<std::string>>> debugDataInfo;
 
+        struct displayInfo_t
+        {
+            displayInfo_t(debugDataInfo data_names)
+            {
+                
+                namesOfDataToDisplay = data_names;
+
+                timestamp = std::chrono::high_resolution_clock::now();
+
+            }
+
+            debug::TimeMeasureInfo_s m_TimeMeasurer;
+
+            const std::chrono::seconds oneSec = std::chrono::seconds(1);
+
+            std::chrono::time_point<std::chrono::high_resolution_clock> timestamp;
+
+            debugDataInfo namesOfDataToDisplay;
+        };
         /**
          * @brief Semi-abstract class to implement an EtherCAT control loop.
          * 
@@ -110,7 +133,7 @@ namespace ethercat_interface
 
             std::thread m_CyclicTaskThread;
 
-            std::unordered_map<std::string, std::unique_ptr<PDO::DataContainer>> m_SharedData;
+            std::unordered_map<std::string, std::shared_ptr<PDO::DataContainer>> m_SharedData;
 
             bool m_IsThreadRunning;
 
@@ -166,15 +189,17 @@ namespace ethercat_interface
 
             private:
 
+            void displayInfo(displayInfo_t& di);
+
             std::string m_PathToConfigFile;
         
             std::vector<StartupInfo> m_StartupInfos;
-
+            
             struct
             {
-                sched_param schedParam;
                 int threadPolicy = SCHED_FIFO;
                 int threadPriority = 19;
+                sched_param schedParam;
             } m_ThreadInfo;
         
         };

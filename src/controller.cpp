@@ -95,13 +95,13 @@ namespace ethercat_interface
             {   
                 const std::string dataOwnerName = config.slaveName;
 
-                std::unique_ptr<PDO::DataContainer> tempPdo(new PDO::DataContainer(
+                std::shared_ptr<PDO::DataContainer> tempPdo(new PDO::DataContainer(
                         dataOwnerName,
                         config.pdoInfo
                     ));
 
                 m_SharedData.insert(std::make_pair(dataOwnerName, std::move(tempPdo)));
-
+                
                 /* for(const auto pdoInfo : config.pdoInfo)
                 {
                     
@@ -303,6 +303,7 @@ namespace ethercat_interface
 
         bool Controller::updateThreadInfo()
         {
+            setThreadParams(SCHED_FIFO, 99);
             if(pthread_setschedparam(m_CyclicTaskThread.native_handle(), m_ThreadInfo.threadPolicy, &m_ThreadInfo.schedParam))
             {
                 return false;
@@ -314,6 +315,33 @@ namespace ethercat_interface
         void Controller::setTaskWakeUpTime()
         {
             m_DcHelper.wakeupTime = addTimespec(m_DcHelper.wakeupTime, m_DcHelper.cycleTime);
+        }
+
+        void Controller::displayInfo(displayInfo_t& di)
+        {
+            debug::measureTime(di.m_TimeMeasurer, this->m_DcHelper.wakeupTime);
+            
+            const auto currentTime = std::chrono::high_resolution_clock::now();
+            const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - di.timestamp);
+            di.timestamp = currentTime;
+            if(elapsedTime.count() < di.oneSec.count())
+            {
+                return;
+            }
+        
+            const auto timingStats = di.m_TimeMeasurer.getTimingStats();
+
+            std::cout << timingStats << std::endl;
+
+            /* std::stringstream infoSstream;
+
+            std::thread gatherInfoOfRequestedDataT(
+                [&infoSstream, this](){
+
+                },
+                this
+            ); */
+        
         }
 
     } // End of namespace controller
