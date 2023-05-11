@@ -53,20 +53,21 @@ namespace ethercat_interface
 
         struct displayInfo_t
         {
-            displayInfo_t(debugDataInfo data_names)
+            displayInfo_t();
+            /* displayInfo_t(debugDataInfo data_names)
             {
                 
                 namesOfDataToDisplay = data_names;
 
                 timestamp = std::chrono::high_resolution_clock::now();
 
-            }
+            } */
 
             debug::TimeMeasureInfo_s m_TimeMeasurer;
 
             const std::chrono::seconds oneSec = std::chrono::seconds(1);
 
-            std::chrono::time_point<std::chrono::high_resolution_clock> timestamp;
+            std::chrono::high_resolution_clock::time_point timestamp;
 
             debugDataInfo namesOfDataToDisplay;
         };
@@ -186,10 +187,10 @@ namespace ethercat_interface
             }
             
             void setTaskWakeUpTime();
+            
+            void displayInfo(displayInfo_t& di);
 
             private:
-
-            void displayInfo(displayInfo_t& di);
 
             std::string m_PathToConfigFile;
         

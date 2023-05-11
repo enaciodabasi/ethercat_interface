@@ -319,16 +319,19 @@ namespace ethercat_interface
 
         void Controller::displayInfo(displayInfo_t& di)
         {
+            using namespace std::chrono_literals;
+            
             debug::measureTime(di.m_TimeMeasurer, this->m_DcHelper.wakeupTime);
             
             const auto currentTime = std::chrono::high_resolution_clock::now();
             const auto elapsedTime = std::chrono::duration_cast<std::chrono::seconds>(currentTime - di.timestamp);
-            di.timestamp = currentTime;
-            if(elapsedTime.count() < di.oneSec.count())
+            
+            if(elapsedTime < 1s) // TODO: Make limit configurable.
             {
+
                 return;
             }
-        
+            di.timestamp = currentTime;
             const auto timingStats = di.m_TimeMeasurer.getTimingStats();
 
             std::cout << timingStats << std::endl;
