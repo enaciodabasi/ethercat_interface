@@ -320,7 +320,7 @@ namespace ethercat_interface
         void Controller::displayInfo(displayInfo_t& di)
         {
             using namespace std::chrono_literals;
-            
+
             debug::measureTime(di.m_TimeMeasurer, this->m_DcHelper.wakeupTime);
             
             const auto currentTime = std::chrono::high_resolution_clock::now();
@@ -328,7 +328,6 @@ namespace ethercat_interface
             
             if(elapsedTime < 1s) // TODO: Make limit configurable.
             {
-
                 return;
             }
             di.timestamp = currentTime;

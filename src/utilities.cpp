@@ -43,6 +43,14 @@ namespace ethercat_interface
                     controllerInfo.numOfDomains = (uint)domain_names.size();
                     controllerInfo.logDirPath = logDirPath;
                     controllerInfo.cyclePeriod = cyclePeriod;
+
+                    if(const auto debugInfo = controller_config_doc["debug_info"])
+                    {
+                        int debugPeriod = debugInfo["print_diagnostics_period"].as<int>();
+
+                        
+
+                    }
                 }
                 std::cout << "Passed controller config\n";
                 return controllerInfo;
@@ -432,9 +440,21 @@ namespace ethercat_interface
                     {
                         conf.slaveType = SlaveType::Driver;
                     }
-                    else if(typeStr == "io" || typeStr == "IO" || typeStr == "Io")
+                    else if(typeStr == "DigitalInput")
                     {
-                        conf.slaveType = SlaveType::IO;
+                        conf.slaveType = SlaveType::DigitalInput;
+                    }
+                    else if(typeStr == "DigitalOutput")
+                    {   
+                        conf.slaveType = SlaveType::DigitalOutput;
+                    }
+                    else if(typeStr == "AnalogInput")
+                    {
+                        conf.slaveType = SlaveType::AnalogInput;
+                    }
+                    else if(typeStr == "AnalogOutput")
+                    {
+                        conf.slaveType = SlaveType::AnalogOutput;
                     }
 
                     conf.pdoNames = doc["pdo_names"].as<std::vector<std::string>>();

@@ -32,11 +32,33 @@ startup_config:
 ---
 
 controller_config:
+ 
  domain_names:
   - domain_1
  log_directory_path: "/home/naci/Projects/igh_master/logs/"
  cycle_period: 500
 
+ debug_info:
+  print_diagnostics_period: 1 # log period in seconds.
+  keep_track_of:
+    - 
+     owner_name: EL7221_9015_0
+     data_name: current_position
+    - 
+     owner_name: EL7221_9015_0 
+     data_name: current_velocity
+    - 
+     owner_name: EL7221_9015_0
+     data_name: info_data
+    - 
+     owner_name: EL7221_9015_1 
+     data_name: current_position
+    - 
+     owner_name: EL7221_9015_1
+     data_name: current_velocity
+    - 
+     owner_name: EL7221_9015_1  
+     data_name: info_data
 ...
 ---
 slave_name: "EK1100_0"

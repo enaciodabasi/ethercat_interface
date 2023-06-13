@@ -26,6 +26,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "defs.hpp"
 #include "ecrt.h"
 
 
@@ -90,12 +91,7 @@ namespace ethercat_interface
             }
         };
 
-        enum class SlaveType
-        {
-            Coupler,
-            Driver,
-            IO
-        };
+        
 
         struct DC_Info
         {
@@ -164,6 +160,8 @@ namespace ethercat_interface
         uint numOfDomains;
         std::string logDirPath;
         uint16_t cyclePeriod;
+        int debugPeriod = 0;
+        std::vector<std::pair<std::string, std::vector<std::string>>> dataToDebug;
     };
 
     typedef std::pair<uint16_t, uint8_t> SDO_Info;
