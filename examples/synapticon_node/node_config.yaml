@@ -1,0 +1,100 @@
+---
+startup_config:
+
+...
+---
+controller_config:
+
+  domain_names:
+    - domain_0
+  log_directory_path: "/home/naci/Projects/igh_master/logs/"
+  cycle_period: 500
+...
+---
+slave_name: "somanet_node"
+slave_type: "driver"
+num_of_slaves: 1
+domain_name: "domain_0"
+vendor_id: 0x000022d2
+product_id: 0x00000201
+slave_position: 0
+slave_alias: 0
+pdo_names:
+  - "ctrl_word"
+  - "op_mode"
+  - "target_position"
+  - "target_velocity"
+  - "status_word"
+  - "actual_position"
+  - "actual_velocity"
+pdo_types:
+  - uint16
+  - uint8
+  - int32
+  - int32
+  - uint16
+  - int32
+  - int32
+pdo_entry_info:
+  indexes:
+    - 0x6040
+    - 0x6060
+    - 0x607a
+    - 0x60ff
+    - 0x6041
+    - 0x6064
+    - 0x606c
+  subindexes:
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+  bit_lengths:
+    - 16
+    - 8
+    - 32
+    - 32
+    - 16
+    - 32
+    - 32
+  rxpdo_address: 0x1600
+  txpdo_address: 0x1A00
+  rxpdo_indexes:
+   - 0x1600
+  rxpdo_size: 4
+  txpdo_indexes:
+    - 0x1A00
+  txpdo_size: 3
+slave_sync_info:
+  num_sync_managers: 4
+  sync_manager_directions:
+    - 1
+    - 2
+    - 1
+    - 2
+  number_of_pdos:
+    - 0
+    - 0
+    - 1
+    - 1
+  pdo_index_diff:
+    - "NULL"
+    - "NULL"
+    - 0
+    - 1
+  watchdog_mode:
+    - 2
+    - 2
+    - 1
+    - 2
+dc_info:
+  assign_activate: 0x300
+  sync0_cycle: 2000000
+  sync0_shift: 0
+  sync1_cycle: 2000000
+  sync1_shift: 0
+
+...
