@@ -114,7 +114,7 @@ namespace ethercat_interface
             std::vector<uint16_t> TxPDO_Indexes;
             void toString()
             {
-                std::cout << "RxPDO Indexes:";
+                /* std::cout << "RxPDO Indexes:";
                 for(auto r : RxPDO_Indexes)
                 {
                     std::cout << "\n" << r << " ";
@@ -123,7 +123,9 @@ namespace ethercat_interface
                 for(auto t : TxPDO_Indexes)
                 {
                     std::cout << "\n" << t << " ";
-                }
+                } */
+                std::cout << "RxPDO Address: " << RxPDO_Address << std::endl;
+                std::cout << "TxPDO Address: " << TxPDO_Address << std::endl;  
             }
         };
 

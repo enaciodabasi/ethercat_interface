@@ -519,8 +519,8 @@ namespace ethercat_interface
                     conf.pdoEntryInfo.subindexes = toHexadecimal(doc["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
                     conf.pdoEntryInfo.bitLengths = doc["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
                 
-                    //conf.ioMappingInfo.RxPDO_Address = doc["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
-                    //conf.ioMappingInfo.TxPDO_Address = doc["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
+                    conf.ioMappingInfo.RxPDO_Address = doc["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
+                    conf.ioMappingInfo.TxPDO_Address = doc["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
                     conf.ioMappingInfo.RxPDO_Size = doc["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
                     conf.ioMappingInfo.TxPDO_Size = doc["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
                     conf.ioMappingInfo.RxPDO_Indexes = doc["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();

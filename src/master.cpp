@@ -242,7 +242,6 @@ namespace ethercat_interface
                 return false; // Can't find domain with the given name in the slave configuration.
             }
 
-            std::cout << slave_config.slaveName << std::endl;
             found->second->registerSlave(new slave::Slave(slave_config));
 
             return true;

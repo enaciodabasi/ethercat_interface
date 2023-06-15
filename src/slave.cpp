@@ -68,7 +68,7 @@ namespace ethercat_interface
             ;
 
             if(m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() == 1 && m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size() == 1)
-            {
+            {   
                 m_SlavePDOs = createSlavePDOs(
                     m_SlavePdoEntries,
                     m_SlaveInfo.ioMappingInfo.RxPDO_Address,
@@ -151,11 +151,12 @@ namespace ethercat_interface
             auto statusOpt = this->readFromSlave<uint16_t>("status_word");
             if(statusOpt == std::nullopt)
             {
+                std::cout << "Status word nullopt\n";
                 return false;
             }
 
             auto status = statusOpt.value();
-            if(status != m_Status)
+            /* if(status != m_Status) */
                 std::cout << m_Status << std::endl;
 
             m_Status = status;
@@ -167,7 +168,7 @@ namespace ethercat_interface
              */
  
             if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
-            {
+            {   
                 return true;
             }
 
@@ -175,19 +176,19 @@ namespace ethercat_interface
             {
                 if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
                 {   
-                    //std::cout << "Switch on disabled\n";
+                    std::cout << "Switch on disabled\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
                 {
-                    //std::cout << "Ready To switch on\n";
+                    std::cout << "Ready To switch on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
                 else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
                 {
-                    //std::cout << "Switched on\n";
+                    std::cout << "Switched on\n";
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
                     return false;
                 }

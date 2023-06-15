@@ -125,7 +125,7 @@ namespace ethercat_interface
 
             if(m_NumOfPdoEntryRegistries != 0)
             {   
-                    std::cout << m_NumOfPdoEntryRegistries << std::endl;
+                    std::cout << "Number of PDO registries: " << m_NumOfPdoEntryRegistries << std::endl;
 /*                 m_Logger->log(INFO, m_DomainName, "Registering PDO entries of the domain.");
  */                // + 1 is for adding the empty entry registry at the end of the array.
                 m_DomainPdoEntryRegistries = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];
@@ -179,12 +179,9 @@ namespace ethercat_interface
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
                     const std::string currDataName = s.second->getOffset()->getDataName(j);
-                    /* std::cout << currDataName << std::hex <<(uint16_t)info.alias << " " <<
-                        (uint16_t)info.position << " " <<
-                        (uint32_t)info.vendorID << " " << 
-                        (uint32_t)info.productCode << " " << 
-                        info.pdoEntryInfo.indexes[j] << " " <<  (uint16_t)info.pdoEntryInfo.subindexes[j] << std::endl; */
-                
+                    /* std::cout << currDataName << " " <<
+                        info.pdoEntryInfo.indexes[j] << " " <<  (uint16_t)info.pdoEntryInfo.subindexes[j] << std::endl;
+                 */
                     
                     if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
                         *(temp + i) = {
