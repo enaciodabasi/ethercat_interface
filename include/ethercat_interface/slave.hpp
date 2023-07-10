@@ -258,6 +258,10 @@ namespace ethercat_interface
 
             SlaveStatus m_Status; // Status Word read from the EtherCAT master.
 
+            bool m_StatusWordSeventhBit = false;
+
+            uint16_t m_FaultResetRetries = 0;
+
             state_machine::CIA402::StateMachine* m_StateMachine;
 
         };

@@ -49,7 +49,7 @@ namespace ethercat_interface
             QuickStop = 0x02, // Activates Quick Stop.
             DisableOperation = 0x01f, // Disables the operation
             DisableVoltage = 0x01, // Inhibits the output stages of the controller.
-            ResetFault = 0x80 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
+            ResetFault = 0x0080 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
         };
 
         inline const uint16_t getCommandValue(const ControlCommand& ctrl_cmd)

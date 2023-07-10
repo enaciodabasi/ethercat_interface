@@ -16,8 +16,12 @@ SomanetNode::SomanetNode(const std::string& config_file_path)
 void SomanetNode::cyclicTask()
 {   
     clock_gettime(m_DcHelper.clock, &m_DcHelper.wakeupTime);
+    int i = 0;
+    int32_t pos  = 0;
+
     while(run)
     {
+        std::cout << "---------------------------------------" << std::endl;
         this->setTaskWakeUpTime();
         sleep_task(
             m_DcHelper.clock,
@@ -41,32 +45,55 @@ void SomanetNode::cyclicTask()
         bool slavesEnabled = m_Master->enableSlaves();
 
 
+        
         this->m_Master->write<int8_t>(
                 "domain_0",
                 "somanet_node",
                 "op_mode",
-                0x09
+                0x08
         );
 
         
-        
+
         if(slavesEnabled)
         {
-            std::cout << "Slaves enabled\n";
             auto leftWheelPosOpt = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_position");
             
             if(leftWheelPosOpt != std::nullopt)
             {
-                std::string posOutMsg = "Left Wheel Position: " + std::to_string(leftWheelPosOpt.value());
-                std::cout << posOutMsg << std::endl;
+                std::string posOutMsg = "Current Position: " + std::to_string(leftWheelPosOpt.value());
+                
+                
+                pos = leftWheelPosOpt.value();
+                std::cout << posOutMsg << " Target: " << pos + 500 << std::endl;
+            }
+
+            auto lifterVel = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_velocity");
+            if(lifterVel != std::nullopt)
+            {
+                std::string velOutMsg = "Current velocity" + std::to_string(lifterVel.value());
+                std::cout << velOutMsg << std::endl;
+            }
+
+            auto error_code = m_Master->read<uint16_t>("domain_0", "somanet_node", "error_code");
+            if(error_code != std::nullopt)
+            {
+                std:: cout << std::hex << "Error Code: " << error_code.value() << std::endl;
+            }
+
+            auto following_error = m_Master->read<int32_t>("domain_0", "somanet_node", "following_error");
+            if(following_error != std::nullopt)
+            {
+                std::cout << std::dec << "Following Error: " << following_error.value() << std::endl;
             }
 
         }
 
         // Write
         if(slavesEnabled)
-        {
-            m_Master->write<int32_t>("domain_0", "somanet_node", "target_velocity", 100);
+        {   
+                m_Master->write<int32_t>("domain_0", "somanet_node", "target_position", pos+500);
+            /* std::cout << std::to_string(pos+2000) << std::endl; */
         }
 
        /*
@@ -78,7 +105,8 @@ void SomanetNode::cyclicTask()
         clock_gettime(m_DcHelper.clock, &m_DcHelper.currentTime);
         m_Master->syncMasterClock(timespecToNanoSec(m_DcHelper.currentTime), m_DcHelper);
         m_Master->send("domain_0");
-
+        i += 1;
+        std::cout << "---------------------------------------" << std::endl;
 
     }
 }

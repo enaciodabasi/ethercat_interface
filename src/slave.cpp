@@ -156,10 +156,16 @@ namespace ethercat_interface
             }
 
             auto status = statusOpt.value();
-            /* if(status != m_Status) */
+            if(status != m_Status)
                 std::cout << m_Status << std::endl;
 
             m_Status = status;
+            
+            const auto seventhBit = readFromSlave<bool>("status_word", 7);
+            if(seventhBit != std::nullopt)
+            {
+                m_StatusWordSeventhBit = seventhBit.value();
+            }
             //std::cout << "Status Word: " << m_Status << std::endl;
             /*
                 Switch on disabled -> Ready to switch on : Shutdown command.
@@ -169,6 +175,7 @@ namespace ethercat_interface
  
             if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
             {   
+                /* std::cout << "Operation Enabled\n"; */
                 return true;
             }
 
@@ -176,28 +183,50 @@ namespace ethercat_interface
             {
                 if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
                 {   
-                    std::cout << "Switch on disabled\n";
+                    /* std::cout << "Switch on disabled\n"; */
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
                     return false;
                 }
                 else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
                 {
-                    std::cout << "Ready To switch on\n";
+                    /* std::cout << "Ready To switch on\n"; */
                     writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
                     return false;
                 }
                 else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
                 {
-                    std::cout << "Switched on\n";
-                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::EnableOperation));
+                    /* std::cout << "Switched on\n"; */
+                    writeToSlave<uint16_t>("ctrl_word", 0x000f);
                     return false;
                 }
                 
             }
             else
             {
-                if(!isStatusCorrect(m_Status, StatusType::FaultResponseActive))
-                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::ResetFault));
+                if((m_Status & 0x0008) && !(m_Status & 0x0007))
+                {   
+                    /* std::cout << "Fault Response not active\n"; */
+                    writeToSlave<uint16_t>("ctrl_word", 0x0080);
+
+                    m_FaultResetRetries += 1;
+                    
+                    /* if(m_StatusWordSeventhBit == false)
+                        writeToSlave<bool>("ctrl_word", 1, 7);
+                    else if(m_StatusWordSeventhBit == true)
+                        writeToSlave<bool>("ctrl_word", 0, 7); */
+                    /* std::cout << "RESETTING FAULT" << std::endl; */
+                    if(m_FaultResetRetries == 20)
+                    {   
+                        /* std::cout << "Can't reset fault\n"; */
+                        m_FaultResetRetries = 0;
+                        writeToSlave<uint16_t>("ctrl_word", 0x00);    
+                    }
+                }
+                else
+                {
+                    writeToSlave<uint16_t>("ctrl_word", 0x00);
+                }
+                    
                 return false;
             }
             

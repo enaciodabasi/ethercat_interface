@@ -27,6 +27,8 @@ pdo_names:
   - "status_word"
   - "actual_position"
   - "actual_velocity"
+  - "error_code"
+  - "following_error"
 pdo_types:
   - uint16
   - uint8
@@ -35,16 +37,22 @@ pdo_types:
   - uint16
   - int32
   - int32
+  - uint16
+  - int32
 pdo_entry_info:
   indexes:
     - 0x6040
     - 0x6060
-    - 0x607a
+    - 0x607A
     - 0x60ff
     - 0x6041
     - 0x6064
     - 0x606c
+    - 0x603F
+    - 0x60F4
   subindexes:
+    - 0x00
+    - 0x00
     - 0x00
     - 0x00
     - 0x00
@@ -60,6 +68,8 @@ pdo_entry_info:
     - 16
     - 32
     - 32
+    - 16
+    - 32
   rxpdo_address: 0x1600
   txpdo_address: 0x1A00
   rxpdo_indexes:
@@ -67,7 +77,7 @@ pdo_entry_info:
   rxpdo_size: 4
   txpdo_indexes:
     - 0x1A00
-  txpdo_size: 3
+  txpdo_size: 5
 slave_sync_info:
   num_sync_managers: 4
   sync_manager_directions:

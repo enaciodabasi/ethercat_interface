@@ -23,6 +23,7 @@ namespace ethercat_interface
         {
 
             m_EthercatDomainState = {};
+            std::cout << m_DomainName << std::endl;
 
             //configureSlaves(); // Configure each slave
             
@@ -80,7 +81,6 @@ namespace ethercat_interface
                 // TODO: Logger.
                 return false;
             }
-
             // Logger.
 
             return true;
