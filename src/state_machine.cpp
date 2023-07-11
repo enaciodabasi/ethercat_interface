@@ -13,169 +13,292 @@
 
 namespace ethercat_interface
 {
+
+
     namespace state_machine
     {
-        namespace CIA402
+
+    namespace CIA402
+    {
+
+        const State detectCurrentState(const uint16_t& status_word)
         {
-            StateMachine::StateMachine(){};
+            State currentState = State::Unknown;
+
+            const uint16_t state = status_word & (sod | qs | f | oe | so | rtso);
+
+            switch(state)
+            {
+
+                case ( 0 | 0 | 0 | 0 | 0 | 0 ):
+                case ( 0 | qs | 0 | 0 | 0 | 0 ):
+                    currentState = State::NotReadyToSwitchOn;
+                    break;
+
+                case ( sod | 0 | 0 | 0 | 0 | 0 ):
+                case ( sod | qs | 0 | 0 | 0 | 0 ):
+                    currentState = State::SwitchOnDisabled;
+                    break;
+
+                case ( 0 | qs | 0 | 0 | 0 | rtso ):
+                    currentState = State::ReadyToSwitchOn;
+                    break;
+
+                case ( 0 | qs | 0 | 0 | so | rtso ):
+                    currentState = State::SwitchedOn;
+                    break;
+
+                case ( 0 | qs | 0 | oe | so | rtso ):
+                    currentState = State::OperationEnabled;
+                    break;
+
+                case ( 0 | 0 | 0 | oe | so | rtso ):
+                    currentState = State::QuickStopActive;
+                    break;
+
+                case ( 0 | 0 | f | oe | so | rtso ):
+                case ( 0 | qs | f | oe | so | rtso ):
+                    currentState = State::FaultReactionActive;
+                    break;
+
+                case ( 0 | 0 | f | 0 | 0 | 0 ):
+                case ( 0 | qs | f | 0 | 0 | 0 ):
+                    currentState = State::Fault;
+                    break;
+
+                default:
+                    currentState = State::Unknown;
+                    break;
+
+            }
             
-            StateMachine::StateMachine(std::shared_ptr<uint16_t>& slave_status_ptr)
+
+            return currentState;
+        }
+
+        StateMachine::StateMachine()
+        {
+            
+        }
+
+        StateMachine::~StateMachine()
+        {
+
+        }
+
+        bool StateMachine::init()
+        {
+            /* 0. */
+            this->addTransition(
+                State::Start,
+                State::NotReadyToSwitchOn,
+                std::make_pair(
+                    automaticTransitionSet,
+                    automaticTransitionReset
+                )
+            );
+            /* 1. */    
+            this->addTransition(
+                State::NotReadyToSwitchOn,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    automaticTransitionSet,
+                    automaticTransitionReset
+                )
+            );
+            /* 2. */
+            this->addTransition(
+                State::SwitchOnDisabled,
+                State::ReadyToSwitchOn,
+                std::make_pair(
+                    shutdownSet,
+                    shutdownReset
+                )
+            );
+            /* 3. */
+            this->addTransition(
+                State::ReadyToSwitchOn,
+                State::SwitchedOn,
+                std::make_pair(
+                    switchOnSet,
+                    switchOnReset
+                )
+            );
+            /* 4. */
+            this->addTransition(
+                State::SwitchedOn,
+                State::OperationEnabled,
+                std::make_pair(
+                    enableOperationSet,
+                    enableOperationReset
+                )
+            );
+            /* 5. */
+            this->addTransition(
+                State::OperationEnabled,
+                State::SwitchedOn,
+                std::make_pair(
+                    switchOnSet,
+                    switchOnReset
+                )
+            );
+            /* 6. */
+            this->addTransition(
+                State::SwitchedOn,
+                State::ReadyToSwitchOn,
+                std::make_pair(
+                    shutdownSet,
+                    shutdownReset
+                )
+            );
+            
+            /* 7. */
+            this->addTransition(
+                State::ReadyToSwitchOn,
+                State::QuickStopActive,
+                std::make_pair(
+                    quickStopSet,
+                    quickStopReset
+                )
+            );
+
+            /* 8. */
+            this->addTransition(
+                State::OperationEnabled,
+                State::ReadyToSwitchOn,
+                std::make_pair(
+                    shutdownSet,
+                    shutdownReset
+                )
+            );
+
+            /* 9. */
+            this->addTransition(
+                State::OperationEnabled,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    disableVoltageSet,
+                    disableVoltageReset
+                )
+            );
+
+            /* 10. */
+            this->addTransition(
+                State::SwitchedOn,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    disableVoltageSet,
+                    disableVoltageReset
+                )
+            );
+
+            /* 11. */
+            this->addTransition(
+                State::OperationEnabled,
+                State::QuickStopActive,
+                std::make_pair(
+                    quickStopSet,
+                    quickStopReset
+                )
+            );
+
+            /* 12. */
+            this->addTransition(
+                State::QuickStopActive,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    disableVoltageSet,
+                    disableVoltageReset
+                )
+            );
+
+            /* 14. */
+            this->addTransition(
+                State::OperationEnabled,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    disableVoltageSet,
+                    disableVoltageReset
+                )
+            );
+
+            /* 15. */
+            this->addTransition(
+                State::Fault,
+                State::SwitchOnDisabled,
+                std::make_pair(
+                    faultResetSet,
+                    faultResetReset
+                )
+            );
+
+            /* 16. */
+            this->addTransition(
+                State::QuickStopActive,
+                State::OperationEnabled,
+                std::make_pair(
+                    enableOperationSet,
+                    enableOperationReset
+                )
+            );
+
+            return true;
+        }
+
+        std::optional<uint16_t> StateMachine::getControlWord(
+            const uint16_t& status_word,
+            const State& target_state
+        )
+        {
+            const auto currentState = detectCurrentState(
+                status_word
+            );
+
+            if(currentState == State::Unknown)
             {
-                m_SlaveStatusPtr = slave_status_ptr;
-
-            }
-
-            void StateMachine::setWriteCallback(std::function<void(const std::string&, const uint16_t&, int)> function_ptr)
-            {
-                writeControlCommand = function_ptr;
-            }
-
-            std::optional<Command> StateMachine::findPathToState(const State& target_state)
-            {
-                uint16_t currentStatus;
-                if(auto statPtr = m_SlaveStatusPtr.lock())
-                {
-                    currentStatus = *statPtr;
-                }
-
-                std::optional<State> stateOpt = std::nullopt;
-
-                for(const auto& state : m_StatesVector)
-                {
-                    if(statusCheck(currentStatus, state))
-                    {
-                        stateOpt = state;
-                        break;
-                    }
-                    else{continue;}
-                }
-
-                if(stateOpt == std::nullopt)
-                {
-                    return std::nullopt;
-                }
-
-                auto resultTransition = m_TransitionTable.find(stateOpt.value());
-                if(resultTransition != m_TransitionTable.end())
-                {
-                    const Transitions possibleTransitions = resultTransition->second;
-                    auto resultCommand = possibleTransitions.find(target_state);
-
-                    if(resultCommand != possibleTransitions.end())
-                    {
-                        const Command commandToTarget = resultCommand->second;
-
-                        return commandToTarget;
-                    }
-                }
-
-
                 return std::nullopt;
             }
 
-            bool StateMachine::switchState(const State& target_state)
+            const auto nextState = this->enableOperationSubMachine(
+                currentState
+            );
+            if(nextState == std::nullopt)
             {
-                bool isSwitchSuccessful = false;
-                uint16_t currentStatus;
-
-                if(auto res = m_SlaveStatusPtr.lock()) // Get temporary ownership of the status.
-                {
-                    currentStatus = *res;
-                }
-                
-                // Get the current state of the slave by comparing the status word with the State's.
-                std::optional<State> optState = std::nullopt;
-
-                for(const auto state : m_StatesVector)
-                {
-                    if(statusCheck(currentStatus, state)) 
-                    {
-                        optState = state;
-                        break;
-                    }
-
-                }
-
-
-
-                // If the current status word does not match with any of the predefined
-                // State's, return false.
-                if(optState == std::nullopt) 
-                {
-                    return false;
-                }
-
-                const State currentState = optState.value();
-
-                auto possibleTransitions = m_TransitionTable.find(currentState);
-                if(possibleTransitions == m_TransitionTable.end())
-                {
-                    return false;
-                }
-
-                auto transitionToTarget = possibleTransitions->second.find(target_state);
-                if(transitionToTarget == possibleTransitions->second.end())
-                {
-                    return false;
-                }
-
-                
-
-
-                /* switch (currentState)
-                {
-                    case State::SwitchOnDisabled:
-
-                    case State::ReadyToSwitchOn:
-
-                        break;
-                    case State::SwitchedOn:
-
-                        break;
-                    case State::OperationEnabled:
-
-                        break;
-                    case State::QuickStopActive:
-
-                        break;
-                    default:
-                        isSwitchSuccessful = false;
-                        break;
-                } */
-                
-                return isSwitchSuccessful;
+                return std::nullopt;
             }
 
-
-            bool statusCheck(const uint16_t& current_status, const State& target_state)
+            uint16_t newCW = m_LastControlWord;
+            if(!getRequiredCommand(std::make_pair(currentState, nextState.value()), newCW))
             {
-                auto skip_indexes = StatusHelper::getNotImportantBits(target_state);
-
-                uint8_t first = (uint8_t)(current_status & 0x00FF);
-                uint8_t second = (uint8_t)(get(target_state) & 0x00FF);
-
-                uint8_t mask = 1;
-                for (int i = 0; i < 8; i++) {
-                  if (std::find(skip_indexes.begin(), skip_indexes.end(), i) == skip_indexes.end()) {
-                    if ((current_status & mask) != (get(target_state) & mask)) {
-                      return false;
-                    }
-                  }
-                  mask <<= 1;
-                }
-                return true;
+                return std::nullopt;
             }
-            
-            StatusHelper::UnimportantBitIndexes StatusHelper::NotReadyToSwitchOn = std::vector<int>{4, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::SwitchOnDisabled = std::vector<int>{4, 5, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::ReadyToSwitchOn = std::vector<int>{4, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::SwitchedOn = std::vector<int>{4, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::OperationEnabled = std::vector<int>{4, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::QuickStopActive = std::vector<int>{4, 5, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::FaultResponseActive = std::vector<int>{4, 5, 7};
-            StatusHelper::UnimportantBitIndexes StatusHelper::Fault = std::vector<int>{4, 5, 7};
+
+            m_LastControlWord = newCW;
+
+            return m_LastControlWord;
 
         }
-    
+
+        bool StateMachine::getRequiredCommand(
+            const Transition& transition, 
+            uint16_t& control_word
+        )
+        {
+
+            const auto cmdFound = m_TransitionTable.find(transition);
+            if(cmdFound == m_TransitionTable.end())
+            {
+                return false;
+            }
+            const auto cmd = cmdFound->second; // Get the value from the iterator.
+
+            control_word = (control_word & ~cmd.second) | cmd.first;
+            
+            return true;
+        }
+
     }
+
+    } //namespace state_machine
+
 }

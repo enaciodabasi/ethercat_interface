@@ -21,7 +21,7 @@ void SomanetNode::cyclicTask()
 
     while(run)
     {
-        std::cout << "---------------------------------------" << std::endl;
+        /* std::cout << "---------------------------------------" << std::endl; */
         this->setTaskWakeUpTime();
         sleep_task(
             m_DcHelper.clock,
@@ -106,7 +106,7 @@ void SomanetNode::cyclicTask()
         m_Master->syncMasterClock(timespecToNanoSec(m_DcHelper.currentTime), m_DcHelper);
         m_Master->send("domain_0");
         i += 1;
-        std::cout << "---------------------------------------" << std::endl;
+        /* std::cout << "---------------------------------------" << std::endl; */
 
     }
 }

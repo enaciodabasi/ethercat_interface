@@ -103,7 +103,7 @@ slave_sync_info:
 dc_info:
   assign_activate: 0x300
   sync0_cycle: 2000000
-  sync0_shift: 0
+  sync0_shift: 1000000
   sync1_cycle: 2000000
   sync1_shift: 0
 

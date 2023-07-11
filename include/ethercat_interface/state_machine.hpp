@@ -15,191 +15,191 @@
 #include <iostream>
 #include <memory>
 #include <functional>
+#include <map>
 #include <unordered_map>
 #include <optional>
 
 namespace ethercat_interface
-{   
+{
     namespace state_machine
     {
+    
+    namespace CIA402
+    {
 
-        class StateMachineBase
+        enum class StatusWord
+        {
+            ReadyToSwitchOn=0,
+            SwitchedOn=1,
+            OperationEnabled=2,
+            Fault=3,
+            VoltageEnabled=4,
+            QuickStop=5,
+            SwitchonDisabled=6,
+            Warning=7,
+            ManufacturerSpecific_0=8,
+            Remote=9,
+            TargetReached=10,
+            InternalLimit=11,
+            OperationModeSpecific_0=12,
+            OperationModeSpecific_1=13,
+            ManufacturerSpecific_1=14,
+            ManufacturerSpecific_2=15
+        };
+
+        inline constexpr int getStatusWordIndex(const StatusWord& sw)
+        {
+            return static_cast<typename std::underlying_type<StatusWord>::type>(sw);
+        }
+
+        enum class ControlWord
+        {
+            SwitchOn = 0,
+            EnableVoltage = 1,
+            QuickStop = 2,
+            EnableOperation = 3,
+            OperationModeSpecific0 = 4,
+            OperationModeSpecific1 = 5,
+            OperationModeSpecific2 = 6,
+            FaultReset = 7,
+            Halt = 8,
+            Operation_mode_specific3 = 9,
+            Reserved_0 = 10,
+            ManufacturerSpecific_0 = 11,
+            ManufacturerSpecific_1 = 12,
+            ManufacturerSpecific_2 = 13,
+            ManufacturerSpecific_3 = 14,
+            ManufacturerSpecific_4 = 15
+        };
+
+        inline constexpr int getControlWordIndex(const ControlWord& cw)
+        {
+            return static_cast<typename std::underlying_type<ControlWord>::type>(cw);
+        }
+
+        enum class State
+        {
+            Unknown = -1,
+            Start = 0,
+            NotReadyToSwitchOn = 1,
+            SwitchOnDisabled = 2,
+            ReadyToSwitchOn = 3,
+            SwitchedOn = 4,
+            OperationEnabled = 5,
+            QuickStopActive = 6,
+            FaultReactionActive = 7,
+            Fault = 8
+        };
+
+        /**
+         * @brief pair.first = Bits to set, pair.second = Bits to reset.
+         * 
+         */
+        using Command = std::pair<uint16_t, uint16_t>;
+        
+        /**
+         * @brief pair.first = current state to transition from, pair.second = state to transition to.
+         * 
+         */
+        using Transition = std::pair<State, State>;
+        
+        using TransitionTable = std::map<Transition, Command>;
+    
+        namespace
+        {
+            inline constexpr uint16_t rtso = (1 << getStatusWordIndex(StatusWord::ReadyToSwitchOn));
+            inline constexpr uint16_t so = (1 << getStatusWordIndex(StatusWord::SwitchedOn));
+            inline constexpr uint16_t oe = (1 << getStatusWordIndex(StatusWord::OperationEnabled));
+            inline constexpr uint16_t f = (1 << getStatusWordIndex(StatusWord::Fault));
+            inline constexpr uint16_t qs = (1 << getStatusWordIndex(StatusWord::QuickStop));
+            inline constexpr uint16_t sod = (1 << getStatusWordIndex(StatusWord::SwitchonDisabled));
+        }
+
+        const State detectCurrentState(const uint16_t& status_word);
+
+        inline constexpr uint16_t automaticTransitionSet = 0;
+        inline constexpr uint16_t automaticTransitionReset = 0;
+
+        inline constexpr uint16_t shutdownSet = ((1 << getControlWordIndex(ControlWord::QuickStop)) | (1 << getControlWordIndex(ControlWord::EnableVoltage)));
+        inline constexpr uint16_t shutdownReset = ((1 << getControlWordIndex(ControlWord::FaultReset)) | (1 << getControlWordIndex(ControlWord::SwitchOn)));
+        
+        inline constexpr uint16_t switchOnSet = ((1 << getControlWordIndex(ControlWord::QuickStop)) | (1 << getControlWordIndex(ControlWord::EnableVoltage)) | (1 << getControlWordIndex(ControlWord::SwitchOn)));
+        inline constexpr uint16_t switchOnReset = ((1 << getControlWordIndex(ControlWord::FaultReset)) | (1 << getControlWordIndex(ControlWord::EnableOperation)));
+
+        inline constexpr uint16_t disableVoltageSet = 0;
+        inline constexpr uint16_t disableVoltageReset = ((1 << getControlWordIndex(ControlWord::FaultReset)) | (1 << getControlWordIndex(ControlWord::EnableVoltage)));
+        
+        inline constexpr uint16_t quickStopSet = (1 << getControlWordIndex(ControlWord::EnableVoltage));
+        inline constexpr uint16_t quickStopReset = ((1 << getControlWordIndex(ControlWord::FaultReset)) | (1 << getControlWordIndex(ControlWord::QuickStop)));
+
+        inline constexpr uint16_t enableOperationSet = ((1 << getControlWordIndex(ControlWord::QuickStop)) | (1 << getControlWordIndex(ControlWord::EnableVoltage)) | (1 << getControlWordIndex(ControlWord::SwitchOn)) | (1 << getControlWordIndex(ControlWord::EnableOperation)));
+        inline constexpr uint16_t enableOperationReset = (1 << getControlWordIndex(ControlWord::FaultReset));
+
+        inline constexpr uint16_t faultResetSet = (1 << getControlWordIndex(ControlWord::FaultReset));
+        inline constexpr uint16_t faultResetReset = 0;
+
+        class StateMachine
         {
             public:
 
-            StateMachineBase();
-            virtual ~StateMachineBase();
-        };
-        
-        namespace CIA402
-        {
-            enum class State : uint16_t
-            {
-                NotReadyToSwitchOn = 0x00,
-                SwitchOnDisabled = 0x40,
-                ReadyToSwitchOn = 0x21,
-                SwitchedOn = 0x23,
-                OperationEnabled = 0x27,
-                QuickStopActive = 0x07,
-                FaultResponseActive = 0x0F,
-                Fault = 0x008
-            };
+            StateMachine();
 
-            inline uint16_t get(const State& state)
+            ~StateMachine();
+
+            bool init();
+
+            std::optional<uint16_t> getControlWord(
+                const uint16_t& status_word,
+                const State& target_state
+            );
+
+            bool getRequiredCommand(
+                const Transition& transition,
+                uint16_t& control_word
+            );
+
+            private:
+
+            uint16_t m_LastControlWord = 0x00;
+
+            TransitionTable m_TransitionTable;
+
+            inline void addTransition(const State& from, const State& to, const Command& command)
             {
-                return static_cast<std::underlying_type<State>::type>(state);
+                m_TransitionTable[std::make_pair(from, to)] = std::move(command);
             }
 
-
-            enum class Command : uint16_t
+            inline std::optional<State> enableOperationSubMachine(const State& current_state)
             {
-                Shutdown = 0x06, // Changes the device status from "Switch On disabled" to "Ready to switch on". 
-                SwitchOn = 0x07, // Deactivates the switch on inhibit., 
-                EnableOperation = 0x000f, // Enables the operation and actives quick stop again. 
-                QuickStop = 0x02, // Activates Quick Stop.
-                DisableOperation = 0x01f, // Disables the operation
-                DisableVoltage = 0x01, // Inhibits the output stages of the controller.
-                ResetFault = 0x80 // Acknowledges an existing error message. Requires a 0 to 1 rising edge.
-            };
-
-            inline uint16_t get(const Command& command)
-            {
-                return static_cast<std::underlying_type<Command>::type>(command);
-            }
-            
-            class StateMachine : public StateMachineBase
-            {
-                public:
-                
-                StateMachine();
-                StateMachine(std::shared_ptr<uint16_t>& slave_status_ptr);
-
-                ~StateMachine();
-
-                std::weak_ptr<uint16_t> m_SlaveStatusPtr; 
-
-                inline void setStatusPtr(std::shared_ptr<uint16_t>& slave_status_ptr)
+                switch (current_state)
                 {
-                    m_SlaveStatusPtr = slave_status_ptr;
-                }
-
-                void setWriteCallback(std::function<void(const std::string&, const uint16_t&, int)> function_ptr);
-                
-                bool switchState(const State& target_state);
-
-                std::optional<Command> findPathToState(const State& target_state);
-
-                private:
-
-                std::function<void(const std::string&, const uint16_t&, int)> writeControlCommand;
-                
-                State m_CurrentState = State::SwitchOnDisabled; 
-
-                const std::vector<State> m_StatesVector = {
-                    State::NotReadyToSwitchOn,
-                    State::SwitchOnDisabled,
-                    State::ReadyToSwitchOn,
-                    State::SwitchedOn,
-                    State::OperationEnabled,
-                    State::QuickStopActive,
-                    State::FaultResponseActive,
-                    State::Fault
-                };
-
-                typedef std::unordered_map<State, Command> Transitions;
-                typedef std::unordered_map<State, Transitions> TransitionTable;
-                
-                const TransitionTable m_TransitionTable = {
-                     {State::SwitchOnDisabled, 
-                        {
-                            {State::ReadyToSwitchOn, Command::Shutdown}
-                        }
-                    },
-                    {State::ReadyToSwitchOn, 
-                        {
-                            {State::SwitchedOn, Command::SwitchOn}, 
-                            {State::SwitchOnDisabled, Command::QuickStop}
-                        }
-                    },
-                    {State::SwitchedOn, 
-                        {
-                            {State::OperationEnabled, Command::EnableOperation}, 
-                            {State::SwitchOnDisabled, Command::QuickStop}
-                        }
-                    },
-                    {State::OperationEnabled, 
-                        {
-                            {State::ReadyToSwitchOn, Command::Shutdown},
-                            {State::QuickStopActive, Command::QuickStop}, 
-                            {State::SwitchedOn, Command::DisableOperation}
-                        }
-                    },
-                    {State::Fault, 
-                    {
-                        {State::SwitchOnDisabled, Command::ResetFault}
-                    }
-                    }
-                };
-                
-            };
-
-            bool statusCheck(const uint16_t& current_status, const State& target_state);
-
-            
-
-            class StatusHelper
-            {
-                public:
-                /**
-                 * @brief Pair first: StatusType Enum, second: Vector of integers containing the unimportant bit's indexes.
-                 * 
-                 */
-                typedef std::vector<int> UnimportantBitIndexes;
-                static UnimportantBitIndexes getNotImportantBits(State type)
-                {
-                    switch (type)
-                    {
+                case State::Start:
+                    return State::NotReadyToSwitchOn;    
+                case State::Fault:
                     case State::NotReadyToSwitchOn:
-                        return NotReadyToSwitchOn;
-                        break;
-                    case State::SwitchOnDisabled:
-                        return SwitchOnDisabled;
-                        break;
-                    case State::ReadyToSwitchOn:
-                        return ReadyToSwitchOn;
-                        break;
-                    case State::SwitchedOn:
-                        return SwitchedOn;
-                        break;
-                    case State::OperationEnabled:
-                        return OperationEnabled;
-                        break;
+                        return State::SwitchOnDisabled;
+                case State::SwitchOnDisabled:
+                    return State::ReadyToSwitchOn;
+                case State::ReadyToSwitchOn:
+                    return State::SwitchedOn;
+                case State::SwitchedOn:
                     case State::QuickStopActive:
-                        return QuickStopActive;
-                        break;
-                    case State::FaultResponseActive:
-                        return FaultResponseActive;
-                        break;
-                    case State::Fault:
-                        return Fault;
-                        break;
-                    default:
-                        break;
-                    }
+                    case State::OperationEnabled:
+                        return State::OperationEnabled;
+                case State::FaultReactionActive:
+                    return State::Fault;
+                default:
+                    return std::nullopt;
                 }
-                static UnimportantBitIndexes NotReadyToSwitchOn;
-                static UnimportantBitIndexes SwitchOnDisabled;
-                static UnimportantBitIndexes ReadyToSwitchOn;
-                static UnimportantBitIndexes SwitchedOn;
-                static UnimportantBitIndexes OperationEnabled;
-                static UnimportantBitIndexes QuickStopActive;
-                static UnimportantBitIndexes FaultResponseActive;
-                static UnimportantBitIndexes Fault;
+
+                return std::nullopt;
+            }
             
-            };
-            
-        }
-    }
-}
+        };  
+
+    } // namespace CIA402
+
+    } // namespace state_machine
+} // namespace ethercat_interface
 
 #endif // STATE_MACHINE_HPP
