@@ -26,30 +26,35 @@ namespace ethercat_interface
             State currentState = State::Unknown;
 
             const uint16_t state = status_word & (sod | qs | f | oe | so | rtso);
-
+            
             switch(state)
             {
 
                 case ( 0 | 0 | 0 | 0 | 0 | 0 ):
                 case ( 0 | qs | 0 | 0 | 0 | 0 ):
                     currentState = State::NotReadyToSwitchOn;
+                    std::cout << "Not Ready To Switch On\n";
                     break;
 
                 case ( sod | 0 | 0 | 0 | 0 | 0 ):
                 case ( sod | qs | 0 | 0 | 0 | 0 ):
                     currentState = State::SwitchOnDisabled;
+                    std::cout << "Switch On Disabled\n";
                     break;
 
                 case ( 0 | qs | 0 | 0 | 0 | rtso ):
                     currentState = State::ReadyToSwitchOn;
+                    std::cout << "Ready To Switch On\n";
                     break;
 
                 case ( 0 | qs | 0 | 0 | so | rtso ):
                     currentState = State::SwitchedOn;
+                    std::cout << "Switched On\n";
                     break;
 
                 case ( 0 | qs | 0 | oe | so | rtso ):
                     currentState = State::OperationEnabled;
+                    std::cout << "Operation Enabled\n";
                     break;
 
                 case ( 0 | 0 | 0 | oe | so | rtso ):
@@ -59,11 +64,13 @@ namespace ethercat_interface
                 case ( 0 | 0 | f | oe | so | rtso ):
                 case ( 0 | qs | f | oe | so | rtso ):
                     currentState = State::FaultReactionActive;
+                    std::cout << "Fault Reaction Active\n";
                     break;
 
                 case ( 0 | 0 | f | 0 | 0 | 0 ):
                 case ( 0 | qs | f | 0 | 0 | 0 ):
                     currentState = State::Fault;
+                    std::cout << "Fault\n";
                     break;
 
                 default:

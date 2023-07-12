@@ -57,6 +57,13 @@ void SomanetNode::cyclicTask()
 
         if(slavesEnabled)
         {
+
+            auto status = m_Master->read<uint16_t>("domain_0", "somanet_node", "status_word");
+            if(status)
+            {
+                std::cout << "Current Status Word: " << status.value() << std::endl;
+            }
+
             auto leftWheelPosOpt = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_position");
             
             if(leftWheelPosOpt != std::nullopt)
@@ -92,7 +99,7 @@ void SomanetNode::cyclicTask()
         // Write
         if(slavesEnabled)
         {   
-                m_Master->write<int32_t>("domain_0", "somanet_node", "target_position", pos+500);
+             m_Master->write<int32_t>("domain_0", "somanet_node", "target_position", pos+500);
             /* std::cout << std::to_string(pos+2000) << std::endl; */
         }
 

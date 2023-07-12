@@ -79,7 +79,7 @@ namespace ethercat_interface
 
         enum class State
         {
-            Unknown = -1,
+            Unknown = 0,
             Start = 0,
             NotReadyToSwitchOn = 1,
             SwitchOnDisabled = 2,

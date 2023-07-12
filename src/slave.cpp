@@ -41,6 +41,8 @@ namespace ethercat_interface
                 {
                     m_DcInfo = std::get<DC_Info>(m_SlaveInfo.dcInfo);
                 }
+
+                m_InnerStateMachine.init();
             }
 
             //m_DataOffset = std::make_unique<offset::DataOffset>(m_SlaveInfo.pdoNames);
@@ -147,91 +149,113 @@ namespace ethercat_interface
 
         bool Slave::enableOperation()
         {
+
+            const auto status_word = readFromSlave<uint16_t>("status_word");
             
-            auto statusOpt = this->readFromSlave<uint16_t>("status_word");
-            if(statusOpt == std::nullopt)
+            if(!status_word)
             {
-                std::cout << "Status word nullopt\n";
                 return false;
             }
-
-            auto status = statusOpt.value();
-            if(status != m_Status)
-                std::cout << m_Status << std::endl;
-
-            m_Status = status;
             
-            const auto seventhBit = readFromSlave<bool>("status_word", 7);
-            if(seventhBit != std::nullopt)
+            m_Status = status_word.value();
+            std::cout << "Status Word: " << m_Status << std::endl;
+            if(state_machine::CIA402::detectCurrentState(status_word.value()) == state_machine::CIA402::State::OperationEnabled)
             {
-                m_StatusWordSeventhBit = seventhBit.value();
-            }
-            //std::cout << "Status Word: " << m_Status << std::endl;
-            /*
-                Switch on disabled -> Ready to switch on : Shutdown command.
-                Ready to switch on -> Switched on: Switch on command.
-                Switched on -> Operation enabled: Enable operation command. 
-             */
- 
-            if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
-            {   
-                /* std::cout << "Operation Enabled\n"; */
+                std::cout << "Operation Enabled state achieved\n";
                 return true;
             }
+        
+            const auto control_word = m_InnerStateMachine.getControlWord(
+                status_word.value(),
+                state_machine::CIA402::State::OperationEnabled
+            );
 
-            if (!isStatusCorrect(m_Status, StatusType::Fault))
+            if(!control_word)
             {
-                if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
-                {   
-                    /* std::cout << "Switch on disabled\n"; */
-                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
-                    return false;
-                }
-                else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
-                {
-                    /* std::cout << "Ready To switch on\n"; */
-                    writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
-                    return false;
-                }
-                else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
-                {
-                    /* std::cout << "Switched on\n"; */
-                    writeToSlave<uint16_t>("ctrl_word", 0x000f);
-                    return false;
-                }
-                
-            }
-            else
-            {
-                if((m_Status & 0x0008) && !(m_Status & 0x0007))
-                {   
-                    /* std::cout << "Fault Response not active\n"; */
-                    writeToSlave<uint16_t>("ctrl_word", 0x0080);
-
-                    m_FaultResetRetries += 1;
-                    
-                    /* if(m_StatusWordSeventhBit == false)
-                        writeToSlave<bool>("ctrl_word", 1, 7);
-                    else if(m_StatusWordSeventhBit == true)
-                        writeToSlave<bool>("ctrl_word", 0, 7); */
-                    /* std::cout << "RESETTING FAULT" << std::endl; */
-                    if(m_FaultResetRetries == 20)
-                    {   
-                        /* std::cout << "Can't reset fault\n"; */
-                        m_FaultResetRetries = 0;
-                        writeToSlave<uint16_t>("ctrl_word", 0x00);    
-                    }
-                }
-                else
-                {
-                    writeToSlave<uint16_t>("ctrl_word", 0x00);
-                }
-                    
                 return false;
             }
-            
-            
+
+            writeToSlave<uint16_t>("ctrl_word", control_word.value());
+            std::cout << "Control Word: " << control_word.value() << std::endl;
+
             return false;
+
+            // auto statusOpt = this->readFromSlave<uint16_t>("status_word");
+            // if(statusOpt == std::nullopt)
+            // {
+            //     std::cout << "Status word nullopt\n";
+            //     return false;
+            // }
+
+            // auto status = statusOpt.value();
+            // if(status != m_Status)
+            //     std::cout << m_Status << std::endl;
+
+            // m_Status = status;
+            
+            // const auto seventhBit = readFromSlave<bool>("status_word", 7);
+            // if(seventhBit != std::nullopt)
+            // {
+            //     m_StatusWordSeventhBit = seventhBit.value();
+            // }
+            // /*
+            //     Switch on disabled -> Ready to switch on : Shutdown command.
+            //     Ready to switch on -> Switched on: Switch on command.
+            //     Switched on -> Operation enabled: Enable operation command. 
+            //  */
+ 
+            // if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
+            // {   
+            //     /* std::cout << "Operation Enabled\n"; */
+            //     return true;
+            // }
+
+            // if (!isStatusCorrect(m_Status, StatusType::Fault))
+            // {
+            //     if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
+            //     {   
+            //         /* std::cout << "Switch on disabled\n"; */
+            //         writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
+            //         return false;
+            //     }
+            //     else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
+            //     {
+            //         /* std::cout << "Ready To switch on\n"; */
+            //         writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
+            //         return false;
+            //     }
+            //     else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
+            //     {
+            //         /* std::cout << "Switched on\n"; */
+            //         writeToSlave<uint16_t>("ctrl_word", 0x000f);
+            //         return false;
+            //     }
+                
+            // }
+            // else
+            // {
+            //     if((m_Status & 0x0008) && !(m_Status & 0x0007))
+            //     {   
+            //         writeToSlave<uint16_t>("ctrl_word", 0x0080);
+
+            //         m_FaultResetRetries += 1;
+            //         if(m_FaultResetRetries == 20)
+            //         {   
+            //             m_FaultResetRetries = 0;
+            //             writeToSlave<uint16_t>("ctrl_word", 0x00);    
+            //         }
+            //     }
+            //     else
+            //     {
+            //         writeToSlave<uint16_t>("ctrl_word", 0x00);
+            //     }
+                    
+            //     return false;
+            // }
+            
+            
+            // return false;
+            
         }
 
         /*
