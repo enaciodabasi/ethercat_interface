@@ -161,7 +161,7 @@ namespace ethercat_interface
             std::cout << "Status Word: " << m_Status << std::endl;
             if(state_machine::CIA402::detectCurrentState(status_word.value()) == state_machine::CIA402::State::OperationEnabled)
             {
-                std::cout << "Operation Enabled state achieved\n";
+                /* std::cout << "Operation Enabled state achieved\n"; */
                 return true;
             }
         
@@ -256,6 +256,24 @@ namespace ethercat_interface
             
             // return false;
             
+        }
+
+        bool Slave::shutdown()
+        {
+            const auto ctrl_word = m_InnerStateMachine.getControlWord(
+                m_Status,
+                state_machine::CIA402::State::SwitchOnDisabled
+            );
+
+            if(!ctrl_word)
+            {
+                return false;
+            }
+
+            writeToSlave<int8_t>("op_mode", 0x00);
+            writeToSlave<uint16_t>("ctrl_word", ctrl_word.value());
+
+            return true;
         }
 
         /*

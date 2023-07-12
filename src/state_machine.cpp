@@ -221,11 +221,11 @@ namespace ethercat_interface
 
             /* 14. */
             this->addTransition(
-                State::OperationEnabled,
-                State::SwitchOnDisabled,
+                State::FaultReactionActive,
+                State::Fault,
                 std::make_pair(
-                    disableVoltageSet,
-                    disableVoltageReset
+                    automaticTransitionSet,
+                    automaticTransitionReset
                 )
             );
 
@@ -265,22 +265,32 @@ namespace ethercat_interface
             {
                 return std::nullopt;
             }
-
-            const auto nextState = this->enableOperationSubMachine(
-                currentState
-            );
-            if(nextState == std::nullopt)
-            {
-                return std::nullopt;
-            }
-
+            std::optional<State> nextState;
             uint16_t newCW = m_LastControlWord;
-            if(!getRequiredCommand(std::make_pair(currentState, nextState.value()), newCW))
+            if(target_state == State::OperationEnabled)
             {
-                return std::nullopt;
-            }
+                nextState = this->enableOperationSubMachine(currentState);
+                if(nextState == std::nullopt)
+                {
+                    return std::nullopt;
+                }
+                if(!getRequiredCommand(std::make_pair(currentState, nextState.value()), newCW))
+                {
+                    return std::nullopt;
+                }
 
-            m_LastControlWord = newCW;
+                m_LastControlWord = newCW;
+            }
+            else
+            {
+                if(!getRequiredCommand(std::make_pair(currentState, target_state), newCW));
+                {
+                    return std::nullopt;
+                }
+
+                m_LastControlWord = newCW;
+
+            }
 
             return m_LastControlWord;
 

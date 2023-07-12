@@ -162,15 +162,6 @@ namespace ethercat_interface
                 return;
             }
 
-/*             if(bit_position == NULL)
-            {
-                m_RegisteredDomains.at(domain_name)->write<T>(
-                    slave_name,
-                    value_to_write_name,
-                    value_to_write
-                );
-            } */
-
             m_RegisteredDomains.at(domain_name)->write<T>(
                 slave_name,
                 value_to_write_name,
@@ -194,14 +185,6 @@ namespace ethercat_interface
                 // TODO: Throw exception
                 
             }
-
-/*             if(bit_position == NULL)
-            {
-                return m_RegisteredDomains.at(domain_name)->read<T>(
-                    slave_name,
-                    value_to_read_name
-                );
-            } */
 
             return m_RegisteredDomains.at(domain_name)->read<T>(
                 slave_name,

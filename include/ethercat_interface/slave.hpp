@@ -222,6 +222,8 @@ namespace ethercat_interface
              */
             virtual bool enableOperation();
 
+            virtual bool shutdown();
+
             protected:
 
             std::string m_SlaveName;
