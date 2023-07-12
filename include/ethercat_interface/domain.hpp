@@ -54,6 +54,8 @@ namespace ethercat_interface
 
             bool enableSlaves();
 
+            bool shutdownSlaves();
+
             /**
              * @brief 
              * 

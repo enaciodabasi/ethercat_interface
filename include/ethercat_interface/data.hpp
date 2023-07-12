@@ -55,6 +55,8 @@ namespace ethercat_interface
 
             ~DataContainer(){};
 
+            const std::string gatherDataRxPDO();
+
             template<typename T>
             bool createData(const std::string& new_data_name);
 
@@ -64,11 +66,13 @@ namespace ethercat_interface
             template<typename T>
             bool set(const std::string& data_name, const T new_val);
 
+
+
             private:
 
             std::string m_OwnerName;
 
-            std::unordered_map<std::string, PdoVar> m_DataMap;
+            std::map<std::string, PdoVar> m_DataMap;
 
             std::mutex m_MutexRW;
         };

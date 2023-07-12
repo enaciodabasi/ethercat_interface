@@ -1,4 +1,5 @@
 #include "../include/node.hpp"
+#include <math.h>
 
 bool run = true; 
 
@@ -50,7 +51,7 @@ void SomanetNode::cyclicTask()
                 "domain_0",
                 "somanet_node",
                 "op_mode",
-                0x08
+                0x09
         );
 
         
@@ -65,21 +66,26 @@ void SomanetNode::cyclicTask()
             }
 
             auto leftWheelPosOpt = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_position");
-            
-            if(leftWheelPosOpt != std::nullopt)
+            auto leftWheelVelOpt = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_velocity");
+            if(leftWheelPosOpt != std::nullopt && leftWheelVelOpt)
             {
-                std::string posOutMsg = "Current Position: " + std::to_string(leftWheelPosOpt.value());
-                
+                double currentPosition = (leftWheelPosOpt.value() / 20480.0) * (2.0 * M_PI) / 24.685;
+                std::string posOutMsg = "Current Position: " + std::to_string(currentPosition);
                 
                 pos = leftWheelPosOpt.value();
-                std::cout << posOutMsg << " Target: " << pos + 500 << std::endl;
+
+                double currentVel = (leftWheelVelOpt.value() * 2) / (60 * M_PI * 24.685);
+                std::cout << " Current Velocity: " + std::to_string(currentVel); 
+                
             }
 
             auto lifterVel = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_velocity");
             if(lifterVel != std::nullopt)
             {
-                std::string velOutMsg = "Current velocity" + std::to_string(lifterVel.value());
-                std::cout << velOutMsg << std::endl;
+                auto motorvel = lifterVel.value();
+                const auto wheelVel = (double)motorvel;
+                //std::string velOutMsg = "Current velocity: " + std::to_string(wheelVel);
+                //std::cout << velOutMsg << std::endl;
             }
 
             auto error_code = m_Master->read<uint16_t>("domain_0", "somanet_node", "error_code");
@@ -99,8 +105,11 @@ void SomanetNode::cyclicTask()
         // Write
         if(slavesEnabled)
         {   
-             m_Master->write<int32_t>("domain_0", "somanet_node", "target_position", pos+500);
+            double angularTarget = 0.1;
+            int32_t targetVel = ((60 * angularTarget) / 2 * M_PI) * 24.685; 
+            m_Master->write<int32_t>("domain_0", "somanet_node", "target_velocity", targetVel);
             /* std::cout << std::to_string(pos+2000) << std::endl; */
+            std::cout << "Target Velocity: " << std::to_string(angularTarget) << std::endl;
         }
 
        /*

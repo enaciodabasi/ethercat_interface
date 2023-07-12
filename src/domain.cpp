@@ -163,6 +163,17 @@ namespace ethercat_interface
 
         }
 
+        bool Domain::shutdownSlaves()
+        {
+            bool areAllShutdown = false;
+
+            for(const auto& s : m_RegisteredSlaves)
+            {
+                bool isShutdown = s.second->shutdown();
+                isShutdown ? areAllShutdown = true : areAllShutdown = false;
+            }
+        }
+
         void Domain::createDomainPdoEntryRegistries()
         {   
             ec_pdo_entry_reg_t* temp = new ec_pdo_entry_reg_t[m_NumOfPdoEntryRegistries + 1];

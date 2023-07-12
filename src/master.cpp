@@ -135,6 +135,17 @@ namespace ethercat_interface
             return areAllEnabled;
         }
 
+        bool Master::shutdownSlaves()
+        {
+            bool areAllShutdown = false;
+
+            for(const auto& s : m_RegisteredDomains)
+            {
+                bool isShutdown = s.second->shutdownSlaves();
+                isShutdown ? areAllShutdown = true : areAllShutdown = false;
+            }
+        }
+
         ec_domain_t* Master::getDomainPtr(const std::string& domain_name)
         {
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())

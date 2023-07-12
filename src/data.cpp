@@ -29,6 +29,7 @@ namespace ethercat_interface
         {
             for(const auto& pdo : pdo_info)
             {
+
                 switch (pdo.second)
                 {
                 case EC_Type::UINT8:
@@ -80,7 +81,16 @@ namespace ethercat_interface
                 }
             }
 
+        }
 
+        const std::string DataContainer::gatherDataRxPDO()
+        {
+            std::string dataStr();
+
+            for(const auto [key, value] : m_DataMap)
+            {
+                /* dataStr += key + ": " +  + " \n"; */
+            }
         }
     }
 }

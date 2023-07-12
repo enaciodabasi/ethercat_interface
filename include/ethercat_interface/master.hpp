@@ -112,6 +112,8 @@ namespace ethercat_interface
 
             bool enableSlaves();
 
+            bool shutdownSlaves();
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:
