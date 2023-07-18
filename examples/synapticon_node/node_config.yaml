@@ -1,6 +1,26 @@
 ---
 startup_config:
 
+  -
+    slave_name: "somanet_node"
+    sdo_index: 0x6098
+    sdo_subindex: 0x0
+    data_type: int8
+    data_value: 0x25
+
+  -
+    slave_name: "somanet_node"
+    sdo_index: 0x6060
+    sdo_subindex: 0x0
+    data_type: uint8
+    data_value: 0x6
+  -
+    slave_name: "somanet_node"
+    sdo_index: 0x6040
+    sdo_subindex: 0x0
+    data_type: uint16
+    data_value: 0x10
+
 ...
 ---
 controller_config:
@@ -25,20 +45,21 @@ pdo_names:
   - "target_position"
   - "target_velocity"
   - "status_word"
+  - "op_mode_display"
   - "actual_position"
-  - "actual_velocity"
   - "error_code"
-  - "following_error"
+  - "actual_velocity"
 pdo_types:
   - uint16
-  - uint8
+  - int8
   - int32
   - int32
   - uint16
-  - int32
+  - int8
   - int32
   - uint16
   - int32
+
 pdo_entry_info:
   indexes:
     - 0x6040
@@ -46,10 +67,10 @@ pdo_entry_info:
     - 0x607A
     - 0x60ff
     - 0x6041
+    - 0x6061
     - 0x6064
-    - 0x606c
     - 0x603F
-    - 0x60F4
+    - 0x606c
   subindexes:
     - 0x00
     - 0x00
@@ -66,7 +87,7 @@ pdo_entry_info:
     - 32
     - 32
     - 16
-    - 32
+    - 8
     - 32
     - 16
     - 32

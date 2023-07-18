@@ -280,6 +280,132 @@ namespace ethercat_interface
                         startup_config.data = result.value();
                     }
                 }
+                else if(std::holds_alternative<int8_t>(startup_config.data))
+                {
+                    
+                    int8_t valToWrite = std::get<int8_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success =  m_Master->sdo_write<int8_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<int8_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
+                    }
+                }
+                else if(std::holds_alternative<int16_t>(startup_config.data))
+                {
+
+                    int16_t valToWrite = std::get<int16_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<int16_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<int16_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
+                    }
+                }
+                else if(std::holds_alternative<int32_t>(startup_config.data))
+                {
+                    int32_t valToWrite = std::get<int32_t>(startup_config.data);
+                    
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<int32_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<int32_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
+                    }
+                }
+                else if(std::holds_alternative<int64_t>(startup_config.data))
+                {
+                    
+                    int64_t valToWrite = std::get<int64_t>(startup_config.data);
+
+                    if(startup_config.configType == SdoConfigType::WRITE)
+                    {
+                        bool success = m_Master->sdo_write<int64_t>(
+                            slavePosition,
+                            startup_config.sdoInfo,
+                            valToWrite
+                        );
+
+                        if(!success)
+                            return false;
+                    }
+                    else if(startup_config.configType == SdoConfigType::READ)
+                    {
+                        auto result = m_Master->sdo_read<int64_t>(
+                            slavePosition,
+                            startup_config.sdoInfo
+                        );
+
+                        if(result == std::nullopt)
+                        {
+                            return false;
+                        }
+
+                        startup_config.data = result.value();
+                    }
+                }
             }
 
             return true;

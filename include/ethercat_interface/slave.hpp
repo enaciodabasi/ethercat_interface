@@ -177,6 +177,11 @@ namespace ethercat_interface
                 m_Logger = shared_logger;
             }
 
+            inline uint16_t getControlWord()
+            {
+                return m_InnerStateMachine.getCW();
+            }
+
             /* void updateSlaveState(); */
 
             /**

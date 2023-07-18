@@ -761,6 +761,18 @@ namespace ethercat_interface
             case EC_Type::UINT64:
                 data = uint64_t();
                 break;
+            case EC_Type::INT8:
+                data = int8_t();
+                break;
+            case EC_Type::INT16:
+                data = int16_t();
+                break;
+            case EC_Type::INT32:
+                data = int32_t();
+                break;
+            case EC_Type::INT64:
+                data = int64_t();
+                break;
             default:
                 return;
             }
@@ -800,6 +812,18 @@ namespace ethercat_interface
                 break;
             case EC_Type::UINT64:
                 this->data = data_node.as<uint64_t>();
+                break;
+            case EC_Type::INT8:
+                this->data = (int8_t)data_node.as<int16_t>();
+                break;
+            case EC_Type::INT16:
+                this->data = data_node.as<int16_t>();
+                break;
+            case EC_Type::INT32:
+                this->data = data_node.as<int32_t>();
+                break;
+            case EC_Type::INT64:
+                this->data = data_node.as<int64_t>();
                 break;
             default:
                 return;

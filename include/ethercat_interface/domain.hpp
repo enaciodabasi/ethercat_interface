@@ -56,6 +56,14 @@ namespace ethercat_interface
 
             bool shutdownSlaves();
 
+            inline const std::optional<uint16_t> getControlWord(const std::string& slave_name) const
+            {
+                if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
+                    return std::nullopt;
+                    
+                return m_RegisteredSlaves.at(slave_name)->getControlWord();
+            }
+
             /**
              * @brief 
              * 

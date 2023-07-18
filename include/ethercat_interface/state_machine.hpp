@@ -86,6 +86,11 @@ namespace ethercat_interface
 
             bool init();
 
+            inline uint16_t getCW()
+            {
+                return m_LastControlWord;
+            }
+
             std::optional<uint16_t> getControlWord(
                 const uint16_t& status_word,
                 const State& target_state

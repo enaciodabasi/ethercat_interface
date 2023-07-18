@@ -114,6 +114,14 @@ namespace ethercat_interface
 
             bool shutdownSlaves();
 
+            inline const std::optional<uint16_t> getControlWord(const std::string& domain_name, const std::string& slave_name) const
+            {
+                if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+                    return std::nullopt;
+                    
+                return m_RegisteredDomains.at(domain_name)->getControlWord(slave_name);
+            }
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:
@@ -202,8 +210,9 @@ namespace ethercat_interface
             const T value_to_write
         )
         {
+            
             uint32_t abort_code;
-
+            std::cout << "SDO: " << std::to_string(value_to_write) << std::endl;
             uint8_t* data_address = (uint8_t*)&value_to_write;
             size_t data_size = sizeof(T) / sizeof(uint8_t);
 
