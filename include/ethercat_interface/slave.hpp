@@ -215,6 +215,12 @@ namespace ethercat_interface
                 std::optional<int> bit_position = std::nullopt
             );
 
+            template<typename T, std::size_t SIZE>
+            std::optional<std::vector<T>> readArray(const std::string& pdo_name);
+
+            template<typename T>
+            void writeArray(const std::string& pdo_name, const std::vector<T>& value_array);
+
             inline void setDomainProcessDataPtr(uint8_t* domain_data_ptr)
             {
                 this->m_DomainProcessDataPtr = domain_data_ptr;
@@ -282,7 +288,7 @@ namespace ethercat_interface
             //auto data = m_DomainProcessDataPtr + *m_SlaveOffsets->getData(value_to_read_name);
             if(m_DataOffset->getDataOffset(value_to_read_name) == std::nullopt)
             {
-                return T();
+                return std::nullopt;
             }        
         
             auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(value_to_read_name).value();
@@ -469,6 +475,74 @@ namespace ethercat_interface
             }
         }
 
+
+        template<typename T, std::size_t SIZE>
+        std::optional<std::vector<T>> Slave::readArray(const std::string& pdo_name)
+        {
+            if(m_DataOffset->getDataOffset(pdo_name) == std::nullopt)
+            {
+                return std::nullopt;
+            }        
+        
+            auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(pdo_name).value();
+            
+            std::vector<T> byteArray;
+            
+            bool firstByte = true;
+            while(byteArray.size() != SIZE)
+            {
+                if(firstByte)
+                {
+                    const auto byte = ((T) *((uint8_t*)(data)));
+                    byteArray.emplace_back(byte);
+                    firstByte = false;
+                }
+                else
+                {
+                    const auto byte = ((T) *((uint8_t*)(data + sizeof(T))));
+                    byteArray.emplace_back(byte);
+                }
+                
+            }
+            
+            if(byteArray.size() != SIZE || byteArray.empty())
+            {
+                return std::nullopt;
+            } 
+
+            return byteArray;
+        }
+
+        template<typename T>
+        void Slave::writeArray(const std::string& pdo_name, const std::vector<T>& value_array)
+        {
+            if(m_DataOffset->getDataOffset(pdo_name) == std::nullopt)
+            {
+                return;
+            }        
+        
+            auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(pdo_name).value();
+
+            int16_t remainingBytes = value_array.size();
+            bool initialWrite = true;
+            while(remainingBytes != 0)
+            {
+                
+                if(initialWrite)
+                {
+                    *((uint8_t*)(data)) = ((uint8_t)(value_array[value_array.size() - remainingBytes]));
+                    initialWrite = false;
+                }
+                else
+                {
+                    *((uint8_t*)(data + sizeof(uint8_t))) = ((uint8_t)(value_array[value_array.size() - remainingBytes]));
+                }
+                
+                
+                remainingBytes -= 1;
+            }
+
+        }
 
     }
     

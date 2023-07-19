@@ -1,0 +1,755 @@
+<?xml version="1.0" ?>
+<EtherCATInfoList>
+  <EtherCATInfo>
+    <!-- Slave 0 -->
+    <Vendor>
+      <Id>16777302</Id>
+    </Vendor>
+    <Descriptions>
+      <Devices>
+        <Device>
+          <Type ProductCode="#x00002301" RevisionNo="#x00010000">Flexi Soft EtherCAT Gateway</Type>
+          <Name><![CDATA[Flexi Soft EtherCAT Gateway]]></Name>
+          <Sm Enable="1" StartAddress="#x1000" ControlByte="#x36" DefaultSize="128" />
+          <Sm Enable="1" StartAddress="#x1080" ControlByte="#x32" DefaultSize="128" />
+          <Sm Enable="1" StartAddress="#x1100" ControlByte="#x74" DefaultSize="50" />
+          <Sm Enable="1" StartAddress="#x1200" ControlByte="#x30" DefaultSize="51" />
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1600</Index>
+            <Name>Out</Name>
+            <Entry>
+              <Index>#x2001</Index>
+              <SubIndex>1</SubIndex>
+              <BitLen>80</BitLen>
+              <Name>Dataset1</Name>
+              <DataType>STRING(10)</DataType>
+            </Entry>
+          </RxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a00</Index>
+            <Name>In</Name>
+            <Entry>
+              <Index>#x10f3</Index>
+              <SubIndex>4</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>New Messages Available</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2000</Index>
+              <SubIndex>1</SubIndex>
+              <BitLen>80</BitLen>
+              <Name>Dataset1</Name>
+              <DataType>STRING(10)</DataType>
+            </Entry>
+          </TxPdo>
+        </Device>
+      </Devices>
+    </Descriptions>
+  </EtherCATInfo>
+  <EtherCATInfo>
+    <!-- Slave 1 -->
+    <Vendor>
+      <Id>8914</Id>
+    </Vendor>
+    <Descriptions>
+      <Devices>
+        <Device>
+          <Type ProductCode="#x00000201" RevisionNo="#x0a00000c"></Type>
+          <Name><![CDATA[SOMANET Node CiA402 Drive]]></Name>
+          <Sm Enable="1" StartAddress="#x1000" ControlByte="#x26" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1400" ControlByte="#x22" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1800" ControlByte="#x64" DefaultSize="35" />
+          <Sm Enable="1" StartAddress="#x1c00" ControlByte="#x20" DefaultSize="47" />
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1600</Index>
+            <Name>Receive PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6040</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Controlword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6060</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6071</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Target Torque</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x607a</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target position</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60ff</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target velocity</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b2</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque offset</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2701</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning command</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1601</Index>
+            <Name>Receive PDO2 mapping</Name>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>1</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Physical outputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>2</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Bit mask</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1602</Index>
+            <Name>Receive PDO3 mapping</Name>
+            <Entry>
+              <Index>#x2703</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MOSI</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b1</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity offset</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a00</Index>
+            <Name>Transmit PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6041</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Statusword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6061</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation display</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6064</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606c</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6077</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque actual value</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a01</Index>
+            <Name>Transmit PDO2 mapping</Name>
+            <Entry>
+              <Index>#x2401</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 1</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2402</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 2</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2403</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 3</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2404</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 4</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2702</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning status</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a02</Index>
+            <Name>Transmit PDO3 mapping</Name>
+            <Entry>
+              <Index>#x60fd</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Digital inputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a03</Index>
+            <Name>Transmit PDO4 mapping</Name>
+            <Entry>
+              <Index>#x2704</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MISO</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x20f0</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Timestamp</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fc</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position demand internal value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606b</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity demand value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6074</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque demand</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+        </Device>
+      </Devices>
+    </Descriptions>
+  </EtherCATInfo>
+  <EtherCATInfo>
+    <!-- Slave 2 -->
+    <Vendor>
+      <Id>8914</Id>
+    </Vendor>
+    <Descriptions>
+      <Devices>
+        <Device>
+          <Type ProductCode="#x00000201" RevisionNo="#x0a00000c"></Type>
+          <Name><![CDATA[SOMANET Node CiA402 Drive]]></Name>
+          <Sm Enable="1" StartAddress="#x1000" ControlByte="#x26" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1400" ControlByte="#x22" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1800" ControlByte="#x64" DefaultSize="35" />
+          <Sm Enable="1" StartAddress="#x1c00" ControlByte="#x20" DefaultSize="47" />
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1600</Index>
+            <Name>Receive PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6040</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Controlword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6060</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6071</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Target Torque</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x607a</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target position</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60ff</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target velocity</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b2</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque offset</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2701</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning command</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1601</Index>
+            <Name>Receive PDO2 mapping</Name>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>1</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Physical outputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>2</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Bit mask</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1602</Index>
+            <Name>Receive PDO3 mapping</Name>
+            <Entry>
+              <Index>#x2703</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MOSI</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b1</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity offset</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a00</Index>
+            <Name>Transmit PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6041</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Statusword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6061</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation display</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6064</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606c</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6077</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque actual value</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a01</Index>
+            <Name>Transmit PDO2 mapping</Name>
+            <Entry>
+              <Index>#x2401</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 1</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2402</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 2</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2403</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 3</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2404</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 4</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2702</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning status</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a02</Index>
+            <Name>Transmit PDO3 mapping</Name>
+            <Entry>
+              <Index>#x60fd</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Digital inputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a03</Index>
+            <Name>Transmit PDO4 mapping</Name>
+            <Entry>
+              <Index>#x2704</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MISO</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x20f0</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Timestamp</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fc</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position demand internal value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606b</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity demand value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6074</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque demand</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+        </Device>
+      </Devices>
+    </Descriptions>
+  </EtherCATInfo>
+  <EtherCATInfo>
+    <!-- Slave 3 -->
+    <Vendor>
+      <Id>8914</Id>
+    </Vendor>
+    <Descriptions>
+      <Devices>
+        <Device>
+          <Type ProductCode="#x00000201" RevisionNo="#x0a00000c"></Type>
+          <Name><![CDATA[SOMANET Node CiA402 Drive]]></Name>
+          <Sm Enable="1" StartAddress="#x1000" ControlByte="#x26" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1400" ControlByte="#x22" DefaultSize="1024" />
+          <Sm Enable="1" StartAddress="#x1800" ControlByte="#x64" DefaultSize="35" />
+          <Sm Enable="1" StartAddress="#x1c00" ControlByte="#x20" DefaultSize="47" />
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1600</Index>
+            <Name>Receive PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6040</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Controlword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6060</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6071</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Target Torque</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x607a</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target position</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60ff</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Target velocity</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b2</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque offset</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2701</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning command</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1601</Index>
+            <Name>Receive PDO2 mapping</Name>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>1</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Physical outputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fe</Index>
+              <SubIndex>2</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Bit mask</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <RxPdo Sm="2" Fixed="1" Mandatory="1">
+            <Index>#x1602</Index>
+            <Name>Receive PDO3 mapping</Name>
+            <Entry>
+              <Index>#x2703</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MOSI</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60b1</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity offset</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </RxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a00</Index>
+            <Name>Transmit PDO1 mapping</Name>
+            <Entry>
+              <Index>#x6041</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Statusword</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6061</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>8</BitLen>
+              <Name>Modes of operation display</Name>
+              <DataType>UINT8</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6064</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606c</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity actual value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6077</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque actual value</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a01</Index>
+            <Name>Transmit PDO2 mapping</Name>
+            <Entry>
+              <Index>#x2401</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 1</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2402</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 2</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2403</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 3</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2404</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Analog input 4</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x2702</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Tuning status</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a02</Index>
+            <Name>Transmit PDO3 mapping</Name>
+            <Entry>
+              <Index>#x60fd</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Digital inputs</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+          </TxPdo>
+          <TxPdo Sm="3" Fixed="1" Mandatory="1">
+            <Index>#x1a03</Index>
+            <Name>Transmit PDO4 mapping</Name>
+            <Entry>
+              <Index>#x2704</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>User MISO</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x20f0</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Timestamp</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x60fc</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Position demand internal value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x606b</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>32</BitLen>
+              <Name>Velocity demand value</Name>
+              <DataType>UINT32</DataType>
+            </Entry>
+            <Entry>
+              <Index>#x6074</Index>
+              <SubIndex>0</SubIndex>
+              <BitLen>16</BitLen>
+              <Name>Torque demand</Name>
+              <DataType>UINT16</DataType>
+            </Entry>
+          </TxPdo>
+        </Device>
+      </Devices>
+    </Descriptions>
+  </EtherCATInfo>
+</EtherCATInfoList>

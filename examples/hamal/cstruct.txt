@@ -1,0 +1,186 @@
+/* Master 0, Slave 0, "Flexi Soft EtherCAT Gateway"
+ * Vendor ID:       0x01000056
+ * Product code:    0x00002301
+ * Revision number: 0x00010000
+ */
+
+ec_pdo_entry_info_t slave_0_pdo_entries[] = {
+    {0x2001, 0x01, 80}, /* Dataset1 */
+    {0x10f3, 0x04, 8}, /* New Messages Available */
+    {0x2000, 0x01, 80}, /* Dataset1 */
+};
+
+ec_pdo_info_t slave_0_pdos[] = {
+    {0x1600, 1, slave_0_pdo_entries + 0}, /* Out */
+    {0x1a00, 2, slave_0_pdo_entries + 1}, /* In */
+};
+
+ec_sync_info_t slave_0_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 1, slave_0_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 1, slave_0_pdos + 1, EC_WD_DISABLE},
+    {0xff}
+};
+
+/* Master 0, Slave 1
+ * Vendor ID:       0x000022d2
+ * Product code:    0x00000201
+ * Revision number: 0x0a00000c
+ */
+
+ec_pdo_entry_info_t slave_1_pdo_entries[] = {
+    {0x6040, 0x00, 16}, /* Controlword */
+    {0x6060, 0x00, 8}, /* Modes of operation */
+    {0x6071, 0x00, 16}, /* Target Torque */
+    {0x607a, 0x00, 32}, /* Target position */
+    {0x60ff, 0x00, 32}, /* Target velocity */
+    {0x60b2, 0x00, 16}, /* Torque offset */
+    {0x2701, 0x00, 32}, /* Tuning command */
+    {0x60fe, 0x01, 32}, /* Physical outputs */
+    {0x60fe, 0x02, 32}, /* Bit mask */
+    {0x2703, 0x00, 32}, /* User MOSI */
+    {0x60b1, 0x00, 32}, /* Velocity offset */
+    {0x6041, 0x00, 16}, /* Statusword */
+    {0x6061, 0x00, 8}, /* Modes of operation display */
+    {0x6064, 0x00, 32}, /* Position actual value */
+    {0x606c, 0x00, 32}, /* Velocity actual value */
+    {0x6077, 0x00, 16}, /* Torque actual value */
+    {0x2401, 0x00, 16}, /* Analog input 1 */
+    {0x2402, 0x00, 16}, /* Analog input 2 */
+    {0x2403, 0x00, 16}, /* Analog input 3 */
+    {0x2404, 0x00, 16}, /* Analog input 4 */
+    {0x2702, 0x00, 32}, /* Tuning status */
+    {0x60fd, 0x00, 32}, /* Digital inputs */
+    {0x2704, 0x00, 32}, /* User MISO */
+    {0x20f0, 0x00, 32}, /* Timestamp */
+    {0x60fc, 0x00, 32}, /* Position demand internal value */
+    {0x606b, 0x00, 32}, /* Velocity demand value */
+    {0x6074, 0x00, 16}, /* Torque demand */
+};
+
+ec_pdo_info_t slave_1_pdos[] = {
+    {0x1600, 7, slave_1_pdo_entries + 0}, /* Receive PDO1 mapping */
+    {0x1601, 2, slave_1_pdo_entries + 7}, /* Receive PDO2 mapping */
+    {0x1602, 2, slave_1_pdo_entries + 9}, /* Receive PDO3 mapping */
+    {0x1a00, 5, slave_1_pdo_entries + 11}, /* Transmit PDO1 mapping */
+    {0x1a01, 5, slave_1_pdo_entries + 16}, /* Transmit PDO2 mapping */
+    {0x1a02, 1, slave_1_pdo_entries + 21}, /* Transmit PDO3 mapping */
+    {0x1a03, 5, slave_1_pdo_entries + 22}, /* Transmit PDO4 mapping */
+};
+
+ec_sync_info_t slave_1_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 3, slave_1_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 4, slave_1_pdos + 3, EC_WD_DISABLE},
+    {0xff}
+};
+
+/* Master 0, Slave 2
+ * Vendor ID:       0x000022d2
+ * Product code:    0x00000201
+ * Revision number: 0x0a00000c
+ */
+
+ec_pdo_entry_info_t slave_2_pdo_entries[] = {
+    {0x6040, 0x00, 16}, /* Controlword */
+    {0x6060, 0x00, 8}, /* Modes of operation */
+    {0x6071, 0x00, 16}, /* Target Torque */
+    {0x607a, 0x00, 32}, /* Target position */
+    {0x60ff, 0x00, 32}, /* Target velocity */
+    {0x60b2, 0x00, 16}, /* Torque offset */
+    {0x2701, 0x00, 32}, /* Tuning command */
+    {0x60fe, 0x01, 32}, /* Physical outputs */
+    {0x60fe, 0x02, 32}, /* Bit mask */
+    {0x2703, 0x00, 32}, /* User MOSI */
+    {0x60b1, 0x00, 32}, /* Velocity offset */
+    {0x6041, 0x00, 16}, /* Statusword */
+    {0x6061, 0x00, 8}, /* Modes of operation display */
+    {0x6064, 0x00, 32}, /* Position actual value */
+    {0x606c, 0x00, 32}, /* Velocity actual value */
+    {0x6077, 0x00, 16}, /* Torque actual value */
+    {0x2401, 0x00, 16}, /* Analog input 1 */
+    {0x2402, 0x00, 16}, /* Analog input 2 */
+    {0x2403, 0x00, 16}, /* Analog input 3 */
+    {0x2404, 0x00, 16}, /* Analog input 4 */
+    {0x2702, 0x00, 32}, /* Tuning status */
+    {0x60fd, 0x00, 32}, /* Digital inputs */
+    {0x2704, 0x00, 32}, /* User MISO */
+    {0x20f0, 0x00, 32}, /* Timestamp */
+    {0x60fc, 0x00, 32}, /* Position demand internal value */
+    {0x606b, 0x00, 32}, /* Velocity demand value */
+    {0x6074, 0x00, 16}, /* Torque demand */
+};
+
+ec_pdo_info_t slave_2_pdos[] = {
+    {0x1600, 7, slave_2_pdo_entries + 0}, /* Receive PDO1 mapping */
+    {0x1601, 2, slave_2_pdo_entries + 7}, /* Receive PDO2 mapping */
+    {0x1602, 2, slave_2_pdo_entries + 9}, /* Receive PDO3 mapping */
+    {0x1a00, 5, slave_2_pdo_entries + 11}, /* Transmit PDO1 mapping */
+    {0x1a01, 5, slave_2_pdo_entries + 16}, /* Transmit PDO2 mapping */
+    {0x1a02, 1, slave_2_pdo_entries + 21}, /* Transmit PDO3 mapping */
+    {0x1a03, 5, slave_2_pdo_entries + 22}, /* Transmit PDO4 mapping */
+};
+
+ec_sync_info_t slave_2_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 3, slave_2_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 4, slave_2_pdos + 3, EC_WD_DISABLE},
+    {0xff}
+};
+
+/* Master 0, Slave 3
+ * Vendor ID:       0x000022d2
+ * Product code:    0x00000201
+ * Revision number: 0x0a00000c
+ */
+
+ec_pdo_entry_info_t slave_3_pdo_entries[] = {
+    {0x6040, 0x00, 16}, /* Controlword */
+    {0x6060, 0x00, 8}, /* Modes of operation */
+    {0x6071, 0x00, 16}, /* Target Torque */
+    {0x607a, 0x00, 32}, /* Target position */
+    {0x60ff, 0x00, 32}, /* Target velocity */
+    {0x60b2, 0x00, 16}, /* Torque offset */
+    {0x2701, 0x00, 32}, /* Tuning command */
+    {0x60fe, 0x01, 32}, /* Physical outputs */
+    {0x60fe, 0x02, 32}, /* Bit mask */
+    {0x2703, 0x00, 32}, /* User MOSI */
+    {0x60b1, 0x00, 32}, /* Velocity offset */
+    {0x6041, 0x00, 16}, /* Statusword */
+    {0x6061, 0x00, 8}, /* Modes of operation display */
+    {0x6064, 0x00, 32}, /* Position actual value */
+    {0x606c, 0x00, 32}, /* Velocity actual value */
+    {0x6077, 0x00, 16}, /* Torque actual value */
+    {0x2401, 0x00, 16}, /* Analog input 1 */
+    {0x2402, 0x00, 16}, /* Analog input 2 */
+    {0x2403, 0x00, 16}, /* Analog input 3 */
+    {0x2404, 0x00, 16}, /* Analog input 4 */
+    {0x2702, 0x00, 32}, /* Tuning status */
+    {0x60fd, 0x00, 32}, /* Digital inputs */
+    {0x2704, 0x00, 32}, /* User MISO */
+    {0x20f0, 0x00, 32}, /* Timestamp */
+    {0x60fc, 0x00, 32}, /* Position demand internal value */
+    {0x606b, 0x00, 32}, /* Velocity demand value */
+    {0x6074, 0x00, 16}, /* Torque demand */
+};
+
+ec_pdo_info_t slave_3_pdos[] = {
+    {0x1600, 7, slave_3_pdo_entries + 0}, /* Receive PDO1 mapping */
+    {0x1601, 2, slave_3_pdo_entries + 7}, /* Receive PDO2 mapping */
+    {0x1602, 2, slave_3_pdo_entries + 9}, /* Receive PDO3 mapping */
+    {0x1a00, 5, slave_3_pdo_entries + 11}, /* Transmit PDO1 mapping */
+    {0x1a01, 5, slave_3_pdo_entries + 16}, /* Transmit PDO2 mapping */
+    {0x1a02, 1, slave_3_pdo_entries + 21}, /* Transmit PDO3 mapping */
+    {0x1a03, 5, slave_3_pdo_entries + 22}, /* Transmit PDO4 mapping */
+};
+
+ec_sync_info_t slave_3_syncs[] = {
+    {0, EC_DIR_OUTPUT, 0, NULL, EC_WD_DISABLE},
+    {1, EC_DIR_INPUT, 0, NULL, EC_WD_DISABLE},
+    {2, EC_DIR_OUTPUT, 3, slave_3_pdos + 0, EC_WD_ENABLE},
+    {3, EC_DIR_INPUT, 4, slave_3_pdos + 3, EC_WD_DISABLE},
+    {0xff}
+};

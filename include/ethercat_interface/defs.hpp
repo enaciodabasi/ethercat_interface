@@ -95,7 +95,8 @@ namespace ethercat_interface
                     Fault = 8
                 };
         }
-    }
-}
+    } 
+
+} // End of namespace ethercat_interface
 
 #endif
