@@ -19,6 +19,8 @@
 #include <variant>
 #include <map>
 #include <optional>
+#include <queue>
+#include <deque>
 
 #include "ecrt.h"
 
@@ -489,19 +491,43 @@ namespace ethercat_interface
             std::vector<T> byteArray;
             
             bool firstByte = true;
+            std::size_t memoryOffset = 0;
+            
             while(byteArray.size() != SIZE)
             {
                 if(firstByte)
                 {
-                    const auto byte = ((T) *((uint8_t*)(data)));
-                    byteArray.emplace_back(byte);
+                    memoryOffset = 0;
                     firstByte = false;
                 }
                 else
                 {
-                    const auto byte = ((T) *((uint8_t*)(data + sizeof(T))));
-                    byteArray.emplace_back(byte);
+                    memoryOffset = sizeof(T);
                 }
+
+                T byte = T();
+                if constexpr (std::is_same_v<uint8_t, T> || std::is_same_v<int8_t, T>)
+                {
+                    byte = ((T) *((uint8_t*)(data + memoryOffset)));
+                }
+                else if constexpr (std::is_same_v<uint16_t, T> || std::is_same_v<int16_t, T>)
+                {
+                    byte = ((T) *(uint16_t*)((void*)(data + memoryOffset)));
+                }
+                else if constexpr (std::is_same_v<uint32_t, T> || std::is_same_v<int32_t, T>)
+                {
+                    byte = ((T) *(uint32_t*)((void*)(data + memoryOffset)));
+                }
+                else if constexpr (std::is_same_v<uint64_t, T> || std::is_same_v<int64_t, T>)
+                {
+                    byte = ((T) *(uint64_t*)((void*)(data + memoryOffset)));
+                }
+                else
+                {
+                    break;
+                }
+                
+                byteArray.emplace_back(byte);
                 
             }
             
@@ -525,21 +551,49 @@ namespace ethercat_interface
 
             int16_t remainingBytes = value_array.size();
             bool initialWrite = true;
-            while(remainingBytes != 0)
+            std::queue<T> valueQueue(value_array.begin(), value_array.end());
+
+            std::size_t memoryOffset = 0;
+
+            while(!valueQueue.empty())
             {
                 
                 if(initialWrite)
                 {
-                    *((uint8_t*)(data)) = ((uint8_t)(value_array[value_array.size() - remainingBytes]));
+                    memoryOffset = 0;
                     initialWrite = false;
                 }
                 else
                 {
-                    *((uint8_t*)(data + sizeof(uint8_t))) = ((uint8_t)(value_array[value_array.size() - remainingBytes]));
+                    memoryOffset = sizeof(T);
                 }
                 
-                
+                const auto value = valueQueue.front();
+
+                if constexpr (std::is_same_v<uint8_t, T> || std::is_same_v<int8_t, T>)
+                {
+                    *((uint8_t*)(data + memoryOffset)) = ((uint8_t)(value));
+                }
+                else if constexpr (std::is_same_v<uint16_t, T> || std::is_same_v<int16_t, T>)
+                {
+                    *((uint16_t*)(data + memoryOffset)) = ((uint16_t)(value));
+                }
+                else if constexpr (std::is_same_v<uint32_t, T> || std::is_same_v<int32_t, T>)
+                {
+                    *((uint32_t*)(data + memoryOffset)) = ((uint32_t)(value));
+                }
+                else if constexpr (std::is_same_v<uint64_t, T> || std::is_same_v<int64_t, T>)
+                {
+                    *((uint64_t*)(data + memoryOffset)) = ((uint64_t)(value));
+                }
+                else
+                {
+                    break;
+                }
+
+                valueQueue.pop();
                 remainingBytes -= 1;
+                
             }
 
         }
