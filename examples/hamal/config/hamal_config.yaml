@@ -100,10 +100,10 @@ pdo_entry_info:
 slave_sync_info:
   num_sync_managers: 4
   sync_manager_directions:
-    - 1
-    - 2
-    - 1
-    - 2
+    - output
+    - input
+    - output
+    - input
   number_of_pdos:
     - 0
     - 0
@@ -115,12 +115,10 @@ slave_sync_info:
     - 0
     - 1
   watchdog_mode:
-    - 2
-    - 2
-    - 1
-    - 2
-
-...
+    - disable
+    - disable
+    - enable
+    - disable
 
 ...
 
@@ -197,10 +195,10 @@ pdo_entry_info:
 slave_sync_info:
   num_sync_managers: 4
   sync_manager_directions:
-    - 1
-    - 2
-    - 1
-    - 2
+    - output
+    - input
+    - output
+    - input
   number_of_pdos:
     - 0
     - 0
@@ -212,10 +210,10 @@ slave_sync_info:
     - 0
     - 1
   watchdog_mode:
-    - 2
-    - 2
-    - 1
-    - 2
+    - disable
+    - disable
+    - enable
+    - disable
 dc_info:
   assign_activate: 0x300
   sync0_cycle: 2000000
@@ -223,5 +221,4 @@ dc_info:
   sync1_cycle: 2000000
   sync1_shift: 0
 
-...
 ...

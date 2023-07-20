@@ -144,6 +144,8 @@ namespace ethercat_interface
                 bool isShutdown = s.second->shutdownSlaves();
                 isShutdown ? areAllShutdown = true : areAllShutdown = false;
             }
+
+            return areAllShutdown;
         }
 
         ec_domain_t* Master::getDomainPtr(const std::string& domain_name)

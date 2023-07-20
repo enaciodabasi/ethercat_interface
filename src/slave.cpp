@@ -149,7 +149,8 @@ namespace ethercat_interface
 
         bool Slave::enableOperation()
         {
-
+            
+        
             const auto status_word = readFromSlave<uint16_t>("status_word");
             
             if(!status_word)

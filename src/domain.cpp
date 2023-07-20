@@ -144,7 +144,8 @@ namespace ethercat_interface
 
             for(const auto& s : m_RegisteredSlaves)
             {
-                if(s.second->getSlaveInfo().slaveType == SlaveType::Coupler)
+                const auto slaveType = s.second->getSlaveInfo().slaveType;
+                if(slaveType == SlaveType::Coupler || slaveType == SlaveType::PLC)
                 {
                     continue;
                 }
@@ -172,6 +173,8 @@ namespace ethercat_interface
                 bool isShutdown = s.second->shutdown();
                 isShutdown ? areAllShutdown = true : areAllShutdown = false;
             }
+
+            return areAllShutdown;
         }
 
         void Domain::createDomainPdoEntryRegistries()

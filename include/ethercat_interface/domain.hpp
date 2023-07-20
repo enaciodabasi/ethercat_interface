@@ -94,6 +94,19 @@ namespace ethercat_interface
                 std::optional<int> bit_position = std::nullopt
             );
 
+            template<typename T, std::size_t SIZE>
+            std::optional<std::vector<T>> readArray(
+                const std::string& slave_name,
+                const std::string& pdo_name
+            );
+
+            template <typename T>
+            void writeArray(
+                const std::string& slave_name,
+                const std::string& pdo_name,
+                const std::vector<T>& value_to_write
+            );
+
             /**
              * @brief: Stores the slave pointers inside the m_RegisteredSlaves Map.
              * 
@@ -224,6 +237,40 @@ namespace ethercat_interface
                 bit_position
             );
         }
+
+        template<typename T, std::size_t SIZE>
+        std::optional<std::vector<T>> Domain::readArray(
+            const std::string& slave_name,
+            const std::string& pdo_name
+        )
+        {
+            if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
+            {
+                return std::nullopt;
+            }
+
+            return m_RegisteredSlaves.at(slave_name)->readArray<T, SIZE>(
+                pdo_name
+            );
+        }
+
+        template <typename T>
+        void Domain::writeArray(
+            const std::string& slave_name,
+            const std::string& pdo_name,
+            const std::vector<T>& value_to_write
+        )
+        {
+            if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end())
+            {
+                return;
+            }
+
+            m_RegisteredSlaves.at(slave_name)->writeArray<T>(
+                pdo_name, 
+                value_to_write
+            );
+        }   
         
         
     }

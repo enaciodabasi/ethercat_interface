@@ -14,7 +14,10 @@
 
 #include "ethercat_interface/controller.hpp"
 
+#include <math.h>
 #include <signal.h>
+
+constexpr double angularToRPM_Constant = ((180 / M_PI) / 6) * 24.635; 
 
 class HamalController : public ethercat_interface::controller::Controller
 {
@@ -29,6 +32,8 @@ class HamalController : public ethercat_interface::controller::Controller
     private:
 
     void cyclicTask() override;
+
+    
 
 };
 

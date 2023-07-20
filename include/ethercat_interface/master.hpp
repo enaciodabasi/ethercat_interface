@@ -79,6 +79,21 @@ namespace ethercat_interface
                 std::optional<int> bit_position = std::nullopt
             );
 
+            template<typename T, std::size_t SIZE>
+            std::optional<std::vector<T>> readArray(
+                const std::string& domain_name,
+                const std::string& slave_name,
+                const std::string& pdo_name
+            );
+
+            template<typename T>
+            void writeArray(
+                const std::string& domain_name,
+                const std::string& slave_name,
+                const std::string& pdo_name,
+                const std::vector<T>& array_to_write
+            );
+
             /**
              * @brief 
              * 
@@ -193,7 +208,7 @@ namespace ethercat_interface
             if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
             {
                 // TODO: Throw exception
-                
+                return std::nullopt;    
             }
 
             return m_RegisteredDomains.at(domain_name)->read<T>(
@@ -202,6 +217,45 @@ namespace ethercat_interface
                 bit_position
             );
         }
+
+        template<typename T, std::size_t SIZE>
+        std::optional<std::vector<T>> Master::readArray(
+            const std::string& domain_name,
+            const std::string& slave_name,
+            const std::string& pdo_name
+        )
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                return std::nullopt;
+            }
+
+            return m_RegisteredDomains.at(domain_name)->readArray<T, SIZE>(
+                slave_name,
+                pdo_name
+            );
+        }
+
+        template<typename T>
+        void Master::writeArray(
+            const std::string& domain_name,
+            const std::string& slave_name,
+            const std::string& pdo_name,
+            const std::vector<T>& array_to_write 
+        )
+        {
+            if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+            {
+                return;
+            }
+
+            m_RegisteredDomains.at(domain_name)->writeArray(
+                slave_name,
+                pdo_name,
+                array_to_write
+            );
+        }
+
 
         template<typename T>
         bool Master::sdo_write(
