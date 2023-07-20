@@ -167,6 +167,68 @@ namespace ethercat_interface
             return dirs;
         }
 
+        const std::vector<ec_direction_t> getEcDirections(const std::vector<std::string>& directions)
+        {
+            std::vector<ec_direction_t> dirs;
+            
+            for(std::size_t i = 0; i < directions.size(); i++)
+            {
+                const std::string currentDirection = directions[i];
+                if(currentDirection == "invalid")
+                {
+                    dirs.push_back(EC_DIR_INVALID);
+                }
+                else if(currentDirection == "output")
+                {
+                    dirs.push_back(EC_DIR_OUTPUT);
+                }
+                else if(currentDirection == "input")
+                {
+                    dirs.push_back(EC_DIR_INPUT);
+                }
+                else if(currentDirection == "count")
+                {
+                    dirs.push_back(EC_DIR_COUNT);
+                }
+                else
+                {
+                    dirs.push_back(EC_DIR_INVALID);
+                }
+
+            }
+
+            return dirs;
+        }
+
+        const std::vector<ec_watchdog_mode_t> getEcWatchdogModes(const std::vector<std::string>& watchdog_modes)
+        {
+            std::vector<ec_watchdog_mode_t> watchdogModes;
+            
+            for(std::size_t i = 0; i < watchdog_modes.size(); i++)
+            {   
+                const std::string currentMode = watchdog_modes[i];
+                if(currentMode == "default")
+                {
+                    watchdogModes.push_back(EC_WD_DEFAULT);
+                }
+                else if(currentMode == "enable")
+                {
+                    watchdogModes.push_back(EC_WD_ENABLE);
+                }
+                else if(currentMode == "disable")
+                {
+                    watchdogModes.push_back(EC_WD_DISABLE);
+                }
+                else
+                {
+                    watchdogModes.push_back(EC_WD_DEFAULT);
+                }
+
+            }
+
+            return watchdogModes;
+        }
+
         std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int> &watchdog_modes)
         {
             std::vector<ec_watchdog_mode_t> watchdogModes;
@@ -336,69 +398,6 @@ namespace ethercat_interface
             return output;
         }
 
-        SlaveInfo parse_config_file(
-            const std::string& file_name,
-            const std::string& slave_name
-        )
-        {
-
-            SlaveInfo info;
-
-            try{
-
-                YAML::Node config_file = YAML::LoadFile(file_name);
-
-                YAML::Node slave_config  = config_file[slave_name];
-
-                info.slaveName = slave_name;
-                const std::string typeStr = slave_config["type"].as<std::string>();
-                if(typeStr == "coupler" || typeStr == "Coupler")
-                {
-                    info.slaveType = SlaveType::Coupler;
-                    return info;
-                }
-                else if(typeStr == "driver" || typeStr == "Driver")
-                {
-                    info.slaveType = SlaveType::Driver;
-                }
-
-                info.vendorID = slave_config["vendor_id"].as<int>();
-                info.productCode = slave_config["product_id"].as<int>();
-                info.position = slave_config["slave_position"].as<uint>();
-                info.alias = slave_config["slave_alias"].as<uint>();
-                
-                info.pdoEntryInfo.indexes = slave_config["pdo_entry_info"]["indexes"].as<std::vector<uint16_t>>();
-                info.pdoEntryInfo.subindexes = toHexadecimal(slave_config["pdo_entry_info"]["subindexes"].as<std::vector<uint>>());
-                
-                info.pdoEntryInfo.bitLengths = slave_config["pdo_entry_info"]["bit_lengths"].as<std::vector<uint16_t>>();
-                
-                info.ioMappingInfo.RxPDO_Address = slave_config["pdo_entry_info"]["rxpdo_address"].as<uint16_t>();
-                info.ioMappingInfo.TxPDO_Address = slave_config["pdo_entry_info"]["txpdo_address"].as<uint16_t>();
-                info.ioMappingInfo.RxPDO_Size = slave_config["pdo_entry_info"]["rxpdo_size"].as<unsigned int>();
-                info.ioMappingInfo.TxPDO_Size = slave_config["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
-                info.ioMappingInfo.RxPDO_Indexes = slave_config["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
-                info.ioMappingInfo.TxPDO_Indexes = slave_config["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
-
-                info.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(slave_config["slave_sync_info"]["num_sync_managers"].as<int>());
-                info.slaveSyncInfo.syncManagerDirections = slave_config["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();
-                info.slaveSyncInfo.numPDOs = slave_config["slave_sync_info"]["number_of_pdos"].as<std::vector<uint>>();
-                const std::vector<std::string> tempPdoDiffs = slave_config["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
-                info.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
-                info.slaveSyncInfo.watchdogModes = slave_config["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
-
-            }catch(const YAML::BadFile& ex)
-            {
-                
-                std::cout << ex.what();
-            }
-            catch(const YAML::TypedBadConversion<unsigned short>& ex)
-            {
-                info.toString();
-            }
-
-            return info;
-        }
-
         std::optional<std::vector<SlaveInfo>> parse_config_file(std::string_view file_name)
         {   
             std::vector<SlaveInfo> slaveConfigs;
@@ -439,6 +438,10 @@ namespace ethercat_interface
                     else if(typeStr == "driver" || typeStr == "Driver")
                     {
                         conf.slaveType = SlaveType::Driver;
+                    }
+                    else if(typeStr == "PLC" || typeStr == "plc")
+                    {
+                        conf.slaveType = SlaveType::PLC;
                     }
                     else if(typeStr == "DigitalInput")
                     {
@@ -530,11 +533,11 @@ namespace ethercat_interface
                     //conf.ioMappingInfo.RxPDO_Size = conf.ioMappingInfo.RxPDO_Indexes.size();                        
                     //conf.ioMappingInfo.TxPDO_Size = conf.ioMappingInfo.TxPDO_Indexes.size();
                     conf.slaveSyncInfo.numSyncManagers = static_cast<std::size_t>(doc["slave_sync_info"]["num_sync_managers"].as<int>());
-                    conf.slaveSyncInfo.syncManagerDirections = doc["slave_sync_info"]["sync_manager_directions"].as<std::vector<int>>();
+                    conf.slaveSyncInfo.syncManagerDirections = getEcDirections(doc["slave_sync_info"]["sync_manager_directions"].as<std::vector<std::string>>());
                     conf.slaveSyncInfo.numPDOs = doc["slave_sync_info"]["number_of_pdos"].as<std::vector<uint>>();
                     const std::vector<std::string> tempPdoDiffs = doc["slave_sync_info"]["pdo_index_diff"].as<std::vector<std::string>>();
                     conf.slaveSyncInfo.pdoIndexDiff = detect_null_diffs(tempPdoDiffs);
-                    conf.slaveSyncInfo.watchdogModes = doc["slave_sync_info"]["watchdog_mode"].as<std::vector<int>>();
+                    conf.slaveSyncInfo.watchdogModes = getEcWatchdogModes(doc["slave_sync_info"]["watchdog_mode"].as<std::vector<std::string>>());
                     
                     if(const auto dcConfig = doc["dc_info"])
                     {
@@ -700,10 +703,10 @@ namespace ethercat_interface
     SlaveSyncInfo::SlaveSyncInfo()
     {
         numSyncManagers = 0;
-        syncManagerDirections = std::vector<int>();
+        syncManagerDirections = std::vector<ec_direction_t>();
         numPDOs = std::vector<uint>();
         pdoIndexDiff = std::vector<std::optional<int>>();
-        watchdogModes = std::vector<int>();
+        watchdogModes = std::vector<ec_watchdog_mode_t>();
     }
     
     SlaveInfo::SlaveInfo()

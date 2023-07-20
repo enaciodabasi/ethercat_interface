@@ -20,6 +20,7 @@ namespace ethercat_interface
     {
         Coupler,
         Driver,
+        PLC,
         DigitalInput,
         DigitalOutput,
         AnalogInput,

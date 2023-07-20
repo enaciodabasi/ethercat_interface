@@ -89,11 +89,11 @@ namespace ethercat_interface
 
             m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
                 m_SlaveInfo.slaveSyncInfo.numSyncManagers,
-                ethercat_interface::utilities::intToEcDirectionEnum(m_SlaveInfo.slaveSyncInfo.syncManagerDirections),
+                m_SlaveInfo.slaveSyncInfo.syncManagerDirections,
                 m_SlaveInfo.slaveSyncInfo.numPDOs,
                 m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
                 m_SlavePDOs,
-                ethercat_interface::utilities::intToEcWatchdogEnum(m_SlaveInfo.slaveSyncInfo.watchdogModes)
+                m_SlaveInfo.slaveSyncInfo.watchdogModes
             );
 
 /*             m_Logger->log(INFO, m_SlaveName, "Loaded slave configuration.");

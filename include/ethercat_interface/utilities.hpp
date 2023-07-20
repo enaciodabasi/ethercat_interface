@@ -33,7 +33,7 @@
 namespace ethercat_interface
 {
 
-    enum EC_Type
+    enum class EC_Type
     {
             UINT8,
             UINT16,
@@ -46,6 +46,14 @@ namespace ethercat_interface
             FLOAT,
             DOUBLE,
             BIT,
+            INT8_ARRAY,
+            UINT8_ARRAY,
+            INT16_ARRAY,
+            UINT16_ARRAY,
+            INT32_ARRAY,
+            UINT32_ARRAY,
+            INT64_ARRAY,
+            UINT64_ARRAY,
             UNDEFINED
     };
 
@@ -55,14 +63,14 @@ namespace ethercat_interface
 
             std::size_t numSyncManagers;
 
-            std::vector<int> syncManagerDirections;
+            std::vector<ec_direction_t> syncManagerDirections;
 
             std::vector<uint> numPDOs;
 
             //std::vector<std::string> pdoIndexDiff;
             std::vector<std::optional<int>> pdoIndexDiff;
 
-            std::vector<int> watchdogModes;
+            std::vector<ec_watchdog_mode_t> watchdogModes;
 
             void toString()
             {      
@@ -172,8 +180,7 @@ namespace ethercat_interface
     namespace
     {
         
-
-        std::vector<std::pair<std::string, EC_Type>> EC_TYPE_STRING_PAIRS = {
+        inline const std::vector<std::pair<std::string, EC_Type>> EC_TYPE_STRING_PAIRS = {
             {"uint8", EC_Type::UINT8},
             {"uint16", EC_Type::UINT16},
             {"uint32", EC_Type::UINT32},
@@ -184,7 +191,15 @@ namespace ethercat_interface
             {"int64", EC_Type::INT64},
             {"float", EC_Type::FLOAT},
             {"double", EC_Type::DOUBLE},
-            {"bit", EC_Type::BIT}
+            {"bit", EC_Type::BIT},
+            {"uint8[]", EC_Type::UINT8_ARRAY},
+            {"uint16[]", EC_Type::UINT16_ARRAY},
+            {"uint32[]", EC_Type::UINT32_ARRAY},
+            {"uint64[]", EC_Type::UINT64_ARRAY},
+            {"int8[]", EC_Type::INT8_ARRAY},
+            {"int16[]", EC_Type::INT16_ARRAY},
+            {"int32[]", EC_Type::INT32_ARRAY},
+            {"int64[]", EC_Type::INT64_ARRAY}
         }; 
     }
     
@@ -265,7 +280,11 @@ namespace ethercat_interface
         
         std::vector<ec_direction_t> intToEcDirectionEnum(const std::vector<int>& directions);
 
+        const std::vector<ec_direction_t> getEcDirections(const std::vector<std::string>& directions);
+
         std::vector<ec_watchdog_mode_t> intToEcWatchdogEnum(const std::vector<int>& watchdog_modes);
+
+        const std::vector<ec_watchdog_mode_t> getEcWatchdogModes(const std::vector<std::string>& watchdog_modes);
 
         class toHexaHelper
         {
@@ -287,11 +306,6 @@ namespace ethercat_interface
         
 
         DC_Info getDcInfo(
-            const std::string& file_name,
-            const std::string& slave_name
-        );
-
-        SlaveInfo parse_config_file(
             const std::string& file_name,
             const std::string& slave_name
         );
