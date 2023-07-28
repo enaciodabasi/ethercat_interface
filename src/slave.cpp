@@ -18,7 +18,7 @@ namespace ethercat_interface
             
             m_SlaveName = m_SlaveInfo.slaveName;
 
-            if(m_SlaveInfo.slaveType != SlaveType::Coupler)
+            if(m_SlaveInfo.slaveType != SlaveType::Coupler || !m_SlaveInfo.ioMappingInfo.useDefaultPdoMapping)
             {
                 if(!m_SlaveInfo.pdoNames.empty())
                 {
@@ -32,7 +32,7 @@ namespace ethercat_interface
                 m_SlavePDOs = new ec_pdo_info_t[m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() + m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size()];
 
                 m_DataOffset = new offset::DataOffset(m_SlaveInfo.pdoNames);
-                if(std::holds_alternative<bool>(m_SlaveInfo.dcInfo))
+                if(std::holds_alternative<bool>(m_SlaveInfo.dcInfo) || m_SlaveInfo.slaveType == SlaveType::PLC)
                 {
                     ENABLE_DC = false;
                 }
@@ -69,6 +69,28 @@ namespace ethercat_interface
                 m_SlaveInfo.pdoEntryInfo.bitLengths)
             ;
 
+            //if(m_SlaveInfo.ioMappingInfo.useDefaultPdoMapping)
+            //{
+            //    /* std::vector<uint16_t> defaultMappings = m_SlaveInfo.ioMappingInfo.RxPDO_Indexes;
+            //    defaultMappings.insert(
+            //        defaultMappings.end(),
+            //        m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.begin(),
+            //        m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.end()
+            //    );
+//
+            //    m_SlavePDOs = assignDefaultPDOs(
+            //        defaultMappings
+            //    );
+//
+            //    m_SlaveSyncs = createDefaultSlaveSyncInfo(
+            //        m_SlavePDOs,
+            //        m_SlaveInfo.ioMappingInfo.RxPDO_Indexes,
+            //        m_SlaveInfo.ioMappingInfo.TxPDO_Indexes
+            //    ); */
+//
+//
+            //    
+            //}
             if(m_SlaveInfo.ioMappingInfo.RxPDO_Indexes.size() == 1 && m_SlaveInfo.ioMappingInfo.TxPDO_Indexes.size() == 1)
             {   
                 m_SlavePDOs = createSlavePDOs(
@@ -80,22 +102,26 @@ namespace ethercat_interface
                 );
             }
             else
+            {
                 m_SlavePDOs = ethercat_interface::slave::createSlavePDOs(
                     m_SlavePdoEntries,
                     m_SlaveInfo.ioMappingInfo.RxPDO_Indexes,
                     m_SlaveInfo.ioMappingInfo.TxPDO_Indexes
                 );
+            }
 
+            if(!m_SlaveInfo.ioMappingInfo.useDefaultPdoMapping)
+            {
+                m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
+                    m_SlaveInfo.slaveSyncInfo.numSyncManagers,
+                    m_SlaveInfo.slaveSyncInfo.syncManagerDirections,
+                    m_SlaveInfo.slaveSyncInfo.numPDOs,
+                    m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
+                    m_SlavePDOs,
+                    m_SlaveInfo.slaveSyncInfo.watchdogModes
+                );
 
-            m_SlaveSyncs = ethercat_interface::slave::createSlaveSyncs(
-                m_SlaveInfo.slaveSyncInfo.numSyncManagers,
-                m_SlaveInfo.slaveSyncInfo.syncManagerDirections,
-                m_SlaveInfo.slaveSyncInfo.numPDOs,
-                m_SlaveInfo.slaveSyncInfo.pdoIndexDiff,
-                m_SlavePDOs,
-                m_SlaveInfo.slaveSyncInfo.watchdogModes
-            );
-
+            }
 /*             m_Logger->log(INFO, m_SlaveName, "Loaded slave configuration.");
  */        }
 
@@ -109,29 +135,45 @@ namespace ethercat_interface
                 m_SlaveInfo.vendorID,
                 m_SlaveInfo.productCode
             );
-
-            if(m_SlaveInfo.slaveType == SlaveType::Coupler)
-            {
-                return;
-            }
         
             if(!slave_config_ptr)
             { 
 /*              m_Logger->log(ERROR, m_SlaveName, "Can't create EC slave config.");
  */         }
 
-            if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
+            if(m_SlaveInfo.slaveType == SlaveType::Coupler)
             {
-/*                 m_Logger->log(ERROR, m_SlaveName, "Can't specify PDO configuration for the slave.");
- */            
+                return;
             }
-            else
-            {
-                //std::cout << "Configured PDOs\n";       
-/*              m_Logger->log(INFO, m_SlaveName, "PDOs configured.");
- */         }
 
-            if(ENABLE_DC)
+            /* if(m_SlaveInfo.ioMappingInfo.useDefaultPdoMapping)
+            {   
+
+                if(ecrt_slave_config_pdos((*slave_config_ptr), 2, m_SlaveSyncs) != 0)
+                {
+                    std::cout << "Error while configuring PDOs" << std::endl;
+                }
+                else
+                {
+                    std::cout << "Configured PDOs" << std::endl;
+                }
+            } */
+            
+            if((!m_SlaveInfo.ioMappingInfo.useDefaultPdoMapping))
+            {
+                std::cout << "Configuring custom PDOs." << std::endl;
+                if(ecrt_slave_config_pdos((*slave_config_ptr), EC_END, m_SlaveSyncs) != 0)
+                {
+                
+                }
+                else
+                {
+
+                }
+            }
+            
+
+            if(ENABLE_DC && m_SlaveInfo.slaveType != SlaveType::PLC)
             {
                 ecrt_slave_config_dc(
                     (*slave_config_ptr),
@@ -143,6 +185,11 @@ namespace ethercat_interface
                 );  
             }
 
+            /* for(const auto p : m_SlaveInfo.pdoNames)
+            {
+                std::cout << *m_DataOffset->getDataOffset(p).value() << std::endl;
+            } */
+
 /*             m_Logger->log(INFO, m_SlaveName, "Successfully set up the slave.");
  */        }
 
@@ -150,7 +197,16 @@ namespace ethercat_interface
         bool Slave::enableOperation()
         {
             
-        
+            for(const auto p : m_SlaveInfo.pdoNames)
+            {
+                std::cout  << p << ": " << *m_DataOffset->getDataOffset(p).value() << std::endl;
+            }
+            if(m_SlaveInfo.slaveType  == SlaveType::PLC)
+            {
+
+                return true;
+            
+            }    
             const auto status_word = readFromSlave<uint16_t>("status_word");
             
             if(!status_word)
@@ -159,8 +215,8 @@ namespace ethercat_interface
             }
             
             m_Status = status_word.value();
-            std::cout << "Status Word: " << m_Status << std::endl;
-            if(state_machine::CIA402::detectCurrentState(status_word.value()) == state_machine::CIA402::State::OperationEnabled)
+/*             std::cout << "Status Word: " << m_Status << std::endl;
+ */            if(state_machine::CIA402::detectCurrentState(status_word.value()) == state_machine::CIA402::State::OperationEnabled)
             {
                 /* std::cout << "Operation Enabled state achieved\n"; */
                 return true;
@@ -177,85 +233,9 @@ namespace ethercat_interface
             }
 
             writeToSlave<uint16_t>("ctrl_word", control_word.value());
-            std::cout << "Control Word: " << control_word.value() << std::endl;
-
+/*             std::cout << "Control Word: " << control_word.value() << std::endl;
+ */
             return false;
-
-            // auto statusOpt = this->readFromSlave<uint16_t>("status_word");
-            // if(statusOpt == std::nullopt)
-            // {
-            //     std::cout << "Status word nullopt\n";
-            //     return false;
-            // }
-
-            // auto status = statusOpt.value();
-            // if(status != m_Status)
-            //     std::cout << m_Status << std::endl;
-
-            // m_Status = status;
-            
-            // const auto seventhBit = readFromSlave<bool>("status_word", 7);
-            // if(seventhBit != std::nullopt)
-            // {
-            //     m_StatusWordSeventhBit = seventhBit.value();
-            // }
-            // /*
-            //     Switch on disabled -> Ready to switch on : Shutdown command.
-            //     Ready to switch on -> Switched on: Switch on command.
-            //     Switched on -> Operation enabled: Enable operation command. 
-            //  */
- 
-            // if(isStatusCorrect(m_Status, StatusType::OperationEnabled))
-            // {   
-            //     /* std::cout << "Operation Enabled\n"; */
-            //     return true;
-            // }
-
-            // if (!isStatusCorrect(m_Status, StatusType::Fault))
-            // {
-            //     if(isStatusCorrect(m_Status, StatusType::SwitchOnDisabled))
-            //     {   
-            //         /* std::cout << "Switch on disabled\n"; */
-            //         writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::Shutdown));
-            //         return false;
-            //     }
-            //     else if(isStatusCorrect(m_Status, StatusType::ReadyToSwitchOn))
-            //     {
-            //         /* std::cout << "Ready To switch on\n"; */
-            //         writeToSlave<uint16_t>("ctrl_word", getCommandValue(ControlCommand::SwitchOn));
-            //         return false;
-            //     }
-            //     else if (isStatusCorrect(m_Status, StatusType::SwitchedOn))
-            //     {
-            //         /* std::cout << "Switched on\n"; */
-            //         writeToSlave<uint16_t>("ctrl_word", 0x000f);
-            //         return false;
-            //     }
-                
-            // }
-            // else
-            // {
-            //     if((m_Status & 0x0008) && !(m_Status & 0x0007))
-            //     {   
-            //         writeToSlave<uint16_t>("ctrl_word", 0x0080);
-
-            //         m_FaultResetRetries += 1;
-            //         if(m_FaultResetRetries == 20)
-            //         {   
-            //             m_FaultResetRetries = 0;
-            //             writeToSlave<uint16_t>("ctrl_word", 0x00);    
-            //         }
-            //     }
-            //     else
-            //     {
-            //         writeToSlave<uint16_t>("ctrl_word", 0x00);
-            //     }
-                    
-            //     return false;
-            // }
-            
-            
-            // return false;
             
         }
 
@@ -362,6 +342,20 @@ namespace ethercat_interface
             }
 
             return slavePDOs;
+        }
+
+        ec_pdo_info_t* assignDefaultPDOs(const std::vector<uint16_t>& pdo_mapping_indexes)
+        {
+            const std::size_t pdoSize = pdo_mapping_indexes.size();
+            
+            ec_pdo_info_t* pdos = new ec_pdo_info_t[pdoSize];
+            for(std::size_t i = 0; i < pdoSize; i++)
+            {   
+                *(pdos + i) = {pdo_mapping_indexes.at(i)};
+            }
+
+            return pdos;
+
         }
 
         // -----------------------------------
@@ -478,6 +472,21 @@ namespace ethercat_interface
             *(slaveSyncs + (int)num_sync_managers) = {0xff};
 
             return slaveSyncs;
+        }
+
+        ec_sync_info_t* createDefaultSlaveSyncInfo(
+            ec_pdo_info_t* default_pdos,
+            const std::vector<uint16_t>& rxpdo_indexes,
+            const std::vector<uint16_t>& txpdo_indexes
+        )
+        {
+            ec_sync_info_t* defaultSyncs = new ec_sync_info_t[2];
+            // RxPDOs:
+            defaultSyncs[0] = {3, EC_DIR_INPUT, (uint)rxpdo_indexes.size(), default_pdos + 0, };
+            //TxPDOs:
+            defaultSyncs[1] = {4, EC_DIR_OUTPUT, (uint)txpdo_indexes.size(), default_pdos + rxpdo_indexes.size(), };
+
+            return defaultSyncs; 
         }
 
     }

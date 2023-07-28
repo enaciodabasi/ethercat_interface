@@ -45,21 +45,20 @@ pdo_names:
   - "target_position"
   - "target_velocity"
   - "status_word"
-  - "op_mode_display"
   - "actual_position"
-  - "error_code"
   - "actual_velocity"
+  - "error_code"
+  - "following_error"
 pdo_types:
   - uint16
-  - int8
+  - uint8
   - int32
   - int32
   - uint16
-  - int8
+  - int32
   - int32
   - uint16
   - int32
-
 pdo_entry_info:
   indexes:
     - 0x6040
@@ -67,10 +66,10 @@ pdo_entry_info:
     - 0x607A
     - 0x60ff
     - 0x6041
-    - 0x6061
     - 0x6064
-    - 0x603F
     - 0x606c
+    - 0x603F
+    - 0x60F4
   subindexes:
     - 0x00
     - 0x00
@@ -87,10 +86,11 @@ pdo_entry_info:
     - 32
     - 32
     - 16
-    - 8
+    - 32
     - 32
     - 16
     - 32
+  use_default_pdo_mapping: false
   rxpdo_address: 0x1600
   txpdo_address: 0x1A00
   rxpdo_indexes:
@@ -102,10 +102,10 @@ pdo_entry_info:
 slave_sync_info:
   num_sync_managers: 4
   sync_manager_directions:
-    - 1
-    - 2
-    - 1
-    - 2
+    - output
+    - input
+    - output
+    - input
   number_of_pdos:
     - 0
     - 0
@@ -117,15 +117,201 @@ slave_sync_info:
     - 0
     - 1
   watchdog_mode:
-    - 2
-    - 2
-    - 1
-    - 2
+    - disable
+    - disable
+    - enable
+    - disable
 dc_info:
-  assign_activate: 0x300
+  assign_activate: 0x0300
   sync0_cycle: 2000000
   sync0_shift: 1000000
   sync1_cycle: 2000000
   sync1_shift: 0
+# slave_type: "driver"
+# num_of_slaves: 1
+# domain_name: "domain_0"
+# vendor_id: 0x000022d2
+# product_id: 0x00000201
+# slave_position: 0
+# slave_alias: 0
+# pdo_names:
+#   # - "ctrl_word"
+#   # - "op_mode"
+#   # - "target_position"
+#   # - "target_velocity"
+#   # - "status_word"
+#   # - "op_mode_display"
+#   # - "actual_position"
+#   # - "error_code"
+#   # - "actual_velocity"
+#   -  ctrl_word
+#   -  op_mode
+#   -  target_torque
+#   -  target_pos
+#   -  target_velocity
+#   -  target_torque
+#   -  tuning_cmd
+#   -  physical_outputs
+#   -  bitmask
+#   -  mosi
+#   -  velocity_offset
+#   -  status_word
+#   -  disp
+#   -  position_val
+#   -  velocity_val
+#   -  torque_val
+#   -  a1
+#   -  a2
+#   -  a3
+#   -  a4
+#   -  ts
+#   -  di
+#   -  miso2
+#   -  time
+#   -  position_demand
+#   -  vel_demand
+#   -  torque_demand
+# pdo_types:
+#   # - uint16
+#   # - int8
+#   # - int32
+#   # - int32
+#   # - uint16
+#   # - int8
+#   # - int32
+#   # - uint16
+#   # - int32
+#   -  uint16
+#   -  int8
+#   -  int32
+#   -  int32
+#   -  int32
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+#   -  uint16
+
+# pdo_entry_info:
+#   indexes:
+#     - 0x6040
+#     - 0x6060
+#     - 0x6071
+#     - 0x607a
+#     - 0x60ff
+#     - 0x60b2
+#     - 0x2701
+#     - 0x60fe
+#     - 0x60fe
+#     - 0x2703
+#     - 0x60b1
+#     - 0x6041
+#     - 0x6061
+#     - 0x6064
+#     - 0x606c
+#     - 0x6077
+#     - 0x2401
+#     - 0x2402
+#     - 0x2403
+#     - 0x2404
+#     - 0x2702
+#     - 0x60fd
+#     - 0x2704
+#     - 0x20f0
+#     - 0x60fc
+#     - 0x606b
+#     - 0x6074
+#   subindexes:
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x01
+#     - 0x02
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#     - 0x00
+#   bit_lengths:
+#     - 16
+#     - 8
+#     - 32
+#     - 32
+#     - 16
+#     - 8
+#     - 32
+#     - 16
+#     - 32
+#   use_default_pdo_mapping: true
+#   rxpdo_address: 0x1600
+#   txpdo_address: 0x1A00
+#   rxpdo_indexes:
+#    - 0x1600
+#   rxpdo_size: 4
+#   txpdo_indexes:
+#     - 0x1A00
+#   txpdo_size: 5
+# slave_sync_info:
+#   num_sync_managers: 4
+#   sync_manager_directions:
+#     - output
+#     - input
+#     - output
+#     - input
+#   number_of_pdos:
+#     - 0
+#     - 0
+#     - 1
+#     - 1
+#   pdo_index_diff:
+#     - "NULL"
+#     - "NULL"
+#     - 0
+#     - 1
+#   watchdog_mode:
+#     - disable
+#     - disable
+#     - enable
+#     - disable
+# dc_info:
+#   assign_activate: 0x300
+#   sync0_cycle: 2000000
+#   sync0_shift: 1000000
+#   sync1_cycle: 2000000
+#   sync1_shift: 0
 
 ...

@@ -114,6 +114,7 @@ namespace ethercat_interface
         struct IoMappingInfo
         {
             IoMappingInfo();
+            bool useDefaultPdoMapping = false;
             uint16_t RxPDO_Address;
             uint16_t TxPDO_Address;
             unsigned int RxPDO_Size;

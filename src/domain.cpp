@@ -145,7 +145,7 @@ namespace ethercat_interface
             for(const auto& s : m_RegisteredSlaves)
             {
                 const auto slaveType = s.second->getSlaveInfo().slaveType;
-                if(slaveType == SlaveType::Coupler || slaveType == SlaveType::PLC)
+                if(slaveType == SlaveType::Coupler)
                 {
                     continue;
                 }
@@ -193,9 +193,9 @@ namespace ethercat_interface
                 for(std::size_t j = 0; j < info.pdoEntryInfo.indexes.size(); j++)
                 {  
                     const std::string currDataName = s.second->getOffset()->getDataName(j);
-                    /* std::cout << currDataName << " " <<
+                    std::cout << currDataName << " " <<
                         info.pdoEntryInfo.indexes[j] << " " <<  (uint16_t)info.pdoEntryInfo.subindexes[j] << std::endl;
-                 */
+                
                     
                     if(s.second->getOffset()->getDataOffset(currDataName) != std::nullopt)
                         *(temp + i) = {
@@ -212,7 +212,7 @@ namespace ethercat_interface
                 }
                 
             }
-            *(temp + m_NumOfPdoEntryRegistries -1) = {};
+            *(temp + m_NumOfPdoEntryRegistries) = {};
             
             m_DomainPdoEntryRegistries = temp;
         }

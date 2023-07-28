@@ -11,6 +11,7 @@
 
 #include "../include/hamal/hamal_test.hpp"
 bool run = true;
+bool dc = true;
 
 HamalController::HamalController(const std::string& config_file_path) : Controller(config_file_path) {}
 
@@ -31,10 +32,12 @@ void HamalController::startTask()
 void HamalController::cyclicTask()
 {
 
+    if(dc)
     clock_gettime(m_DcHelper.clock, &m_DcHelper.wakeupTime);
 
     while(run)
     {
+        if(dc){
         this->setTaskWakeUpTime();
         sleep_task(
             m_DcHelper.clock,
@@ -42,9 +45,10 @@ void HamalController::cyclicTask()
             &m_DcHelper.wakeupTime,
             NULL
         );
+        
 
         m_Master->setMasterTime(timespecToNanoSec(m_DcHelper.wakeupTime));
-
+        }
         m_Master->receive("domain_0");
 
         m_Master->updateDomainStates();
@@ -53,11 +57,26 @@ void HamalController::cyclicTask()
 
         bool slavesEnabled = m_Master->enableSlaves();
 
-        this->m_Master->write<int8_t>("domain_0", "somanet_node_0", "op_mode", 0x09);
-        this->m_Master->write<int8_t>("domain_0", "somanet_node_1", "op_mode", 0x09);
+        /* this->m_Master->write<int8_t>("domain_0", "somanet_node_0", "op_mode", 0x09);
+        this->m_Master->write<int8_t>("domain_0", "somanet_node_1", "op_mode", 0x09); */
 
+        const auto plcInput = m_Master->readArray<int8_t, 10>("domain_0", "safety_plc", "input_data");
+        const auto diag = m_Master->read<uint8_t>("domain_0", "safety_plc", "diag");
+        std::vector<uint8_t> o = {55, 2, 33,44, 58, 23, 34, 24, 22, 21};
+        m_Master->writeArray<uint8_t>("domain_0", "safety_plc", "output_data", o);
+        if(diag)
+        std::cout << "Diag: " << (int16_t)diag.value() << std::endl;
+        if(plcInput)
+        {
+            int i = 0;
+            for(const auto input : plcInput.value())
+            {
+                std::cout << "PLC Input " << i << ": " << (uint16_t)input << std::endl;
+                i+=1;
+            }
+        }
 
-        if(slavesEnabled)
+        /* if(slavesEnabled)
         {
             const auto status0_o = m_Master->read<uint16_t>("domain_0", "somanet_node_0", "status_word");
             const auto status1_o = m_Master->read<uint16_t>("domain_0", "somanet_node_1", "status_word");
@@ -70,20 +89,22 @@ void HamalController::cyclicTask()
 
             const auto errorCode0_o = m_Master->read<uint16_t>("domain_0", "somanet_node_0", "error_code");
             const auto errorCode1_o = m_Master->read<uint16_t>("domain_0", "somanet_node_1", "error_code");
-        }
+        } */
 
 
 
-        if(slavesEnabled)
+        /* if(slavesEnabled)
         {
             double angularTarget = 0.2;
             int32_t targetVel = angularTarget * angularToRPM_Constant;
             m_Master->write<int32_t>("domain_0", "somanet_node_0", "target_velocity", targetVel); 
             m_Master->write<int32_t>("domain_0", "somanet_node_1", "target_velocity", targetVel);
-        }
+        } */
 
+        if(dc){
         clock_gettime(m_DcHelper.clock, &m_DcHelper.currentTime);
         m_Master->syncMasterClock(timespecToNanoSec(m_DcHelper.currentTime), m_DcHelper);
+        }
         m_Master->send("domain_0");
 
     }

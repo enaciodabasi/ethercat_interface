@@ -528,6 +528,7 @@ namespace ethercat_interface
                     conf.ioMappingInfo.TxPDO_Size = doc["pdo_entry_info"]["txpdo_size"].as<unsigned int>();
                     conf.ioMappingInfo.RxPDO_Indexes = doc["pdo_entry_info"]["rxpdo_indexes"].as<std::vector<uint16_t>>();
                     conf.ioMappingInfo.TxPDO_Indexes = doc["pdo_entry_info"]["txpdo_indexes"].as<std::vector<uint16_t>>();
+                    conf.ioMappingInfo.useDefaultPdoMapping = doc["pdo_entry_info"]["use_default_pdo_mapping"].as<bool>();
                     conf.ioMappingInfo.RxPDO_Address = conf.ioMappingInfo.RxPDO_Indexes[0];
                     conf.ioMappingInfo.TxPDO_Address = conf.ioMappingInfo.TxPDO_Indexes[0];
                     //conf.ioMappingInfo.RxPDO_Size = conf.ioMappingInfo.RxPDO_Indexes.size();                        

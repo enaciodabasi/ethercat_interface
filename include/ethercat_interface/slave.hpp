@@ -89,6 +89,9 @@ namespace ethercat_interface
             uint16_t RxPDO_start,
             uint16_t TxPDO_start
         );
+
+        ec_pdo_info_t* assignDefaultPDOs(const std::vector<uint16_t>& pdo_mapping_indexes);
+
         /**
          * @brief Create a ec_pdo_entry_reg_t struct pointer for mass PDO entry registration.
          * 
@@ -121,6 +124,12 @@ namespace ethercat_interface
             std::vector<std::optional<int>> index_to_add_to_pdo,
             ec_pdo_info_t* pdos,
             std::vector<ec_watchdog_mode_t> watchdog_modes
+        );
+
+        ec_sync_info_t* createDefaultSlaveSyncInfo(
+            ec_pdo_info_t* default_pdos,
+            const std::vector<uint16_t>& rxpdo_indexes,
+            const std::vector<uint16_t>& txpdo_indexes
         );
 
         /**
@@ -485,9 +494,13 @@ namespace ethercat_interface
             {
                 return std::nullopt;
             }        
-        
-            auto data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(pdo_name).value();
+
             
+            uint8_t* data = m_DomainProcessDataPtr + *m_DataOffset->getDataOffset(pdo_name).value();
+            if(!data)
+            {
+                std::cout << "Data ptr = nullptr" << std::endl;
+            }
             std::vector<T> byteArray;
             
             bool firstByte = true;
@@ -498,16 +511,16 @@ namespace ethercat_interface
                 if(firstByte)
                 {
                     memoryOffset = 0;
-                    firstByte = false;
                 }
                 else
                 {
-                    memoryOffset = sizeof(T);
+                    memoryOffset += 1;
                 }
-
-                T byte = T();
+                T byte = 20;
+                firstByte = false;
                 if constexpr (std::is_same_v<uint8_t, T> || std::is_same_v<int8_t, T>)
-                {
+                {   
+                    /* std::cout << "Addr: " << *((uint16_t*)(data)) << std::endl; */
                     byte = ((T) *((uint8_t*)(data + memoryOffset)));
                 }
                 else if constexpr (std::is_same_v<uint16_t, T> || std::is_same_v<int16_t, T>)
@@ -526,7 +539,6 @@ namespace ethercat_interface
                 {
                     break;
                 }
-                
                 byteArray.emplace_back(byte);
                 
             }
@@ -543,7 +555,7 @@ namespace ethercat_interface
         void Slave::writeArray(const std::string& pdo_name, const std::vector<T>& value_array)
         {
             if(m_DataOffset->getDataOffset(pdo_name) == std::nullopt)
-            {
+            {   
                 return;
             }        
         
@@ -551,7 +563,9 @@ namespace ethercat_interface
 
             int16_t remainingBytes = value_array.size();
             bool initialWrite = true;
-            std::queue<T> valueQueue(value_array.begin(), value_array.end());
+            std::queue<T> valueQueue;
+            for(const auto val : value_array)
+                valueQueue.push(val);
 
             std::size_t memoryOffset = 0;
 
@@ -572,6 +586,7 @@ namespace ethercat_interface
 
                 if constexpr (std::is_same_v<uint8_t, T> || std::is_same_v<int8_t, T>)
                 {
+                    
                     *((uint8_t*)(data + memoryOffset)) = ((uint8_t)(value));
                 }
                 else if constexpr (std::is_same_v<uint16_t, T> || std::is_same_v<int16_t, T>)

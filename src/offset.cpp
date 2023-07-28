@@ -10,7 +10,7 @@
  */
 
 #include "ethercat_interface/offset.hpp"
-
+#include <iostream>
 namespace ethercat_interface
 {
     namespace offset
@@ -20,7 +20,7 @@ namespace ethercat_interface
         DataOffset::DataOffset(const std::vector<std::string>& pdo_names)
         {
             for(const std::string& pdo : pdo_names)
-            {
+            {  
                 m_DataOffsets.emplace_back(std::make_pair(pdo, 0));
             }
     
