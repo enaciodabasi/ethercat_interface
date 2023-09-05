@@ -1,18 +1,5 @@
 ---
 startup_config:
-  -
-    slave_name: "safety_plc"
-    sdo_index: 0x1C12
-    sdo_subindex: 0x0
-    data_type: uint16
-    data_value: 0x1600
-
-  -
-    slave_name: "safety_plc"
-    sdo_index: 0x1C13
-    sdo_subindex: 0x0
-    data_type: uint16
-    data_value: 0x1a00
   
   # -
   #   slave_name: "somanet_node_0"
@@ -66,148 +53,51 @@ controller_config:
 ...
 
 # Configuration for the SICK Safety PLC
----
-
-slave_name: safety_plc
-slave_type: PLC
-num_of_slaves: 1
-domain_name: domain_0
-vendor_id: 0x01000056
-product_id: 0x00002301
-slave_position: 0
-slave_alias: 0
-
-pdo_names:
-  - "output_data"
-  - "diag"
-  - "input_data"
-
-pdo_types:
-  - int8[]
-  - uint8
-  - int8[]
-
-pdo_entry_info:
-  indexes:
-    - 0x2001
-    - 0x10F3
-    - 0x2000
-  subindexes:
-    - 0x01
-    - 0x04
-    - 0x01
-
-  bit_lengths:
-    - 80
-    - 8
-    - 80
-
-  use_default_pdo_mapping: true 
-  rxpdo_address: 0x1600
-  txpdo_address: 0x1a00
-  rxpdo_indexes:
-   - 0x1600
-  rxpdo_size: 1
-  txpdo_indexes:
-    - 0x1a00
-  txpdo_size: 2
-slave_sync_info:
-  num_sync_managers: 4
-  sync_manager_directions:
-    - output
-    - input
-    - output
-    - input
-  number_of_pdos:
-    - 0
-    - 0
-    - 1
-    - 1
-  pdo_index_diff:
-    - "NULL"
-    - "NULL"
-    - 0
-    - 1
-  watchdog_mode:
-    - disable
-    - disable
-    - enable
-    - disable
-
-...
-
-#Configuration for the Somanet Node Safety Motor Drivers
 # ---
-# slave_name: "somanet_node"
-# slave_type: "driver"
-# num_of_slaves: 3
-# domain_name: "domain_0"
-# vendor_id: 0x000022d2
-# product_id: 0x00000201
-# slave_position: 1
+
+# slave_name: safety_plc
+# slave_type: PLC
+# num_of_slaves: 1
+# domain_name: domain_0
+# vendor_id: 0x01000056
+# product_id: 0x00002301
+# slave_position: 0
 # slave_alias: 0
+
 # pdo_names:
-#   - "ctrl_word"
-#   - "op_mode"
-#   - "target_position"
-#   - "target_velocity"
-#   - "status_word"
-#   - "op_mode_display"
-#   - "actual_position"
-#   - "error_code"
-#   - "actual_velocity"
+#   - "output_data"
+#   - "diag"
+#   - "input_data"
+
 # pdo_types:
-#   - uint16
-#   - int8
-#   - int32
-#   - int32
-#   - uint16
-#   - int8
-#   - int32
-#   - uint16
-#   - int32
+#   - int8[]
+#   - uint8
+#   - int8[]
 
 # pdo_entry_info:
 #   indexes:
-#     - 0x6040
-#     - 0x6060
-#     - 0x607A
-#     - 0x60ff
-#     - 0x6041
-#     - 0x6061
-#     - 0x6064
-#     - 0x603F
-#     - 0x606c
+#     - 0x2001
+#     - 0x10F3
+#     - 0x2000
 #   subindexes:
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#     - 0x00
-#   bit_lengths:
-#     - 16
-#     - 8
-#     - 32
-#     - 32
-#     - 16
-#     - 8
-#     - 32
-#     - 16
-#     - 32
+#     - 0x01
+#     - 0x04
+#     - 0x01
 
-#   use_default_pdo_mapping: false
+#   bit_lengths:
+#     - 80
+#     - 8
+#     - 80
+
+#   use_default_pdo_mapping: true 
 #   rxpdo_address: 0x1600
-#   txpdo_address: 0x1A00
+#   txpdo_address: 0x1a00
 #   rxpdo_indexes:
 #    - 0x1600
-#   rxpdo_size: 4
+#   rxpdo_size: 1
 #   txpdo_indexes:
-#     - 0x1A00
-#   txpdo_size: 5
+#     - 0x1a00
+#   txpdo_size: 2
 # slave_sync_info:
 #   num_sync_managers: 4
 #   sync_manager_directions:
@@ -230,11 +120,108 @@ slave_sync_info:
 #     - disable
 #     - enable
 #     - disable
-# dc_info:
-#   assign_activate: 0x300
-#   sync0_cycle: 2000000
-#   sync0_shift: 1000000
-#   sync1_cycle: 2000000
-#   sync1_shift: 0
 
 # ...
+
+#Configuration for the Somanet Node Safety Motor Drivers
+---
+slave_name: "somanet_node"
+slave_type: "driver"
+num_of_slaves: 3
+domain_name: "domain_0"
+vendor_id: 0x000022d2
+product_id: 0x00000201
+slave_position: 1
+slave_alias: 0
+pdo_names:
+  - "ctrl_word"
+  - "op_mode"
+  - "target_position"
+  - "target_velocity"
+  - "status_word"
+  - "op_mode_display"
+  - "actual_position"
+  - "error_code"
+  - "actual_velocity"
+pdo_types:
+  - uint16
+  - int8
+  - int32
+  - int32
+  - uint16
+  - int8
+  - int32
+  - uint16
+  - int32
+
+pdo_entry_info:
+  indexes:
+    - 0x6040
+    - 0x6060
+    - 0x607A
+    - 0x60ff
+    - 0x6041
+    - 0x6061
+    - 0x6064
+    - 0x603F
+    - 0x606c
+  subindexes:
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+    - 0x00
+  bit_lengths:
+    - 16
+    - 8
+    - 32
+    - 32
+    - 16
+    - 8
+    - 32
+    - 16
+    - 32
+
+  use_default_pdo_mapping: false
+  rxpdo_address: 0x1600
+  txpdo_address: 0x1A00
+  rxpdo_indexes:
+   - 0x1600
+  rxpdo_size: 4
+  txpdo_indexes:
+    - 0x1A00
+  txpdo_size: 5
+slave_sync_info:
+  num_sync_managers: 4
+  sync_manager_directions:
+    - output
+    - input
+    - output
+    - input
+  number_of_pdos:
+    - 0
+    - 0
+    - 1
+    - 1
+  pdo_index_diff:
+    - "NULL"
+    - "NULL"
+    - 0
+    - 1
+  watchdog_mode:
+    - disable
+    - disable
+    - enable
+    - disable
+dc_info:
+  assign_activate: 0x300
+  sync0_cycle: 2000000
+  sync0_shift: 1000000
+  sync1_cycle: 2000000
+  sync1_shift: 0
+
+...

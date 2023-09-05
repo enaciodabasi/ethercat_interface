@@ -2,65 +2,80 @@
 #include <iostream>
 #include <vector>
 #include <thread>
-static ec_master_t* master = nullptr;
-static ec_domain_t* domain = nullptr;
-static ec_slave_config_t *sc = nullptr;
+static ec_master_t* master;
+static ec_domain_t* domain;
+static ec_slave_config_t *sc;
 static uint8_t* domain_process_data;
 
-#define PLC_POS 0, 0
-#define PLC 0x01000056, 0x00002301
-/* static ec_pdo_entry_info_t input_channel[] = {
-	{0x2000, 0x01, 80}
-};
 
-static ec_pdo_entry_info_t output_channel[] = {
-	{0x10f3, 0x04, 8},
-	{0x2001, 0x01, 80}
-}; */
+
+
+
+
+
 
 /* static ec_pdo_info_t pdo_out[] ={
-	{0x1600, 1, input_channel}
-}; 
-
-static ec_pdo_info_t pdo_in[] = {
-	{0x1A03, 5, output_channel}
-}; */
-
-static ec_pdo_info_t pdo_out[] ={
 	{0x1600}
 };
 static ec_pdo_info_t pdo_in[] = {
 	{0x1A03}
-};
+}; */
 
 
-
-
-static ec_sync_info_t syncs[] = {
-	{0, EC_DIR_OUTPUT, 0, NULL},
-	{0, EC_DIR_INPUT, 0, NULL},
-	{2, EC_DIR_OUTPUT, 1, pdo_out},
-    {3, EC_DIR_INPUT, 1, pdo_in},
-	{0xff}
-};
-
-static uint out_arr_offset = 0;
-static uint diag_offset = 0;
-static uint in_arr_offset1 = 0;
-static uint in_arr_offset2 = 0;
-static uint in_arr_offset3 = 0;
-static uint in_arr_offset4 = 0;
-static uint in_arr_offset5 = 0;
-
-static ec_pdo_entry_reg_t regs[] = {
-	{PLC_POS, PLC, 0x2001, 0x01, &out_arr_offset},
-	{PLC_POS, PLC, 0X10f3, 0x04, &diag_offset},
-	{PLC_POS, PLC, 0x2000, 0x01, &in_arr_offset1},
-/* 	{PLC_POS, PLC, 0x2000, 0x02, &in_arr_offset2},
-	{PLC_POS, PLC, 0x2000, 0x03, &in_arr_offset3},
-	{PLC_POS, PLC, 0x2000, 0x04, &in_arr_offset4}, */
-	{}
-};
+//#define PLC_POS 0, 0
+//#define PLC 0x01000056, 0x00002301
+//static ec_pdo_entry_info_t input_channel[] = {
+//	{0x2001, 0x01, 80},
+//	{0x2001, 0x02, 80},
+//	{0x2001, 0x03, 80},
+//	{0x2001, 0x04, 80},
+//	{0x2001, 0x05, 80}
+//};
+//
+//static ec_pdo_entry_info_t output_channel[] = {
+//	{0x10f3, 0x04, 8},
+//	{0x2000, 0x01, 80},
+//	{0x2000, 0x02, 80},
+//	{0x2000, 0x03, 80},
+//	{0x2000, 0x04, 80},
+//	{0x2000, 0x05, 80}
+//	
+//};
+//
+//static ec_pdo_info_t pdo_out[] ={
+//	{0x1600, 5, input_channel}
+//}; 
+//
+//static ec_pdo_info_t pdo_in[] = {
+//	{0x1A04, 6, output_channel}
+//};
+//
+//
+//static ec_sync_info_t syncs[] = {
+//	{0, EC_DIR_OUTPUT, 0, NULL},
+//	{1, EC_DIR_INPUT, 0, NULL},
+//	{2, EC_DIR_OUTPUT, 1, pdo_out},
+//    {3, EC_DIR_INPUT, 1, pdo_in},
+//	{0xff}
+//};
+//
+//static uint out_arr_offset = 0;
+//static uint diag_offset = 0;
+//static uint in_arr_offset1 = 0;
+//static uint in_arr_offset2 = 0;
+//static uint in_arr_offset3 = 0;
+//static uint in_arr_offset4 = 0;
+//static uint in_arr_offset5 = 0;
+//
+//static ec_pdo_entry_reg_t regs[] = {
+//	{PLC_POS, PLC, 0x2001, 0x01, &out_arr_offset},
+//	{PLC_POS, PLC, 0X10f3, 0x04, &diag_offset},
+//	{PLC_POS, PLC, 0x2000, 0x01, &in_arr_offset1},
+///* 	{PLC_POS, PLC, 0x2000, 0x02, &in_arr_offset2},
+//	{PLC_POS, PLC, 0x2000, 0x03, &in_arr_offset3},
+//	{PLC_POS, PLC, 0x2000, 0x04, &in_arr_offset4}, */
+//	{}
+//};
 
 static struct
 {
@@ -135,20 +150,13 @@ int main(int argc, char**argv)
 		return 1;
 	}
 
-	if(!(sc = ecrt_master_slave_config(master, PLC_POS, PLC)))
+	if(!(sc = ecrt_master_slave_config(master, 0, 0, 0x000022d2, 0x00000201)))
 	{
-		std::cout << "Failed to configure slave\n";
-		return 1;
-	}
-	std::cout << "Configuring PDO assignments\n";
-	if(ecrt_slave_config_pdos(sc, EC_END, syncs))
-	{
-		std::cout << "Error during config" << std::endl;
 		return 1;
 	}
 
-	std::cout << "Configuring PDO registries\n";
-	if(ecrt_domain_reg_pdo_entry_list(domain, regs))
+
+	if(ecrt_domain_reg_pdo_entry_list(domain, domain_regs))
 	{
 		std::cout << "Failed to register pdo list\n";
 		return 1;
@@ -159,14 +167,21 @@ int main(int argc, char**argv)
 		return 1;
 	}
 
-	domain_process_data = ecrt_domain_data(domain);
+	if(!(domain_process_data = ecrt_domain_data(domain)))
+	{
+		std::cout << "Error during ecrt_domain_data\n";
+		return 1;
+	}
+	
 
 	while(true)
 	{
 		ecrt_master_receive(master);
 		ecrt_domain_process(domain);
 
-		uint8_t* data = domain_process_data + in_arr_offset1;
+		std::cout << EC_READ_S32(domain_process_data + offset.position_val) << std::endl;
+
+		/* uint8_t* data = domain_process_data + in_arr_offset1;
 		
 		std::vector<int8_t> vals = [&data]() -> std::vector<int8_t>{
 			std::vector<int8_t> res;
@@ -179,19 +194,18 @@ int main(int argc, char**argv)
 			return res;
 		}();
 
-		/* for(const auto in : vals)
+		for(const auto in : vals)
 		{
 			std::cout << "from plc: " << (uint16_t)in << std::endl;
 		} */
 
-			std::cout << "Diag: " << (uint16_t)EC_READ_S8(domain_process_data + diag_offset) << std::endl;
+			/* std::cout << "Diag: " << (uint16_t)EC_READ_S8(domain_process_data + diag_offset) << std::endl;
 		ecrt_domain_queue(domain);
 		ecrt_master_send(master);
 		using namespace std::chrono_literals;
 		const std::chrono::duration<double, std::milli> sl(4ms);
-		std::this_thread::sleep_for(sl);
+		std::this_thread::sleep_for(sl); */
 
-		
 	}
 
 	ecrt_release_master(master);

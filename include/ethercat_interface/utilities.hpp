@@ -354,6 +354,26 @@ namespace ethercat_interface
 
         } // End of namespace debug.
 
+
+        bool isBitSet(const uint16_t& value_to_check, uint8_t index_of_bit)
+        {
+            return (value_to_check & (1 << index_of_bit));
+        }
+
+        void setBitAtIndex(uint16_t& value, const uint8_t& index_of_bit)
+        {
+            uint16_t setMask = 1 << index_of_bit;
+            value = value | setMask;
+        }
+
+        void resetBitAtIndex(uint16_t& value, const uint8_t& index_of_bit)
+        {
+
+            uint16_t resetMask = 1 << index_of_bit;
+            value = value & ~(resetMask);
+        }
+        
+
     } // End of namespace utilities
 
 } // End of namespace ethercat_interface
