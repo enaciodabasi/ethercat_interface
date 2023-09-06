@@ -34,7 +34,8 @@ void HomingTest::cyclicTask()
     bool homingSuccessful = false;
     bool homingError = false;
     bool targetReached = false;
-
+    bool slavesEnabled = false;
+    uint16_t prevCtrlWord = 0x0;
     while(run)
     {
         setTaskWakeUpTime();
@@ -44,33 +45,57 @@ void HomingTest::cyclicTask()
         m_Master->setMasterTime(timespecToNanoSec(m_DcHelper.wakeupTime));
 
         m_Master->receive("domain_0");
-        bool slavesEnabled = false;
+
 
         // If homing is not currently active, switch to Operation Enabled state.
         if(!homingInProgress)
             slavesEnabled = m_Master->enableSlaves();
-        
+    
         // If slaves are Operation enabled state and the homing parameters are not yet set
         // Set Mode of Operation, Homing Method, Speed and Acceleration.
         if(slavesEnabled && !homingSetup){
+            std::cout << "Setting up the homing process\n";
             m_Master->write<int8_t>("domain_0", "somanet_node", "op_mode", 0x06);
             m_Master->write<int8_t>("domain_0", "somanet_node", "homing_method", 0x11);
-            m_Master->write<uint32_t>("domain_0", "somanet_node", "homing_speed", 150);
-            m_Master->write<uint32_t>("domain_0", "somanet_node", "homing_accel", 50);
+            m_Master->write<uint32_t>("domain_0", "somanet_node", "homing_speed", 300);
+            m_Master->write<uint32_t>("domain_0", "somanet_node", "homing_speed2", 300);
+            m_Master->write<uint32_t>("domain_0", "somanet_node", "homing_accel", 600);
             homingSetup = true;
             // Set "Homing In Progress" flag to true to start homing.
             homingInProgress = true;
         }
 
+        bool opModeIsCorrect = false; 
+        const auto opModeDisplayOpt = m_Master->read<int8_t>("domain_0", "somanet_node", "op_mode_display");
+        if(opModeDisplayOpt){
+            //std::cout << (uint16_t)opModeDisplayOpt.value() << std::endl;
+            if(opModeDisplayOpt.value() == 0x06){
+                opModeIsCorrect = true;
+            }
+            else{
+                opModeIsCorrect = false;
+            }
+        }
+
+        if(!opModeIsCorrect){
+            m_Master->write<int8_t>("domain_0", "somanet_node", "op_mode", 0x06);
+        }
         
-        if(homingInProgress){
+        const auto currentPosOpt = m_Master->read<int32_t>("domain_0", "somanet_node", "actual_position");
+        if(currentPosOpt){
+            int32_t currentPos = currentPosOpt.value();
+            std::cout << "Current Position: " << currentPos << std::endl; 
+        }
+
+        if(homingInProgress && opModeIsCorrect){
+            std::cout << "Homing in progress..." << std::endl;
             uint16_t ctrlWord = 0x0;
             auto ctrlWordOpt = m_Master->getControlWord("domain_0", "somanet_node");
             if(ctrlWordOpt){
                 ctrlWord = ctrlWordOpt.value();
             }   
 
-            auto statusWordOpt = m_Master->read<uint16_t>("domain_0", "somanet_node", "ctrl_word");
+            auto statusWordOpt = m_Master->read<uint16_t>("domain_0", "somanet_node", "status_word");
             uint16_t statusWord = 0x0;
             if(statusWordOpt){
                 statusWord = statusWordOpt.value();
@@ -91,38 +116,54 @@ void HomingTest::cyclicTask()
             // From the Synapticon instructions:
             // Set 8th bit to 0.
             if(isBitSet(ctrlWord, 8))
+            {
                 resetBitAtIndex(ctrlWord, 8);
+            }
             // Set 4th bit to 1.
             if(!isBitSet(ctrlWord, 4))
                 setBitAtIndex(ctrlWord, 4);
 
-            m_Master->write<uint16_t>("domain_0", "somanet_node", "ctrl_word", ctrlWord);
+            if(prevCtrlWord != ctrlWord)            
+                m_Master->write<uint16_t>("domain_0", "somanet_node", "ctrl_word", ctrlWord);
 
+            prevCtrlWord = ctrlWord;
         }
 
-        if(!homingError && !homingSuccessful && !targetReached){
-            std::cout << "Homing is performed" << std::endl;
-            homingDone = false;
+        if(homingInProgress){
+            if(!homingError && !homingSuccessful && !targetReached){
+                std::cout << "Homing is performed" << std::endl;
+                homingDone = false;
+            }
+            else if(!homingError && !homingSuccessful && targetReached){
+                std::cout << "Homing is interrupted or not started" << std::endl;
+                homingDone = false;
+            }
+            else if(!homingError && homingSuccessful && !targetReached){
+                std::cout << "Homing confirmed, but target not yet reached" << std::endl;
+                homingDone = false;
+            }
+            else if(!homingError && homingSuccessful && targetReached){
+                std::cout << "Homing completed" << std::endl;
+                homingDone = true;
+            }
+            else if(homingError && !homingSuccessful && !targetReached){
+                std::cout << "Error detected, motor still running" << std::endl;
+                homingDone = false;
+            }
+            else if(homingError && !homingSuccessful && targetReached){
+                std::cout << "Error during homing, motor at standstill." << std::endl;
+                homingDone = false;
+            }
         }
-        else if(!homingError && !homingSuccessful && targetReached){
-            std::cout << "Homing is interrupted or not started" << std::endl;
-            homingDone = false;
-        }
-        else if(!homingError && homingSuccessful && !targetReached){
-            std::cout << "Homing confirmed, but target not yet reached" << std::endl;
-            homingDone = false;
-        }
-        else if(!homingError && homingSuccessful && targetReached){
-            std::cout << "Homing completed" << std::endl;
-            homingDone = true;
-        }
-        else if(homingError && !homingSuccessful && !targetReached){
-            std::cout << "Error detected, motor still running" << std::endl;
-            homingDone = true;
-        }
-        else if(homingError && !homingSuccessful && targetReached){
-            std::cout << "Error during homing, motor at standstill." << std::endl;
-            homingDone = true;
+
+        if(homingDone){
+            setBitAtIndex(prevCtrlWord, 8);
+            m_Master->write<uint16_t>("domain_0", "somanet_node", "ctrl_word", prevCtrlWord);
+            std::cout << "Homing Done" << std::endl;
+            homingInProgress = false;
+            
+            m_Master->write<int32_t>("domain_0", "somanet_node", "target_velocity", 0);
+            
         }
 
         clock_gettime(m_DcHelper.clock, &m_DcHelper.currentTime);

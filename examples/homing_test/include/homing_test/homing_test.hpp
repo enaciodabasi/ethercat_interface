@@ -36,4 +36,4 @@ class HomingTest : public controller::Controller
 
 };
 
-#endif HOMING_TEST_HPP_
+#endif // HOMING_TEST_HPP_
