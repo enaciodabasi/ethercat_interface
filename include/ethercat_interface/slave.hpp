@@ -9,8 +9,8 @@
  * 
  */
 
-#ifndef SLAVE_HPP
-#define SLAVE_HPP
+#ifndef SLAVE_HPP_
+#define SLAVE_HPP_
 
 #include <iostream>
 #include <string>
@@ -191,6 +191,15 @@ namespace ethercat_interface
             inline uint16_t getControlWord()
             {
                 return m_InnerStateMachine.getCW();
+            }
+
+            const std::optional<std::string> getStateString(){
+                const auto found = state_machine::CIA402::StateStrings.find(m_InnerStateMachine.m_LastState);
+                if(found == state_machine::CIA402::StateStrings.end()){
+                    return std::nullopt;
+                }
+
+                return found->second;
             }
 
             /* void updateSlaveState(); */

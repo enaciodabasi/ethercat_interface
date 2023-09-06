@@ -64,6 +64,14 @@ namespace ethercat_interface
                 return m_RegisteredSlaves.at(slave_name)->getControlWord();
             }
 
+            inline const std::optional<std::string> getSlaveStateString(const std::string& slave_name) const
+            {
+                if(m_RegisteredSlaves.find(slave_name) == m_RegisteredSlaves.end()){
+                    return std::nullopt;
+                }
+                return m_RegisteredSlaves.at(slave_name)->getStateString();
+            }
+
             /**
              * @brief 
              * 

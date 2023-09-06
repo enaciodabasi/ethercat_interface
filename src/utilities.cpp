@@ -7,6 +7,24 @@ namespace ethercat_interface
     namespace utilities
     {   
 
+        bool isBitSet(const uint16_t& value_to_check, uint8_t index_of_bit)
+        {
+            return (value_to_check & (1 << index_of_bit));
+        }
+
+        void setBitAtIndex(uint16_t& value, const uint8_t& index_of_bit)
+        {
+            uint16_t setMask = 1 << index_of_bit;
+            value = value | setMask;
+        }
+
+        void resetBitAtIndex(uint16_t& value, const uint8_t& index_of_bit)
+        {
+
+            uint16_t resetMask = 1 << index_of_bit;
+            value = value & ~(resetMask);
+        }
+
         namespace parser
         {
             

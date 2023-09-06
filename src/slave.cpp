@@ -197,10 +197,10 @@ namespace ethercat_interface
         bool Slave::enableOperation()
         {
             
-            for(const auto p : m_SlaveInfo.pdoNames)
+           /*  for(const auto p : m_SlaveInfo.pdoNames)
             {
                 std::cout  << p << ": " << *m_DataOffset->getDataOffset(p).value() << std::endl;
-            }
+            } */
             if(m_SlaveInfo.slaveType  == SlaveType::PLC)
             {
 
@@ -216,7 +216,7 @@ namespace ethercat_interface
             
             m_Status = status_word.value();
 /*             std::cout << "Status Word: " << m_Status << std::endl;
- */            if(state_machine::CIA402::detectCurrentState(status_word.value()) == state_machine::CIA402::State::OperationEnabled)
+ */         if(state_machine::CIA402::detectCurrentState(status_word.value(), m_InnerStateMachine.m_LastState) == state_machine::CIA402::State::OperationEnabled)
             {
                 /* std::cout << "Operation Enabled state achieved\n"; */
                 return true;

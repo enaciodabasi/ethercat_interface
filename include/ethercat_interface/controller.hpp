@@ -128,6 +128,11 @@ namespace ethercat_interface
                 const T& new_val
             );
 
+            const std::optional<std::string> getSlaveStateString(const std::string& domain_name, const std::string& slave_name)
+            {
+                return m_Master->getSlaveStateString(domain_name, slave_name);
+            }
+
             protected:
 
             std::unique_ptr<master::Master> m_Master;

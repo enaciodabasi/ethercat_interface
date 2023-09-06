@@ -21,7 +21,7 @@
 #include <string>
 #include <algorithm>
 
-#include "ethercat_interface/utilities.hpp"
+#include "utilities.hpp"
 
 namespace ethercat_interface
 {

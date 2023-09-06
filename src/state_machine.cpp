@@ -21,7 +21,7 @@ namespace ethercat_interface
     namespace CIA402
     {
 
-        const State detectCurrentState(const uint16_t& status_word)
+        const State detectCurrentState(const uint16_t& status_word, State& last_state)
         {
             State currentState = State::Unknown;
 
@@ -33,28 +33,28 @@ namespace ethercat_interface
                 case ( 0 | 0 | 0 | 0 | 0 | 0 ):
                 case ( 0 | qs | 0 | 0 | 0 | 0 ):
                     currentState = State::NotReadyToSwitchOn;
-                    std::cout << "Not Ready To Switch On\n";
+                    /* std::cout << "Not Ready To Switch On\n"; */
                     break;
 
                 case ( sod | 0 | 0 | 0 | 0 | 0 ):
                 case ( sod | qs | 0 | 0 | 0 | 0 ):
                     currentState = State::SwitchOnDisabled;
-                    std::cout << "Switch On Disabled\n";
+                    /* std::cout << "Switch On Disabled\n"; */
                     break;
 
                 case ( 0 | qs | 0 | 0 | 0 | rtso ):
                     currentState = State::ReadyToSwitchOn;
-                    std::cout << "Ready To Switch On\n";
+                    /* std::cout << "Ready To Switch On\n"; */
                     break;
 
                 case ( 0 | qs | 0 | 0 | so | rtso ):
                     currentState = State::SwitchedOn;
-                    std::cout << "Switched On\n";
+                    /* std::cout << "Switched On\n"; */
                     break;
 
                 case ( 0 | qs | 0 | oe | so | rtso ):
                     currentState = State::OperationEnabled;
-                    std::cout << "Operation Enabled\n";
+                    /* std::cout << "Operation Enabled\n";/* 
                     break;
 
                 case ( 0 | 0 | 0 | oe | so | rtso ):
@@ -64,19 +64,23 @@ namespace ethercat_interface
                 case ( 0 | 0 | f | oe | so | rtso ):
                 case ( 0 | qs | f | oe | so | rtso ):
                     currentState = State::FaultReactionActive;
-                    std::cout << "Fault Reaction Active\n";
+                    /* std::cout << "Fault Reaction Active\n"; */
                     break;
 
                 case ( 0 | 0 | f | 0 | 0 | 0 ):
                 case ( 0 | qs | f | 0 | 0 | 0 ):
                     currentState = State::Fault;
-                    std::cout << "Fault\n";
+                    /* std::cout << "Fault\n"; */
                     break;
 
                 default:
                     currentState = State::Unknown;
                     break;
 
+            }
+
+            if(last_state != currentState){
+                last_state = currentState;
             }
             
 
@@ -258,7 +262,8 @@ namespace ethercat_interface
         )
         {
             const auto currentState = detectCurrentState(
-                status_word
+                status_word,
+                m_LastState
             );
 
             if(currentState == State::Unknown)

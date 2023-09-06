@@ -53,7 +53,7 @@ namespace ethercat_interface
             inline constexpr uint16_t sod = (1 << getStatusWordIndex(StatusWord::SwitchonDisabled));
         }
 
-        const State detectCurrentState(const uint16_t& status_word);
+        const State detectCurrentState(const uint16_t& status_word, State& last_state);
 
         inline constexpr uint16_t automaticTransitionSet = 0;
         inline constexpr uint16_t automaticTransitionReset = 0;
@@ -75,6 +75,19 @@ namespace ethercat_interface
 
         inline constexpr uint16_t faultResetSet = (1 << getControlWordIndex(ControlWord::FaultReset));
         inline constexpr uint16_t faultResetReset = 0;
+
+        const std::unordered_map<State, std::string> StateStrings = {
+            {State::Unknown, "Unknown"},
+            {State::Start, "Start"},
+            {State::NotReadyToSwitchOn, "Not Ready To Switch On"},
+            {State::SwitchOnDisabled, "Switch On Disabled"},
+            {State::ReadyToSwitchOn, "Ready To Switch On"},
+            {State::SwitchedOn, "Switched On"},
+            {State::OperationEnabled, "Operation Enabled"},
+            {State::QuickStopActive, "Quick Stop Active"},
+            {State::FaultReactionActive, "Fault Reaction Active"},
+            {State::Fault, "Fault"}
+        };
 
         class StateMachine
         {
@@ -100,6 +113,8 @@ namespace ethercat_interface
                 const Transition& transition,
                 uint16_t& control_word
             );
+
+            State m_LastState = State::Unknown;
 
             private:
 

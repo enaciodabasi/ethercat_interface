@@ -137,6 +137,14 @@ namespace ethercat_interface
                 return m_RegisteredDomains.at(domain_name)->getControlWord(slave_name);
             }
 
+            inline const std::optional<std::string> getSlaveStateString(const std::string& domain_name, const std::string& slave_name) const
+            {
+                if(m_RegisteredDomains.find(domain_name) == m_RegisteredDomains.end())
+                    return std::nullopt;
+                    
+                return m_RegisteredDomains.at(domain_name)->getSlaveStateString(slave_name);
+            }
+
             ec_domain_t* getDomainPtr(const std::string& domain_name);
 
             protected:
