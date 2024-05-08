@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(ethercat_interface)
+project(ethercat_interface VERSION 2.0.0 LANGUAGES C CXX)
 
 find_package(yaml-cpp REQUIRED) 
 
@@ -8,18 +8,7 @@ find_package(Boost REQUIRED)
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCES
-    src/slave.cpp
-    src/utilities.cpp
-    src/state.cpp
-    src/domain.cpp
-    src/master.cpp
-    include/ethercat_interface/dc_sync.h
-    src/dc_sync.c
-    src/logger.cpp
-    src/state_machine.cpp
-    src/controller.cpp
-    src/offset.cpp
-    src/data.cpp
+    
 )
 
 set(
@@ -55,14 +44,7 @@ target_link_libraries(
 #set(${PROJECT_NAME}_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
-    include/ethercat_interface/slave.hpp
-    include/ethercat_interface/offset.hpp
-    include/ethercat_interface/utilities.hpp
-    include/ethercat_interface/state.hpp
-    include/ethercat_interface/dc_sync.h
-    include/ethercat_interface/state_machine.hpp
-    include/ethercat_interface/controller.hpp
-    include/ethercat_interface/data.hpp
+    
 )
 
 set_target_properties(${PROJECT_NAME}
